@@ -3,11 +3,13 @@ import { motion, AnimatePresence } from 'motion/react';
 import { X } from 'lucide-react';
 
 import { useAppUi } from '../ClassicContext';
+import { useOverlayHistory } from '@/hooks/use-overlay-history';
 
 const SettingsView = lazy(() => import('@/features/settings/SettingsView').then((module) => ({ default: module.SettingsView })));
 
 export function SettingsPanel() {
   const { settingsOpen, setSettingsOpen } = useAppUi();
+  useOverlayHistory(settingsOpen, setSettingsOpen, 'classic-settings');
 
   return (
     <AnimatePresence>

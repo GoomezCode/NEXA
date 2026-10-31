@@ -99,4 +99,15 @@ test.describe('em viewport móvel', () => {
     await expect(page.getByRole('dialog', { name: 'Conversa com a NEXA' })).toBeVisible();
     await expect(page.getByPlaceholder('Escreva sua mensagem...')).toBeVisible();
   });
+
+  test('voltar fecha a conversa clássica e restaura o núcleo', async ({ page }) => {
+    await page.goto('/?ui=classic');
+    await page.getByRole('button', { name: 'Abrir Chat' }).click();
+    const conversation = page.getByRole('dialog', { name: 'Conversa com a NEXA' });
+    await expect(conversation).toBeVisible();
+
+    await page.goBack();
+    await expect(conversation).toBeHidden();
+    await expect(page.locator('.classic-ai-core-orb')).toBeVisible();
+  });
 });

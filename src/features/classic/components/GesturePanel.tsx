@@ -3,6 +3,7 @@ import { Activity, ArrowUpRight, Brain, Grid2X2, MessageSquare, Monitor, X, Zap 
 import { AnimatePresence, motion } from 'motion/react';
 
 import { useAppUi } from '../ClassicContext';
+import { useOverlayHistory } from '@/hooks/use-overlay-history';
 
 const mono = { fontFamily: 'Share Tech Mono, monospace' };
 const orb = { fontFamily: 'Orbitron, sans-serif' };
@@ -16,6 +17,7 @@ const shortcuts = [
 
 export function GesturePanel() {
   const { gestureOpen, setGestureOpen, setLeftPanel, setRightPanel, setAppGridOpen } = useAppUi();
+  useOverlayHistory(gestureOpen, setGestureOpen, 'classic-gestures');
   const [selected, setSelected] = useState<(typeof shortcuts)[number]['id']>('monitor');
   const active = shortcuts.find((shortcut) => shortcut.id === selected) ?? shortcuts[0];
   const ActiveIcon = active.icon;

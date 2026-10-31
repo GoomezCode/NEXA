@@ -10,6 +10,7 @@ import { useConnectionStore } from '@/stores/connection-store';
 import { useOllamaHealth } from '@/api/ollama';
 
 import { useAppUi } from '../ClassicContext';
+import { useOverlayHistory } from '@/hooks/use-overlay-history';
 
 type CheckResult = { label: string; detail: string; ok: boolean | null };
 
@@ -18,6 +19,7 @@ const orb = { fontFamily: 'Orbitron, sans-serif' };
 
 export function ScanningPanel() {
   const { scanningActive, setScanningActive } = useAppUi();
+  useOverlayHistory(scanningActive, setScanningActive, 'classic-scan');
   const demoMode = useSettingsStore((state) => state.settings.demoMode);
   const offlineMode = useConnectionStore((state) => state.mode === 'offline');
   const ollama = useOllamaHealth();

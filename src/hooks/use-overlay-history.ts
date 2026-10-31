@@ -11,18 +11,20 @@ export function useOverlayHistory(
   const pushed = useRef(false);
 
   const close = useCallback(() => {
-    if (pushed.current && (window.history.state as Record<string, unknown> | null)?.[OVERLAY_KEY] === id) {
-      window.history.back();
-      return;
-    }
-    pushed.current = false;
     setOpen(false);
-  }, [id, setOpen]);
+  }, [setOpen]);
 
   useEffect(() => {
     if (!open || pushed.current) return;
     window.history.pushState({ ...(window.history.state ?? {}), [OVERLAY_KEY]: id }, '');
     pushed.current = true;
+  }, [id, open]);
+
+  useEffect(() => {
+    if (open || !pushed.current) return;
+    const currentId = (window.history.state as Record<string, unknown> | null)?.[OVERLAY_KEY];
+    if (currentId === id) window.history.back();
+    pushed.current = false;
   }, [id, open]);
 
   useEffect(() => {

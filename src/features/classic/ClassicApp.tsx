@@ -28,6 +28,7 @@ import { useSessionMetricsStore } from '@/stores/session-metrics-store';
 import { useConnectionStore } from '@/stores/connection-store';
 import { useLayoutClass } from '@/hooks/use-layout-class';
 import { useVisualViewport } from '@/hooks/use-visual-viewport';
+import { useOverlayHistory } from '@/hooks/use-overlay-history';
 
 const orb = { fontFamily: 'Orbitron, sans-serif' };
 const mono = { fontFamily: 'Share Tech Mono, monospace' };
@@ -102,6 +103,7 @@ function MainLayout({ onExit }: { onExit: () => void }) {
     conversationOpen,
     setConversationOpen,
   } = useAppUi();
+  useOverlayHistory(conversationOpen, setConversationOpen, 'classic-chat');
   const selectedModelId = useModelStore((state) => state.selectedModelId);
   const modelCatalog = useModels();
   const usage = useUsage();
