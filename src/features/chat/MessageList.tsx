@@ -74,7 +74,7 @@ export function MessageList({
           <button
             type="button"
             onClick={onRetry}
-            className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-xl border border-danger/30 bg-danger/10 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-danger transition hover:bg-danger/15"
+            className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-xl border border-danger/30 bg-danger/10 px-3 py-2 font-mono text-2xs uppercase tracking-[0.12em] text-danger transition hover:bg-danger/15"
           >
             <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" />
             Tentar novamente
@@ -94,7 +94,7 @@ export function MessageList({
             <NexaMark size={52} className="relative" />
           </div>
 
-          <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.3em] text-primary/70">
+          <p className="mt-4 font-mono text-2xs uppercase tracking-[0.3em] text-primary/70">
             canal aberto
           </p>
           <h3 className="mt-2 font-display text-lg tracking-[0.12em] text-foreground">
@@ -155,7 +155,7 @@ export function MessageList({
               onClick={onRetryLast}
               disabled={disabled}
               title={disabled ? 'Sem conexão — aguardando a rede…' : undefined}
-              className="ml-auto inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-danger/30 bg-danger/10 px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-danger transition hover:bg-danger/20 disabled:cursor-not-allowed disabled:opacity-50"
+              className="ml-auto inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-danger/30 bg-danger/10 px-2.5 py-1.5 font-mono text-2xs uppercase tracking-[0.12em] text-danger transition hover:bg-danger/20 disabled:cursor-not-allowed disabled:opacity-50"
             >
               <RefreshCw className="h-3 w-3" aria-hidden="true" />
               Tentar novamente

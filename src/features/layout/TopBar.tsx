@@ -19,7 +19,7 @@ function StatusChip({ tone, label }: { tone: 'success' | 'warning'; label: strin
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.14em] ${styles}`}
+      className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 font-mono text-2xs uppercase tracking-[0.14em] ${styles}`}
     >
       <span
         className={`h-1.5 w-1.5 rounded-full ${tone === 'success' ? 'bg-success' : 'bg-warning'}`}
@@ -73,7 +73,7 @@ export function TopBar() {
         <NexaMark size={28} />
         <div>
           <h1 className="font-display text-[13px] tracking-[0.3em] text-foreground">NEXA</h1>
-          <p className="hidden font-mono text-[10px] uppercase tracking-[0.2em] text-muted sm:block">
+          <p className="hidden font-mono text-2xs uppercase tracking-[0.2em] text-muted sm:block">
             interface neural
           </p>
         </div>
@@ -90,7 +90,7 @@ export function TopBar() {
                 useConnectionStore.getState().setMode('api');
                 useAuthStore.getState().clear();
               }}
-              className="min-h-11 rounded-xl border border-white/10 px-3 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition hover:border-primary/30 hover:text-primary disabled:opacity-40"
+              className="min-h-11 rounded-xl border border-white/10 px-3 font-mono text-2xs uppercase tracking-[0.12em] text-muted transition hover:border-primary/30 hover:text-primary disabled:opacity-40"
             >Sair do offline</button>
           </>
         ) : <>
@@ -111,7 +111,7 @@ export function TopBar() {
             <button
               type="button"
               onClick={logout}
-              className="min-h-11 rounded-xl border border-white/10 px-3 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition hover:border-primary/30 hover:text-primary"
+              className="min-h-11 rounded-xl border border-white/10 px-3 font-mono text-2xs uppercase tracking-[0.12em] text-muted transition hover:border-primary/30 hover:text-primary"
             >
               {session.role === 'guest' ? 'Entrar' : 'Sair'}
             </button>
@@ -165,7 +165,7 @@ export function TopBar() {
 
         <div className="text-right leading-tight">
           <p className="font-mono text-sm tabular-nums text-primary">{formatClock(now)}</p>
-          <p className="hidden font-mono text-[10px] uppercase tracking-[0.12em] text-muted sm:block">
+          <p className="hidden font-mono text-2xs uppercase tracking-[0.12em] text-muted sm:block">
             {formatShortDate(now)}
           </p>
         </div>

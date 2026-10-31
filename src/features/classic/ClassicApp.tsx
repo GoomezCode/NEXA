@@ -71,7 +71,7 @@ function PanelTab({
         style={{
           ...mono,
           color: active ? color : 'rgba(255,255,255,0.35)',
-          fontSize: '9px',
+          fontSize: '0.6875rem',
           letterSpacing: '0.08em',
         }}
       >
@@ -248,7 +248,7 @@ function MainLayout({ onExit }: { onExit: () => void }) {
                 <span style={{ ...orb, color, fontSize: '13px', textShadow: `0 0 8px ${color}` }}>
                   {value}
                 </span>
-                <span style={{ ...mono, color: 'rgba(255,255,255,0.3)', fontSize: '8px' }}>
+                <span style={{ ...mono, color: 'rgba(255,255,255,0.3)', fontSize: '0.6875rem' }}>
                   {label}
                 </span>
               </div>
@@ -395,7 +395,7 @@ function QuickActionButton({
       }
       onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.boxShadow = 'none')}
     >
-        <span style={{ ...mono, color, fontSize: '10px', letterSpacing: '0.08em' }}>{label}</span>
+        <span style={{ ...mono, color, fontSize: '0.6875rem', letterSpacing: '0.08em' }}>{label}</span>
     </motion.button>
   );
 }

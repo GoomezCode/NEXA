@@ -52,7 +52,7 @@ function SettingSwitch({
       <span className="min-w-0">
         <span className="block text-[13px] text-foreground">{label}</span>
         {description && (
-          <span className="mt-0.5 block text-[11px] leading-relaxed text-muted">{description}</span>
+          <span className="mt-0.5 block text-2xs leading-relaxed text-muted">{description}</span>
         )}
       </span>
       <span
@@ -91,7 +91,7 @@ function SectionCard({
     >
       <h3
         id={id}
-        className="flex items-center gap-2 font-display text-[11px] tracking-[0.2em] text-primary"
+        className="flex items-center gap-2 font-display text-2xs tracking-[0.2em] text-primary"
       >
         <Icon className="h-3.5 w-3.5" aria-hidden="true" />
         {title}
@@ -160,7 +160,7 @@ function InterfaceModeSettings() {
                   <Check className="ml-auto h-3.5 w-3.5 text-primary" aria-hidden="true" />
                 )}
               </span>{' '}
-              <span className="mt-1 block text-[11px] leading-relaxed text-muted">
+              <span className="mt-1 block text-2xs leading-relaxed text-muted">
                 {option.description}
               </span>
             </button>
@@ -168,7 +168,7 @@ function InterfaceModeSettings() {
         })}
       </div>
 
-      <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted/70">
+      <p className="mt-2 font-mono text-2xs uppercase tracking-[0.12em] text-muted/70">
         {busy ? 'Aguarde a resposta terminar' : 'Atalho: Alt+M'}
       </p>
     </div>
@@ -180,11 +180,11 @@ function AccountSettings() {
   const demoMode = useSettingsStore((state) => state.settings.demoMode);
   const offlineMode = useConnectionStore((state) => state.mode === 'offline');
 
-  if (offlineMode) return <p className="text-[11px] leading-relaxed text-muted">Modo offline — sem conta. Suas conversas ficam neste navegador.</p>;
+  if (offlineMode) return <p className="text-2xs leading-relaxed text-muted">Modo offline — sem conta. Suas conversas ficam neste navegador.</p>;
 
   if (demoMode || !session) {
     return (
-      <p className="text-[11px] leading-relaxed text-muted">
+      <p className="text-2xs leading-relaxed text-muted">
         Sessão não autenticada. Entre ou continue como convidado na tela de acesso.
       </p>
     );
@@ -198,14 +198,14 @@ function AccountSettings() {
         <dt className="text-muted">Usuário</dt>
         <dd className="text-foreground">{session.username ?? 'convidado'}</dd>
         <dt className="text-muted">Validade</dt>
-        <dd className="font-mono text-[10px] text-foreground">
+        <dd className="font-mono text-2xs text-foreground">
           {new Date(session.expiresAt).toLocaleString()}
         </dd>
       </dl>
       <button
         type="button"
         onClick={logout}
-        className="inline-flex min-h-11 w-full items-center justify-center gap-1.5 rounded-xl border border-white/10 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition hover:border-primary/30 hover:text-primary"
+        className="inline-flex min-h-11 w-full items-center justify-center gap-1.5 rounded-xl border border-white/10 px-3 py-2 font-mono text-2xs uppercase tracking-[0.12em] text-muted transition hover:border-primary/30 hover:text-primary"
       >
         <LogOut className="h-3.5 w-3.5" aria-hidden="true" />
         {session.role === 'guest' ? 'Entrar com conta' : 'Sair'}
@@ -268,7 +268,7 @@ export function SettingsView() {
     <section aria-label="Ajustes" className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
       <div className="mx-auto w-full max-w-2xl space-y-3">
         <header className="rounded-2xl border border-border bg-surface/60 p-5">
-          <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-primary/70">
+          <p className="font-mono text-2xs uppercase tracking-[0.28em] text-primary/70">
             configuração
           </p>
           <h2 className="font-display text-xl tracking-[0.12em] text-foreground">Ajustes</h2>
@@ -278,7 +278,7 @@ export function SettingsView() {
         </header>
 
         <SectionCard id="settings-profile" title="PERFIL" icon={User}>
-          <label htmlFor="settings-display-name" className="block text-[11px] text-muted">
+          <label htmlFor="settings-display-name" className="block text-2xs text-muted">
             Como a NEXA deve chamar você
           </label>
           <input
@@ -318,7 +318,7 @@ export function SettingsView() {
           />
 
           <div>
-            <label htmlFor="settings-speech-voice" className="block text-[11px] text-muted">
+            <label htmlFor="settings-speech-voice" className="block text-2xs text-muted">
               Voz em português
             </label>
             <select
@@ -335,16 +335,16 @@ export function SettingsView() {
               type="button"
               onClick={() => speakText('Olá. Esta é a voz selecionada para a NEXA.')}
               disabled={!settings.ttsEnabled || !speechSupported}
-              className="mt-2 min-h-10 rounded-lg border border-white/10 px-3 font-mono text-[10px] uppercase tracking-[0.1em] text-muted disabled:opacity-40"
+              className="mt-2 min-h-10 rounded-lg border border-white/10 px-3 font-mono text-2xs uppercase tracking-[0.1em] text-muted disabled:opacity-40"
             >Testar voz</button>
           </div>
 
           <div>
             <div className="flex items-center justify-between gap-3">
-              <label htmlFor="settings-speech-rate" className="text-[11px] text-muted">
+              <label htmlFor="settings-speech-rate" className="text-2xs text-muted">
                 Velocidade da voz
               </label>
-              <span className="font-mono text-[10px] text-primary">
+              <span className="font-mono text-2xs text-primary">
                 {settings.speechRate.toFixed(1)}x
               </span>
             </div>
@@ -361,7 +361,7 @@ export function SettingsView() {
             />
           </div>
 
-          <p className="flex items-start gap-2 rounded-lg border border-white/5 bg-background/30 p-2.5 font-mono text-[10px] uppercase leading-relaxed tracking-[0.1em] text-muted/70">
+          <p className="flex items-start gap-2 rounded-lg border border-white/5 bg-background/30 p-2.5 font-mono text-2xs uppercase leading-relaxed tracking-[0.1em] text-muted/70">
             <ShieldCheck className="mt-0.5 h-3 w-3 shrink-0 text-success" aria-hidden="true" />
             No Chrome, o reconhecimento pode enviar áudio aos servidores do navegador. Evite falar
             dados sensíveis.
@@ -370,7 +370,7 @@ export function SettingsView() {
 
         <SectionCard id="settings-appearance" title="APARÊNCIA" icon={Palette}>
           <div>
-            <p className="text-[11px] text-muted">Modo de interface</p>
+            <p className="text-2xs text-muted">Modo de interface</p>
             <div className="mt-2">
               <InterfaceModeSettings />
             </div>
@@ -390,7 +390,7 @@ export function SettingsView() {
 
         <SectionCard id="settings-connection" title="CONEXÃO" icon={Plug}>
           <div>
-            <label htmlFor="settings-api-url" className="block text-[11px] text-muted">
+            <label htmlFor="settings-api-url" className="block text-2xs text-muted">
               URL base da API
             </label>
             <input
@@ -400,7 +400,7 @@ export function SettingsView() {
               placeholder="/api/v1"
               className="mt-1 w-full rounded-xl border border-white/10 bg-background/60 px-3 py-2 font-mono text-xs text-foreground outline-none transition focus:border-primary/40"
             />
-            <p className="mt-1 text-[10px] leading-relaxed text-muted/70">
+            <p className="mt-1 text-2xs leading-relaxed text-muted/70">
               Use <code>/api/v1</code> para o proxy local ou a URL completa do backend. Nenhuma
               chave de API é armazenada no frontend.
             </p>
@@ -414,7 +414,7 @@ export function SettingsView() {
           />
 
           {connectionError && (
-            <p role="alert" className="text-[11px] text-danger">
+            <p role="alert" className="text-2xs text-danger">
               {connectionError}
             </p>
           )}
@@ -424,40 +424,40 @@ export function SettingsView() {
               type="button"
               onClick={applyConnection}
               disabled={!connectionDirty}
-              className="inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-primary/35 bg-primary/10 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-primary transition hover:bg-primary/15 disabled:cursor-not-allowed disabled:opacity-40"
+              className="inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-primary/35 bg-primary/10 px-3 py-2 font-mono text-2xs uppercase tracking-[0.12em] text-primary transition hover:bg-primary/15 disabled:cursor-not-allowed disabled:opacity-40"
             >
               <Gauge className="h-3.5 w-3.5" aria-hidden="true" />
               Aplicar e recarregar
             </button>
-            <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted/60">
+            <span className="font-mono text-2xs uppercase tracking-[0.1em] text-muted/60">
               {connectionDirty ? 'alterações pendentes' : 'sem alterações'}
             </span>
           </div>
         </SectionCard>
 
         <SectionCard id="settings-offline" title="MODO OFFLINE (OLLAMA)" icon={Plug}>
-          <div><label htmlFor="settings-ollama-url" className="block text-[11px] text-muted">URL local</label><input id="settings-ollama-url" value={ollamaUrl} onChange={(event) => setOllamaConfig(event.target.value, numCtx)} className="mt-1 w-full rounded-xl border border-white/10 bg-background/60 px-3 py-2 font-mono text-xs text-foreground" /><p className="mt-1 text-[10px] text-muted/70">Use /ollama para acessar pelo proxy same-origin, inclusive quando a Web é aberta pelo IP da rede. URLs diretas aceitam somente localhost ou loopback.</p></div>
-          <div><label htmlFor="settings-ollama-context" className="block text-[11px] text-muted">Contexto (num_ctx)</label><input id="settings-ollama-context" type="number" min={512} max={131072} step={512} value={numCtx} onChange={(event) => setOllamaConfig(ollamaUrl, Math.max(512, Number(event.target.value) || 4096))} className="mt-1 w-full rounded-xl border border-white/10 bg-background/60 px-3 py-2 font-mono text-xs text-foreground" /></div>
-          <div className="flex flex-wrap gap-2"><button type="button" onClick={() => { setOllamaError(null); setOllamaStatus(null); void ollamaVersion().then((version) => setOllamaStatus(`Ollama ${version} conectado`)).catch((error: unknown) => setOllamaError(error instanceof Error ? error.message : 'Falha ao conectar.')); }} className="min-h-11 rounded-xl border border-white/10 px-3 font-mono text-[10px] uppercase text-muted hover:text-primary">Testar conexão</button><button type="button" onClick={() => { if (connectionMode === 'offline') { setConnectionMode('api'); useAuthStore.getState().clear(); } else setConnectionMode('offline'); }} className="min-h-11 rounded-xl border border-primary/35 bg-primary/10 px-3 font-mono text-[10px] uppercase text-primary">{connectionMode === 'offline' ? 'Sair do offline' : 'Entrar no offline'}</button></div>
-          {ollamaStatus && <p role="status" className="text-[11px] text-success">{ollamaStatus}</p>}{ollamaError && <p role="alert" className="text-[11px] text-danger">{ollamaError}</p>}
+          <div><label htmlFor="settings-ollama-url" className="block text-2xs text-muted">URL local</label><input id="settings-ollama-url" value={ollamaUrl} onChange={(event) => setOllamaConfig(event.target.value, numCtx)} className="mt-1 w-full rounded-xl border border-white/10 bg-background/60 px-3 py-2 font-mono text-xs text-foreground" /><p className="mt-1 text-2xs text-muted/70">Use /ollama para acessar pelo proxy same-origin, inclusive quando a Web é aberta pelo IP da rede. URLs diretas aceitam somente localhost ou loopback.</p></div>
+          <div><label htmlFor="settings-ollama-context" className="block text-2xs text-muted">Contexto (num_ctx)</label><input id="settings-ollama-context" type="number" min={512} max={131072} step={512} value={numCtx} onChange={(event) => setOllamaConfig(ollamaUrl, Math.max(512, Number(event.target.value) || 4096))} className="mt-1 w-full rounded-xl border border-white/10 bg-background/60 px-3 py-2 font-mono text-xs text-foreground" /></div>
+          <div className="flex flex-wrap gap-2"><button type="button" onClick={() => { setOllamaError(null); setOllamaStatus(null); void ollamaVersion().then((version) => setOllamaStatus(`Ollama ${version} conectado`)).catch((error: unknown) => setOllamaError(error instanceof Error ? error.message : 'Falha ao conectar.')); }} className="min-h-11 rounded-xl border border-white/10 px-3 font-mono text-2xs uppercase text-muted hover:text-primary">Testar conexão</button><button type="button" onClick={() => { if (connectionMode === 'offline') { setConnectionMode('api'); useAuthStore.getState().clear(); } else setConnectionMode('offline'); }} className="min-h-11 rounded-xl border border-primary/35 bg-primary/10 px-3 font-mono text-2xs uppercase text-primary">{connectionMode === 'offline' ? 'Sair do offline' : 'Entrar no offline'}</button></div>
+          {ollamaStatus && <p role="status" className="text-2xs text-success">{ollamaStatus}</p>}{ollamaError && <p role="alert" className="text-2xs text-danger">{ollamaError}</p>}
         </SectionCard>
 
         <div className="flex flex-wrap items-center justify-between gap-2 pb-2">
-          <p className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-muted/60">
+          <p className="flex items-center gap-1.5 font-mono text-2xs uppercase tracking-[0.12em] text-muted/60">
             <AudioLines className="h-3 w-3" aria-hidden="true" />
             Preferências salvas em localStorage
           </p>
           <button
             type="button"
             onClick={resetAll}
-            className="inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-white/10 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition hover:border-danger/30 hover:text-danger"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-white/10 px-3 py-2 font-mono text-2xs uppercase tracking-[0.12em] text-muted transition hover:border-danger/30 hover:text-danger"
           >
             <RotateCcw className="h-3 w-3" aria-hidden="true" />
             Restaurar padrões
           </button>
         </div>
 
-        <p className="flex items-center gap-1.5 pb-2 font-mono text-[10px] uppercase tracking-[0.1em] text-muted/50">
+        <p className="flex items-center gap-1.5 pb-2 font-mono text-2xs uppercase tracking-[0.1em] text-muted/50">
           <Volume2 className="h-3 w-3" aria-hidden="true" />
           TTS desligado por padrão
         </p>

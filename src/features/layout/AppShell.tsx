@@ -43,7 +43,7 @@ function ViewLoading({ label }: { label: string }) {
       className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3"
     >
       <span className="h-8 w-8 animate-spin rounded-full border border-primary/25 border-t-primary" />
-      <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-primary/70">
+      <p className="font-mono text-2xs uppercase tracking-[0.24em] text-primary/70">
         carregando {label}
       </p>
     </div>
@@ -77,7 +77,7 @@ export function AppShell() {
             event.preventDefault();
             document.getElementById('nexa-main')?.focus();
           }}
-          className="sr-only focus:not-sr-only focus:absolute focus:left-3 focus:top-3 focus:z-50 focus:rounded-lg focus:border focus:border-primary/40 focus:bg-surface focus:px-3 focus:py-2 focus:font-mono focus:text-[10px] focus:uppercase focus:tracking-[0.12em] focus:text-primary"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-3 focus:top-3 focus:z-50 focus:rounded-lg focus:border focus:border-primary/40 focus:bg-surface focus:px-3 focus:py-2 focus:font-mono focus:text-2xs focus:uppercase focus:tracking-[0.12em] focus:text-primary"
         >
           Ir para o conteúdo
         </a>
@@ -101,13 +101,13 @@ export function AppShell() {
             className="flex shrink-0 items-center gap-2 border-b border-warning/15 bg-warning/5 px-3 py-1.5 sm:px-5 short:py-0"
           >
             <Sparkles className="h-3 w-3 shrink-0 text-warning" aria-hidden="true" />
-            <p className="min-w-0 truncate font-mono text-[10px] uppercase tracking-[0.12em] text-warning/90">
+            <p className="min-w-0 truncate font-mono text-2xs uppercase tracking-[0.12em] text-warning/90">
               Modo demonstração · respostas simuladas localmente
             </p>
             <button
               type="button"
               onClick={() => setActiveView('settings')}
-              className="ml-auto min-h-11 shrink-0 rounded-lg border border-warning/25 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.1em] text-warning transition hover:bg-warning/10"
+              className="ml-auto min-h-11 shrink-0 rounded-lg border border-warning/25 px-2.5 py-1 font-mono text-2xs uppercase tracking-[0.1em] text-warning transition hover:bg-warning/10"
             >
               Ajustes
             </button>

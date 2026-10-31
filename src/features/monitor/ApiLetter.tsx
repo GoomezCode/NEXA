@@ -59,7 +59,7 @@ export function ApiLetter() {
           <motion.span aria-hidden="true" className="absolute inset-x-0 top-0 h-7 origin-top rounded-t-xl border-b border-primary/15 bg-primary/[.08]" animate={{ rotateX: open ? -160 : 0 }} transition={{ type: 'spring', stiffness: 180, damping: 16 }} style={{ transformStyle: 'preserve-3d', backfaceVisibility: 'hidden' }} />
         </span>
         <span className="relative min-w-0 flex-1">
-          <span className="block font-mono text-[9px] uppercase tracking-[0.2em] text-primary/70">uma correspondência para você</span>
+          <span className="block font-mono text-2xs uppercase tracking-[0.2em] text-primary/70">uma correspondência para você</span>
           <span className="mt-1 block font-display text-base tracking-wide text-foreground">Carta de integração</span>
           <span className="mt-1 block text-xs leading-relaxed text-muted">Endereços úteis e exemplos para conectar seus clientes à API NEXA.</span>
         </span>
@@ -73,12 +73,12 @@ export function ApiLetter() {
               <div className="relative max-h-[92vh] overflow-y-auto p-5 sm:p-8">
                 <motion.button type="button" whileHover={{ rotate: 90, scale: 1.05 }} whileTap={{ scale: .92 }} aria-label="Fechar carta" onClick={() => setOpen(false)} className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full border border-[#243342]/10 text-[#526171] transition hover:bg-[#243342]/5"><X className="h-4 w-4" /></motion.button>
                 <div className="flex items-start justify-between gap-4 border-b border-[#243342]/12 pb-5 pr-10">
-                  <div><p className="font-mono text-[9px] uppercase tracking-[.22em] text-[#477b83]">Correspondência · NEXA API</p><h2 id="api-letter-title" className="mt-2 font-display text-2xl tracking-wide text-[#1e3040]">Olá, operador.</h2><p className="mt-1 text-sm text-[#64717a]">Sua carta de integração chegou.</p></div>
+                  <div><p className="font-mono text-2xs uppercase tracking-[.22em] text-[#477b83]">Correspondência · NEXA API</p><h2 id="api-letter-title" className="mt-2 font-display text-2xl tracking-wide text-[#1e3040]">Olá, operador.</h2><p className="mt-1 text-sm text-[#64717a]">Sua carta de integração chegou.</p></div>
                   <span className="flex h-14 w-14 shrink-0 rotate-3 items-center justify-center border border-dashed border-[#477b83]/55 bg-[#477b83]/8 font-display text-xs tracking-widest text-[#477b83]">NEXA<br />API</span>
                 </div>
 
                 <div className="py-5">
-                  <p className="text-sm leading-relaxed text-[#3f4d59]">Use os endereços abaixo para consultar a documentação ou conectar uma ferramenta compatível. A origem configurada é <code className="break-all rounded bg-[#243342]/[.06] px-1.5 py-0.5 font-mono text-[11px]">{origin || 'não configurada'}</code>{health.data?.version ? <> e a API está na versão <strong>{health.data.version}</strong></> : null}.</p>
+                  <p className="text-sm leading-relaxed text-[#3f4d59]">Use os endereços abaixo para consultar a documentação ou conectar uma ferramenta compatível. A origem configurada é <code className="break-all rounded bg-[#243342]/[.06] px-1.5 py-0.5 font-mono text-2xs">{origin || 'não configurada'}</code>{health.data?.version ? <> e a API está na versão <strong>{health.data.version}</strong></> : null}.</p>
                   <nav aria-label="Documentação da API" className="mt-4 flex flex-wrap gap-2">
                     {[["Swagger", "/docs"], ["ReDoc", "/redoc"], ["OpenAPI JSON", "/openapi.json"]].map(([label, path]) => <a key={path} href={`${origin}${path}`} target="_blank" rel="noreferrer" className="inline-flex min-h-10 items-center gap-1.5 rounded-full border border-[#477b83]/20 bg-white/50 px-3 text-xs text-[#356a73] transition hover:border-[#477b83]/45 hover:bg-white"><ExternalLink className="h-3 w-3" aria-hidden="true" />{label}</a>)}
                   </nav>
@@ -87,13 +87,13 @@ export function ApiLetter() {
                 <div className="space-y-3 border-t border-[#243342]/12 pt-5">
                   <div><h3 className="font-display text-sm tracking-wide text-[#243342]">Exemplos para seus clientes</h3><p className="mt-1 text-xs text-[#64717a]">Copie um exemplo e substitua <code className="font-mono">&lt;NEXA_API_KEY&gt;</code> por uma chave emitida pelo administrador.</p></div>
                   {examples.map((example) => <section key={example.id} className="overflow-hidden rounded-xl border border-[#243342]/10 bg-white/55">
-                    <div className="flex items-center justify-between gap-2 border-b border-[#243342]/8 px-3 py-2"><h4 className="text-xs font-semibold text-[#354552]">{example.title}</h4><button type="button" onClick={() => void copy(example.id, example.body)} className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-[#477b83]/20 px-2.5 font-mono text-[9px] uppercase tracking-wider text-[#356a73] transition hover:bg-[#477b83]/8" aria-label={`Copiar exemplo ${example.title}`}>{copied === example.id ? <Check className="h-3.5 w-3.5" aria-hidden="true" /> : <Copy className="h-3.5 w-3.5" aria-hidden="true" />}{copied === example.id ? 'Copiado' : 'Copiar'}</button></div>
-                    <pre className="max-h-48 overflow-auto p-3 font-mono text-[10px] leading-relaxed text-[#46545f]"><code>{example.body.replaceAll('{{origin}}', origin)}</code></pre>
+                    <div className="flex items-center justify-between gap-2 border-b border-[#243342]/8 px-3 py-2"><h4 className="text-xs font-semibold text-[#354552]">{example.title}</h4><button type="button" onClick={() => void copy(example.id, example.body)} className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-[#477b83]/20 px-2.5 font-mono text-2xs uppercase tracking-wider text-[#356a73] transition hover:bg-[#477b83]/8" aria-label={`Copiar exemplo ${example.title}`}>{copied === example.id ? <Check className="h-3.5 w-3.5" aria-hidden="true" /> : <Copy className="h-3.5 w-3.5" aria-hidden="true" />}{copied === example.id ? 'Copiado' : 'Copiar'}</button></div>
+                    <pre className="max-h-48 overflow-auto p-3 font-mono text-2xs leading-relaxed text-[#46545f]"><code>{example.body.replaceAll('{{origin}}', origin)}</code></pre>
                   </section>)}
                   {copyError && <p role="alert" className="text-xs text-red-700">Não foi possível copiar; selecione o exemplo para copiá-lo manualmente.</p>}
                   <p className="rounded-lg border border-[#477b83]/15 bg-[#477b83]/[.06] p-3 text-xs leading-relaxed text-[#526171]">As chaves de compatibilidade são configuradas pelo administrador no servidor via <code className="font-mono">COMPAT_API_KEYS</code>. Nunca coloque chaves de provedor ou segredos pessoais nestes exemplos.</p>
                 </div>
-                <div className="mt-6 flex items-center justify-between border-t border-[#243342]/12 pt-4 font-mono text-[9px] uppercase tracking-[.15em] text-[#78909a]"><span>Com carinho,</span><span>Equipe NEXA</span></div>
+                <div className="mt-6 flex items-center justify-between border-t border-[#243342]/12 pt-4 font-mono text-2xs uppercase tracking-[.15em] text-[#78909a]"><span>Com carinho,</span><span>Equipe NEXA</span></div>
               </div>
             </motion.article>
           </motion.div>

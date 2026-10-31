@@ -52,7 +52,7 @@ export function CommandConsole() {
       <div className="flex items-center justify-between flex-shrink-0">
         <div className="flex items-center gap-2">
           <Terminal className="w-4 h-4" style={{ color: '#00f5ff' }} />
-          <span style={{ ...orb, color: '#00f5ff', fontSize: '11px', letterSpacing: '0.15em' }}>
+          <span style={{ ...orb, color: '#00f5ff', fontSize: '0.6875rem', letterSpacing: '0.15em' }}>
             COMMAND CONSOLE
           </span>
         </div>
@@ -127,7 +127,7 @@ export function CommandConsole() {
                   </p>
                 )}
                 <div className="mt-1 flex justify-end">
-                  <span style={{ ...mono, color: 'rgba(255,255,255,0.2)', fontSize: '9px' }}>
+                  <span style={{ ...mono, color: 'rgba(255,255,255,0.2)', fontSize: '0.6875rem' }}>
                     {msg.timestamp.toLocaleTimeString('en-US', { hour12: false })}
                   </span>
                 </div>
@@ -207,7 +207,7 @@ export function CommandConsole() {
               border: '1px solid rgba(0,245,255,0.15)',
             }}
           >
-            <span style={{ ...mono, color: 'rgba(0,245,255,0.6)', fontSize: '9px' }}>{s}</span>
+            <span style={{ ...mono, color: 'rgba(0,245,255,0.6)', fontSize: '0.6875rem' }}>{s}</span>
           </motion.button>
         ))}
       </div>
@@ -258,7 +258,7 @@ export function CommandConsole() {
           <Mic aria-hidden="true" />
         </button>
         {isStreaming && (
-          <button type="button" onClick={stop} className="px-2 font-mono text-[9px] text-warning">
+          <button type="button" onClick={stop} className="px-2 font-mono text-2xs text-warning">
             PARAR
           </button>
         )}

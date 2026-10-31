@@ -48,7 +48,7 @@ export function SessionsSheet() {
     >
         <div className="flex h-full flex-col bg-background/95 pb-[var(--safe-bottom)] pt-[var(--safe-top)] backdrop-blur-2xl">
         <div className="flex min-h-14 items-center justify-between border-b border-white/5 px-4 py-3">
-          <span className="font-display text-[11px] tracking-[0.24em] text-primary">NEXA</span>
+          <span className="font-display text-2xs tracking-[0.24em] text-primary">NEXA</span>
           <button
             type="button"
             onClick={() => setOpen(false)}

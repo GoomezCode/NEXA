@@ -27,7 +27,7 @@ export function MessageBubble({ message }: { message: ChatMessage }) {
         className={cn(
           'mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border',
           isUser
-            ? 'border-white/10 bg-white/5 font-mono text-[10px] text-muted'
+            ? 'border-white/10 bg-white/5 font-mono text-2xs text-muted'
             : 'border-primary/25 bg-primary/10',
         )}
         aria-hidden="true"
@@ -65,7 +65,7 @@ export function MessageBubble({ message }: { message: ChatMessage }) {
 
         <div
           className={cn(
-            'mt-1 flex flex-wrap items-center gap-2 px-1 font-mono text-[10px] uppercase tracking-[0.12em] text-muted/60',
+            'mt-1 flex flex-wrap items-center gap-2 px-1 font-mono text-2xs uppercase tracking-[0.12em] text-muted/60',
             isUser && 'justify-end',
           )}
         >

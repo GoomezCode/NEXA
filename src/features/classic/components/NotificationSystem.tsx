@@ -68,7 +68,7 @@ function NotifCard({ notif }: { notif: Notification }) {
         </div>
 
         <div className="flex-1 min-w-0">
-          <p style={{ ...mono, color: cfg.color, fontSize: '10px', letterSpacing: '0.05em' }}>
+          <p style={{ ...mono, color: cfg.color, fontSize: '0.6875rem', letterSpacing: '0.05em' }}>
             {notif.title}
           </p>
           <p

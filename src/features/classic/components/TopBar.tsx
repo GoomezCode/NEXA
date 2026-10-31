@@ -108,7 +108,7 @@ export function TopBar({ onExit }: { onExit: () => void }) {
           >
             NEXA AI
           </div>
-          <div style={{ ...mono, color: 'rgba(0,245,255,0.45)', fontSize: '10px' }}>
+          <div style={{ ...mono, color: 'rgba(0,245,255,0.45)', fontSize: '0.6875rem' }}>
             OS v3.7.2 — ALPHA
           </div>
         </div>
@@ -125,7 +125,7 @@ export function TopBar({ onExit }: { onExit: () => void }) {
           className="w-2 h-2 rounded-full"
           style={{ background: stateColor, boxShadow: `0 0 8px ${stateColor}` }}
         />
-        <span style={{ ...mono, color: stateColor, fontSize: '11px', letterSpacing: '0.12em' }}>
+        <span style={{ ...mono, color: stateColor, fontSize: '0.6875rem', letterSpacing: '0.12em' }}>
           {stateLabel}
         </span>
       </div>
@@ -139,10 +139,10 @@ export function TopBar({ onExit }: { onExit: () => void }) {
         ].map(({ icon: Icon, label, val, color }) => (
           <div key={label} className="flex items-center gap-1.5">
             <Icon className="w-3 h-3" style={{ color }} />
-            <span style={{ ...mono, color: 'rgba(255,255,255,0.4)', fontSize: '10px' }}>
+            <span style={{ ...mono, color: 'rgba(255,255,255,0.4)', fontSize: '0.6875rem' }}>
               {label}
             </span>
-            <span style={{ ...mono, color, fontSize: '10px' }}>{val}</span>
+            <span style={{ ...mono, color, fontSize: '0.6875rem' }}>{val}</span>
           </div>
         ))}
       </div>
@@ -159,7 +159,7 @@ export function TopBar({ onExit }: { onExit: () => void }) {
         >
           {fmtTime(time)}
         </div>
-        <div style={{ ...raj, color: 'rgba(0,245,255,0.5)', fontSize: '10px' }}>
+        <div style={{ ...raj, color: 'rgba(0,245,255,0.5)', fontSize: '0.6875rem' }}>
           {fmtDate(time)}
         </div>
       </div>

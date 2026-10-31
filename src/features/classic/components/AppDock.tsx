@@ -64,11 +64,11 @@ export function AppDock() {
       {/* Left label */}
       <div className="absolute left-6 flex flex-col">
         <span
-          style={{ ...orb, color: 'rgba(0,245,255,0.5)', fontSize: '8px', letterSpacing: '0.15em' }}
+          style={{ ...orb, color: 'rgba(0,245,255,0.5)', fontSize: '0.6875rem', letterSpacing: '0.15em' }}
         >
           NEXA
         </span>
-        <span style={{ ...mono, color: 'rgba(0,245,255,0.3)', fontSize: '7px' }}>APP DOCK</span>
+        <span style={{ ...mono, color: 'rgba(0,245,255,0.3)', fontSize: '0.6875rem' }}>APP DOCK</span>
       </div>
 
       {/* Dock inner container */}
@@ -110,7 +110,7 @@ export function AppDock() {
                     boxShadow: `0 0 12px ${app.color}20`,
                   }}
                 >
-                  <span style={{ ...mono, color: app.color, fontSize: '10px' }}>{app.name}</span>
+                  <span style={{ ...mono, color: app.color, fontSize: '0.6875rem' }}>{app.name}</span>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -162,7 +162,7 @@ export function AppDock() {
                   border: '1px solid rgba(0,245,255,0.2)',
                 }}
               >
-                <span style={{ ...mono, color: '#00f5ff', fontSize: '10px' }}>All Apps</span>
+                <span style={{ ...mono, color: '#00f5ff', fontSize: '0.6875rem' }}>All Apps</span>
               </motion.div>
             )}
           </AnimatePresence>
@@ -185,7 +185,7 @@ export function AppDock() {
       {/* Right: swipe hint */}
       <div className="absolute right-6 flex items-center gap-1 opacity-50">
         <ChevronUp className="w-3 h-3" style={{ color: 'rgba(0,245,255,0.5)' }} />
-        <span style={{ ...mono, color: 'rgba(0,245,255,0.4)', fontSize: '8px' }}>SWIPE UP</span>
+        <span style={{ ...mono, color: 'rgba(0,245,255,0.4)', fontSize: '0.6875rem' }}>SWIPE UP</span>
       </div>
     </div>
   );

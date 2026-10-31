@@ -78,13 +78,13 @@ export function Composer({
           role={voiceError ? 'alert' : 'status'}
           aria-live="polite"
           className={cn(
-            'mx-auto mb-2 w-full max-w-3xl rounded-xl border px-3 py-2 text-[11px] leading-relaxed',
+            'mx-auto mb-2 w-full max-w-3xl rounded-xl border px-3 py-2 text-2xs leading-relaxed',
             voiceError
               ? 'border-danger/25 bg-danger/5 text-danger'
               : 'border-primary/25 bg-primary/5 text-primary',
           )}
         >
-          <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.14em]">
+          <span className="flex items-center gap-1.5 font-mono text-2xs uppercase tracking-[0.14em]">
             <Mic className="h-3 w-3 shrink-0" aria-hidden="true" />
             {listening ? 'Ouvindo · solte para encerrar' : 'Transcrição de voz'}
           </span>
@@ -213,11 +213,11 @@ export function Composer({
       </div>
 
       <div className="mx-auto mt-2 flex w-full max-w-3xl items-center justify-between gap-3 px-1">
-        <p className="hidden items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-muted/70 sm:flex">
+        <p className="hidden items-center gap-1.5 font-mono text-2xs uppercase tracking-[0.12em] text-muted/70 sm:flex">
           <CornerDownLeft className="h-3 w-3" aria-hidden="true" />
           Enter envia · Shift + Enter quebra linha
         </p>
-        <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted/70">
+        <p className="font-mono text-2xs uppercase tracking-[0.12em] text-muted/70">
           {value.length > 0
             ? `${value.length}${maxLength ? `/${maxLength}` : ''} caracteres`
             : <span className="hidden sm:inline">Ctrl+K foca o campo</span>}

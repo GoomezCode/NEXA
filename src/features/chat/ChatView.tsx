@@ -92,7 +92,7 @@ export function ChatView({ sessionId }: { sessionId: string | null }) {
           <p
             role="status"
             aria-live="polite"
-            className="font-mono text-[10px] uppercase tracking-[0.18em] text-primary/80"
+            className="font-mono text-2xs uppercase tracking-[0.18em] text-primary/80"
           >
             {offlineMode && aiState === 'processing' ? 'carregando modelo' : AI_STATE_LABEL[aiState]}
             {session ? ` · ${formatSessionTime(session.updatedAt)}` : ''}
@@ -110,25 +110,25 @@ export function ChatView({ sessionId }: { sessionId: string | null }) {
               value={selectedModelId ?? ''}
               onChange={(event) => setSelectedModel(event.target.value || null)}
               disabled={!models.data?.models.length}
-              className="max-w-48 rounded-full border border-white/10 bg-background px-2.5 py-1 font-mono text-[10px] text-foreground"
+              className="max-w-48 rounded-full border border-white/10 bg-background px-2.5 py-1 font-mono text-2xs text-foreground"
             >
               <option value="">Automático</option>
               {(models.data?.models ?? []).map((model) => <option key={model.model_id} value={model.model_id}>{model.name}</option>)}
             </select>
           )}
-          <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
+          <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 font-mono text-2xs uppercase tracking-[0.14em] text-muted">
             {offlineMode ? (modelFromStream ?? 'ollama local') : demoMode ? 'nexa-mock-1' : 'nexa-remote'}
           </span>
-          <span className="rounded-full border border-success/20 bg-success/5 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-success">
+          <span className="rounded-full border border-success/20 bg-success/5 px-2.5 py-1 font-mono text-2xs uppercase tracking-[0.14em] text-success">
             {offlineMode ? 'offline' : demoMode ? 'demo' : 'online'}
           </span>
           {modelFromStream && (
-            <span className="ml-2 rounded-full border border-primary/20 bg-primary/5 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-primary">
+            <span className="ml-2 rounded-full border border-primary/20 bg-primary/5 px-2.5 py-1 font-mono text-2xs uppercase tracking-[0.14em] text-primary">
               {modelFromStream}
             </span>
           )}
           {finishReasonFromStream && (
-            <span className="ml-2 rounded-full border border-warning/20 bg-warning/5 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-warning">
+            <span className="ml-2 rounded-full border border-warning/20 bg-warning/5 px-2.5 py-1 font-mono text-2xs uppercase tracking-[0.14em] text-warning">
               {finishReasonFromStream}
             </span>
           )}
@@ -147,13 +147,13 @@ export function ChatView({ sessionId }: { sessionId: string | null }) {
       />
 
       {offlineMode && models.isError && (
-        <div role="status" className="border-t border-warning/20 bg-warning/5 px-4 py-2 text-center font-mono text-[10px] text-warning">
+        <div role="status" className="border-t border-warning/20 bg-warning/5 px-4 py-2 text-center font-mono text-2xs text-warning">
           {models.error instanceof Error ? models.error.message : 'Não foi possível consultar o Ollama.'}
           <button type="button" onClick={() => void models.refetch()} className="ml-3 underline">Tentar novamente</button>
         </div>
       )}
       {offlineMode && models.data && models.data.models.length === 0 && (
-        <div role="status" className="border-t border-warning/20 bg-warning/5 px-4 py-2 text-center font-mono text-[10px] text-warning">
+        <div role="status" className="border-t border-warning/20 bg-warning/5 px-4 py-2 text-center font-mono text-2xs text-warning">
           Nenhum modelo local instalado. Execute <code>ollama pull llama3.1</code>.
         </div>
       )}
@@ -163,7 +163,7 @@ export function ChatView({ sessionId }: { sessionId: string | null }) {
           role="status"
           className="flex shrink-0 flex-wrap items-center justify-center gap-3 border-t border-warning/20 bg-warning/5 px-4 py-2"
         >
-          <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-warning">
+          <p className="font-mono text-2xs uppercase tracking-[0.12em] text-warning">
             {demoMode
               ? 'Sem conexão · o modo demonstração continua local'
               : 'Sem conexão · envio pausado até a rede voltar'}
@@ -175,7 +175,7 @@ export function ChatView({ sessionId }: { sessionId: string | null }) {
                 retry();
                 void sessions.refetch();
               }}
-              className="rounded-lg border border-warning/30 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.12em] text-warning transition hover:bg-warning/10"
+              className="rounded-lg border border-warning/30 px-2.5 py-1 font-mono text-2xs uppercase tracking-[0.12em] text-warning transition hover:bg-warning/10"
             >
               Tentar agora
             </button>

@@ -86,8 +86,8 @@ export function SessionsSidebar({ onSelect, className }: SessionsSidebarProps) {
     <div className={cn('flex h-full min-h-0 flex-col', className)}>
       <div className="flex items-center justify-between gap-2 border-b border-white/5 px-4 py-3">
         <div>
-          <h2 className="font-display text-[11px] tracking-[0.24em] text-primary">CONVERSAS</h2>
-          <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted">
+          <h2 className="font-display text-2xs tracking-[0.24em] text-primary">CONVERSAS</h2>
+          <p className="font-mono text-2xs uppercase tracking-[0.16em] text-muted">
             {normalizedQuery
               ? `${filteredSessions.length} de ${allSessions.length}`
               : `${allSessions.length} registro${allSessions.length === 1 ? '' : 's'}`}
@@ -98,7 +98,7 @@ export function SessionsSidebar({ onSelect, className }: SessionsSidebarProps) {
           type="button"
           onClick={handleCreate}
           disabled={createSession.isPending}
-          className="inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-primary/35 bg-primary/10 px-2.5 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-primary transition hover:bg-primary/15 disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-primary/35 bg-primary/10 px-2.5 py-2 text-2xs font-semibold uppercase tracking-[0.12em] text-primary transition hover:bg-primary/15 disabled:cursor-not-allowed disabled:opacity-50"
           aria-label="Criar nova conversa"
         >
           <Plus className="h-3.5 w-3.5" aria-hidden="true" />
@@ -135,7 +135,7 @@ export function SessionsSidebar({ onSelect, className }: SessionsSidebarProps) {
 
       <nav aria-label="Histórico de conversas" className="min-h-0 flex-1 overflow-y-auto p-2">
         {sessions.isLoading && (
-          <p role="status" className="px-2 py-3 font-mono text-[10px] text-muted">
+          <p role="status" className="px-2 py-3 font-mono text-2xs text-muted">
             Carregando conversas…
           </p>
         )}
@@ -146,7 +146,7 @@ export function SessionsSidebar({ onSelect, className }: SessionsSidebarProps) {
             <button
               type="button"
               onClick={() => void sessions.refetch()}
-              className="mt-2 inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-danger hover:underline"
+              className="mt-2 inline-flex items-center gap-1.5 font-mono text-2xs uppercase tracking-[0.12em] text-danger hover:underline"
             >
               <RefreshCw className="h-3 w-3" aria-hidden="true" />
               Tentar novamente
@@ -164,7 +164,7 @@ export function SessionsSidebar({ onSelect, className }: SessionsSidebarProps) {
             <button
               type="button"
               onClick={() => setQuery('')}
-              className="mt-1 font-mono text-[10px] uppercase tracking-[0.12em] text-primary hover:underline"
+              className="mt-1 font-mono text-2xs uppercase tracking-[0.12em] text-primary hover:underline"
             >
               Limpar busca
             </button>
@@ -184,7 +184,7 @@ export function SessionsSidebar({ onSelect, className }: SessionsSidebarProps) {
                     className="rounded-xl border border-danger/30 bg-danger/5 p-2.5"
                   >
                     <p className="text-xs text-foreground">Excluir “{session.title}”?</p>
-                    <p className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.1em] text-muted">
+                    <p className="mt-0.5 font-mono text-2xs uppercase tracking-[0.1em] text-muted">
                       Esta ação não pode ser desfeita
                     </p>
                     <div className="mt-2 flex gap-2">
@@ -192,14 +192,14 @@ export function SessionsSidebar({ onSelect, className }: SessionsSidebarProps) {
                         type="button"
                         onClick={() => confirmDelete(session.id)}
                         disabled={deleteSession.isPending}
-                        className="rounded-lg border border-danger/35 bg-danger/15 px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-danger transition hover:bg-danger/25 disabled:opacity-50"
+                        className="rounded-lg border border-danger/35 bg-danger/15 px-2.5 py-1.5 font-mono text-2xs uppercase tracking-[0.12em] text-danger transition hover:bg-danger/25 disabled:opacity-50"
                       >
                         Excluir
                       </button>
                       <button
                         type="button"
                         onClick={() => setConfirmingId(null)}
-                        className="rounded-lg border border-white/10 px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition hover:text-foreground"
+                        className="rounded-lg border border-white/10 px-2.5 py-1.5 font-mono text-2xs uppercase tracking-[0.12em] text-muted transition hover:text-foreground"
                       >
                         Cancelar
                       </button>
@@ -236,14 +236,14 @@ export function SessionsSidebar({ onSelect, className }: SessionsSidebarProps) {
                       <button
                         type="submit"
                         disabled={!draftTitle.trim() || renameSession.isPending}
-                        className="rounded-lg border border-primary/35 bg-primary/15 px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-primary transition hover:bg-primary/25 disabled:opacity-50"
+                        className="rounded-lg border border-primary/35 bg-primary/15 px-2.5 py-1.5 font-mono text-2xs uppercase tracking-[0.12em] text-primary transition hover:bg-primary/25 disabled:opacity-50"
                       >
                         Salvar
                       </button>
                       <button
                         type="button"
                         onClick={cancelRename}
-                        className="rounded-lg border border-white/10 px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition hover:text-foreground"
+                        className="rounded-lg border border-white/10 px-2.5 py-1.5 font-mono text-2xs uppercase tracking-[0.12em] text-muted transition hover:text-foreground"
                       >
                         Cancelar
                       </button>
@@ -285,7 +285,7 @@ export function SessionsSidebar({ onSelect, className }: SessionsSidebarProps) {
                       >
                         {session.title}
                       </span>
-                      <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted/70">
+                      <span className="font-mono text-2xs uppercase tracking-[0.12em] text-muted/70">
                         {formatSessionTime(session.updatedAt)}
                       </span>
                     </span>
@@ -316,14 +316,14 @@ export function SessionsSidebar({ onSelect, className }: SessionsSidebarProps) {
         </ul>
 
         {mutationError && (
-          <p role="alert" className="mx-1 mt-2 text-[11px] text-danger">
+          <p role="alert" className="mx-1 mt-2 text-2xs text-danger">
             Não foi possível atualizar a conversa. Tente novamente.
           </p>
         )}
       </nav>
 
       <div className="border-t border-white/5 px-4 py-3">
-        <p className="font-mono text-[10px] uppercase leading-relaxed tracking-[0.14em] text-muted/70">
+        <p className="font-mono text-2xs uppercase leading-relaxed tracking-[0.14em] text-muted/70">
           Histórico local
           <br />
           modo demonstração

@@ -40,7 +40,7 @@ function NavButton({
       <span
         className={cn(
           'font-mono uppercase tracking-[0.1em]',
-          compact ? 'text-[10px]' : 'text-[10px]',
+          compact ? 'text-2xs' : 'text-2xs',
         )}
       >
         {item.label}

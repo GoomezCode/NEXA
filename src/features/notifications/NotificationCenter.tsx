@@ -63,7 +63,7 @@ function NotificationToast({ item }: { item: AppNotification }) {
       <div className="min-w-0 flex-1">
         <p className="text-[12px] font-semibold leading-snug text-foreground">{item.title}</p>
         {item.message && (
-          <p className="mt-0.5 text-[11px] leading-relaxed text-muted">{item.message}</p>
+          <p className="mt-0.5 text-2xs leading-relaxed text-muted">{item.message}</p>
         )}
       </div>
 

@@ -56,7 +56,7 @@ function MemoryForm({
       <div className="flex items-center justify-between gap-3">
         <h3
           id="memory-form-title"
-          className="font-display text-[11px] tracking-[0.2em] text-primary"
+          className="font-display text-2xs tracking-[0.2em] text-primary"
         >
           {editing ? 'EDITAR MEMÓRIA' : 'NOVA MEMÓRIA'}
         </h3>
@@ -72,7 +72,7 @@ function MemoryForm({
 
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
         <div>
-          <label htmlFor="memory-title" className="block text-[11px] text-muted">
+          <label htmlFor="memory-title" className="block text-2xs text-muted">
             Nome
           </label>
           <input
@@ -87,7 +87,7 @@ function MemoryForm({
         </div>
 
         <div>
-          <label htmlFor="memory-tags" className="block text-[11px] text-muted">
+          <label htmlFor="memory-tags" className="block text-2xs text-muted">
             Tags
           </label>
           <input
@@ -97,14 +97,14 @@ function MemoryForm({
             placeholder="sistema, preferências"
             className="mt-1 w-full rounded-xl border border-white/10 bg-background/60 px-3 py-2 text-sm text-foreground outline-none transition focus:border-primary/40"
           />
-          <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.08em] text-muted/60">
+          <p className="mt-1 font-mono text-2xs uppercase tracking-[0.08em] text-muted/60">
             separe por vírgulas · até 8 tags
           </p>
         </div>
       </div>
 
       <div className="mt-3">
-        <label htmlFor="memory-content" className="block text-[11px] text-muted">
+        <label htmlFor="memory-content" className="block text-2xs text-muted">
           Conteúdo
         </label>
         <textarea
@@ -119,7 +119,7 @@ function MemoryForm({
       </div>
 
       {error && (
-        <p role="alert" className="mt-2 text-[11px] text-danger">
+        <p role="alert" className="mt-2 text-2xs text-danger">
           {error}
         </p>
       )}
@@ -128,7 +128,7 @@ function MemoryForm({
         <button
           type="submit"
           disabled={!canSave}
-          className="inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-primary/35 bg-primary/10 px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-primary transition hover:bg-primary/15 disabled:cursor-not-allowed disabled:opacity-40"
+          className="inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-primary/35 bg-primary/10 px-4 py-2 font-mono text-2xs uppercase tracking-[0.12em] text-primary transition hover:bg-primary/15 disabled:cursor-not-allowed disabled:opacity-40"
         >
           <Plus className="h-3.5 w-3.5" aria-hidden="true" />
           Salvar memória
@@ -136,12 +136,12 @@ function MemoryForm({
         <button
           type="button"
           onClick={onCancel}
-          className="inline-flex min-h-11 items-center rounded-xl border border-white/10 px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition hover:border-white/20 hover:text-foreground"
+          className="inline-flex min-h-11 items-center rounded-xl border border-white/10 px-4 py-2 font-mono text-2xs uppercase tracking-[0.12em] text-muted transition hover:border-white/20 hover:text-foreground"
         >
           Cancelar
         </button>
         {editing && (
-          <span className="font-mono text-[10px] uppercase tracking-[0.08em] text-muted/60">
+          <span className="font-mono text-2xs uppercase tracking-[0.08em] text-muted/60">
             atualizada em {formatSessionTime(editing.updatedAt)}
           </span>
         )}
@@ -258,7 +258,7 @@ export function MemoryView() {
         <header className="rounded-2xl border border-border bg-surface/60 p-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-primary/70">
+              <p className="font-mono text-2xs uppercase tracking-[0.28em] text-primary/70">
                 arquivo neural
               </p>
               <h2 className="font-display text-xl tracking-[0.12em] text-foreground">Memória</h2>
@@ -270,14 +270,14 @@ export function MemoryView() {
             <button
               type="button"
               onClick={openCreate}
-              className="inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-primary/35 bg-primary/10 px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-primary transition hover:bg-primary/15"
+              className="inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-primary/35 bg-primary/10 px-4 py-2 font-mono text-2xs uppercase tracking-[0.12em] text-primary transition hover:bg-primary/15"
             >
               <Plus className="h-3.5 w-3.5" aria-hidden="true" />
               Nova memória
             </button>
           </div>
 
-          <p className="mt-3 flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.1em] text-muted/60">
+          <p className="mt-3 flex items-center gap-1.5 font-mono text-2xs uppercase tracking-[0.1em] text-muted/60">
             <Database className="h-3 w-3" aria-hidden="true" />
             salvo apenas neste navegador · IndexedDB
           </p>
@@ -321,7 +321,7 @@ export function MemoryView() {
                 type="button"
                 onClick={() => setActiveTag(null)}
                 aria-pressed={effectiveTag === null}
-                className={`inline-flex min-h-9 items-center rounded-full border px-3 text-[10px] uppercase tracking-[0.1em] transition ${
+                className={`inline-flex min-h-9 items-center rounded-full border px-3 text-2xs uppercase tracking-[0.1em] transition ${
                   effectiveTag === null
                     ? 'border-primary/35 bg-primary/10 text-primary'
                     : 'border-white/10 bg-white/5 text-muted hover:border-primary/25 hover:text-primary'
@@ -335,7 +335,7 @@ export function MemoryView() {
                   type="button"
                   onClick={() => setActiveTag(effectiveTag === tag ? null : tag)}
                   aria-pressed={effectiveTag === tag}
-                  className={`inline-flex min-h-9 items-center rounded-full border px-3 text-[10px] uppercase tracking-[0.1em] transition ${
+                  className={`inline-flex min-h-9 items-center rounded-full border px-3 text-2xs uppercase tracking-[0.1em] transition ${
                     effectiveTag === tag
                       ? 'border-primary/35 bg-primary/10 text-primary'
                       : 'border-white/10 bg-white/5 text-muted hover:border-primary/25 hover:text-primary'
@@ -347,19 +347,19 @@ export function MemoryView() {
             </div>
           )}
 
-          <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.1em] text-muted/60">
+          <p className="mt-3 font-mono text-2xs uppercase tracking-[0.1em] text-muted/60">
             {entries.length === 0
               ? 'nenhum registro'
               : `${filtered.length} de ${entries.length} memória${entries.length === 1 ? '' : 's'}`}
           </p>
-          <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.1em] text-muted/60">
+          <p className="mt-1 font-mono text-2xs uppercase tracking-[0.1em] text-muted/60">
             {entries.filter((entry) => entry.enabled).length} memórias ativas para a IA
           </p>
         </div>
 
         {memories.isLoading && (
           <div role="status" className="rounded-2xl border border-border bg-surface/40 p-6">
-            <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
+            <p className="font-mono text-2xs uppercase tracking-[0.12em] text-muted">
               Carregando memórias…
             </p>
           </div>
@@ -374,7 +374,7 @@ export function MemoryView() {
             <button
               type="button"
               onClick={() => void memories.refetch()}
-              className="mt-3 inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-danger/30 bg-danger/10 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-danger transition hover:bg-danger/15"
+              className="mt-3 inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-danger/30 bg-danger/10 px-3 py-2 font-mono text-2xs uppercase tracking-[0.12em] text-danger transition hover:bg-danger/15"
             >
               Tentar novamente
             </button>
@@ -382,7 +382,7 @@ export function MemoryView() {
         )}
 
         {deleteMemory.isError && (
-          <p role="alert" className="text-[11px] text-danger">
+          <p role="alert" className="text-2xs text-danger">
             Não foi possível esquecer a memória. Tente novamente.
           </p>
         )}
@@ -399,7 +399,7 @@ export function MemoryView() {
             <button
               type="button"
               onClick={openCreate}
-              className="mt-4 inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-primary/35 bg-primary/10 px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-primary transition hover:bg-primary/15"
+              className="mt-4 inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-primary/35 bg-primary/10 px-4 py-2 font-mono text-2xs uppercase tracking-[0.12em] text-primary transition hover:bg-primary/15"
             >
               <Plus className="h-3.5 w-3.5" aria-hidden="true" />
               Criar primeira memória
@@ -413,7 +413,7 @@ export function MemoryView() {
             <button
               type="button"
               onClick={clearFilters}
-              className="mt-2 font-mono text-[10px] uppercase tracking-[0.12em] text-primary hover:underline"
+              className="mt-2 font-mono text-2xs uppercase tracking-[0.12em] text-primary hover:underline"
             >
               Limpar filtros
             </button>
@@ -435,7 +435,7 @@ export function MemoryView() {
                   >
                     {entry.title}
                   </h3>
-                  <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.08em] text-muted/60">
+                  <span className="shrink-0 font-mono text-2xs uppercase tracking-[0.08em] text-muted/60">
                     {formatSessionTime(entry.updatedAt)}
                   </span>
                 </div>
@@ -452,7 +452,7 @@ export function MemoryView() {
                           type="button"
                           onClick={() => setActiveTag(effectiveTag === tag ? null : tag)}
                           aria-pressed={effectiveTag === tag}
-                          className={`inline-flex min-h-8 items-center rounded-full border px-2.5 text-[10px] uppercase tracking-[0.08em] transition ${
+                          className={`inline-flex min-h-8 items-center rounded-full border px-2.5 text-2xs uppercase tracking-[0.08em] transition ${
                             effectiveTag === tag
                               ? 'border-primary/35 bg-primary/10 text-primary'
                               : 'border-white/10 bg-white/5 text-muted hover:border-primary/25 hover:text-primary'
@@ -465,7 +465,7 @@ export function MemoryView() {
                   </ul>
                 )}
 
-                <label className="mt-3 flex min-h-9 cursor-pointer items-center gap-2 font-mono text-[10px] uppercase tracking-[0.08em] text-muted">
+                <label className="mt-3 flex min-h-9 cursor-pointer items-center gap-2 font-mono text-2xs uppercase tracking-[0.08em] text-muted">
                   <input
                     type="checkbox"
                     checked={entry.enabled}
@@ -483,7 +483,7 @@ export function MemoryView() {
                     className="mt-3 rounded-xl border border-danger/30 bg-danger/5 p-3"
                   >
                     <p className="text-[12px] text-foreground">Esquecer “{entry.title}”?</p>
-                    <p className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.08em] text-muted">
+                    <p className="mt-0.5 font-mono text-2xs uppercase tracking-[0.08em] text-muted">
                       Esta ação não pode ser desfeita
                     </p>
                     <div className="mt-3 flex gap-2">
@@ -498,14 +498,14 @@ export function MemoryView() {
                           })
                         }
                         disabled={deleteMemory.isPending}
-                        className="inline-flex min-h-11 items-center rounded-lg border border-danger/35 bg-danger/15 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-danger transition hover:bg-danger/25 disabled:opacity-50"
+                        className="inline-flex min-h-11 items-center rounded-lg border border-danger/35 bg-danger/15 px-3 py-2 font-mono text-2xs uppercase tracking-[0.12em] text-danger transition hover:bg-danger/25 disabled:opacity-50"
                       >
                         Esquecer
                       </button>
                       <button
                         type="button"
                         onClick={() => setConfirmingId(null)}
-                        className="inline-flex min-h-11 items-center rounded-lg border border-white/10 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition hover:text-foreground"
+                        className="inline-flex min-h-11 items-center rounded-lg border border-white/10 px-3 py-2 font-mono text-2xs uppercase tracking-[0.12em] text-muted transition hover:text-foreground"
                       >
                         Cancelar
                       </button>
@@ -517,7 +517,7 @@ export function MemoryView() {
                       type="button"
                       onClick={() => openEdit(entry)}
                       aria-label={`Editar ${entry.title}`}
-                      className="inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.1em] text-muted transition hover:border-primary/25 hover:text-primary"
+                      className="inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3 py-2 font-mono text-2xs uppercase tracking-[0.1em] text-muted transition hover:border-primary/25 hover:text-primary"
                     >
                       <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
                       Editar
@@ -526,7 +526,7 @@ export function MemoryView() {
                       type="button"
                       onClick={() => setConfirmingId(entry.id)}
                       aria-label={`Esquecer ${entry.title}`}
-                      className="inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.1em] text-muted transition hover:border-danger/30 hover:text-danger"
+                      className="inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3 py-2 font-mono text-2xs uppercase tracking-[0.1em] text-muted transition hover:border-danger/30 hover:text-danger"
                     >
                       <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
                       Esquecer

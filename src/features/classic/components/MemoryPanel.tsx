@@ -29,7 +29,7 @@ export function MemoryPanel() {
 
   return (
     <div className="flex h-full flex-col gap-3 overflow-hidden">
-      <div className="flex items-center gap-2"><Brain className="h-4 w-4" style={{ color: '#a855f7' }} /><span style={{ ...mono, color: '#a855f7', fontSize: '10px' }}>MEMÓRIAS LOCAIS</span></div>
+      <div className="flex items-center gap-2"><Brain className="h-4 w-4" style={{ color: '#a855f7' }} /><span style={{ ...mono, color: '#a855f7', fontSize: '0.6875rem' }}>MEMÓRIAS LOCAIS</span></div>
       <label className="flex items-center gap-2 rounded-lg px-3 py-2" style={{ background: 'rgba(0,8,25,0.6)', border: '1px solid rgba(168,85,247,0.2)' }}>
         <Search className="h-3.5 w-3.5" style={{ color: '#a855f7' }} />
         <input aria-label="Buscar memórias" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar memórias" className="min-w-0 flex-1 bg-transparent outline-none" style={{ ...raj, color: 'white' }} />
@@ -37,7 +37,7 @@ export function MemoryPanel() {
       <div className="flex flex-col gap-2 rounded-xl p-2" style={{ background: 'rgba(0,8,25,0.5)', border: '1px solid rgba(168,85,247,0.15)' }}>
         <input aria-label="Título da memória" value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Título" className="bg-transparent px-1 outline-none" style={{ ...raj, color: 'white' }} />
         <textarea aria-label="Conteúdo da memória" value={content} onChange={(event) => setContent(event.target.value)} placeholder="Conteúdo" rows={2} className="resize-none bg-transparent px-1 outline-none" style={{ ...raj, color: 'white' }} />
-        <button type="button" onClick={() => void add()} disabled={create.isPending || !title.trim() || !content.trim()} className="flex items-center justify-center gap-1 rounded-lg py-1.5 disabled:opacity-40" style={{ ...mono, color: '#d8b4fe', background: 'rgba(168,85,247,0.12)', fontSize: '9px' }}><Plus className="h-3 w-3" /> ADICIONAR</button>
+        <button type="button" onClick={() => void add()} disabled={create.isPending || !title.trim() || !content.trim()} className="flex items-center justify-center gap-1 rounded-lg py-1.5 disabled:opacity-40" style={{ ...mono, color: '#d8b4fe', background: 'rgba(168,85,247,0.12)', fontSize: '0.6875rem' }}><Plus className="h-3 w-3" /> ADICIONAR</button>
       </div>
       <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto">
         {memories.isLoading && <p style={{ ...raj, color: 'rgba(255,255,255,0.5)' }}>Carregando memórias…</p>}
@@ -61,7 +61,7 @@ export function MemoryPanel() {
               </div>
             </div>
             <p className="mt-1 line-clamp-3" style={{ ...raj, color: 'rgba(255,255,255,0.6)', fontSize: '12px' }}>{entry.content}</p>
-            <label className="mt-2 flex items-center gap-2" style={{ ...mono, color: entry.enabled ? '#22c55e' : 'rgba(255,255,255,.4)', fontSize: '8px' }}>
+            <label className="mt-2 flex items-center gap-2" style={{ ...mono, color: entry.enabled ? '#22c55e' : 'rgba(255,255,255,.4)', fontSize: '0.6875rem' }}>
               <input type="checkbox" checked={entry.enabled} onChange={(event) => setEnabled.mutate({ id: entry.id, enabled: event.target.checked })} /> USAR NESTA IA
             </label>
             </>}

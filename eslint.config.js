@@ -41,6 +41,17 @@ export default tseslint.config(
         'error',
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
       ],
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: "Property[key.name='fontSize'][value.value=/^(?:[0-9]|10)px$/]",
+          message: 'Fontes abaixo de 11px não atendem ao mínimo legível; use rem e pelo menos 0.6875rem.',
+        },
+        {
+          selector: "Literal[value=/text-\\[(?:[0-9]|10)px\\]/]",
+          message: 'Use text-2xs em vez de classes Tailwind com fonte menor que 11px.',
+        },
+      ],
     },
   },
   {

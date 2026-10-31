@@ -39,7 +39,7 @@ function Badge({ tone, label }: { tone: Tone; label: string }) {
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.14em]',
+        'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 font-mono text-2xs uppercase tracking-[0.14em]',
         TONE_STYLES[tone],
       )}
     >
@@ -60,7 +60,7 @@ function Panel({
 }) {
   return (
     <section className="rounded-2xl border border-border bg-surface/50 p-4 sm:p-5">
-      <h3 className="flex items-center gap-2 font-display text-[11px] tracking-[0.2em] text-primary">
+      <h3 className="flex items-center gap-2 font-display text-2xs tracking-[0.2em] text-primary">
         <Icon className="h-3.5 w-3.5" aria-hidden="true" />
         {title}
       </h3>
@@ -72,7 +72,7 @@ function Panel({
 function Row({ label, value }: { label: string; value: ReactNode }) {
   return (
     <div className="flex items-baseline justify-between gap-3">
-      <dt className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted/70">{label}</dt>
+      <dt className="font-mono text-2xs uppercase tracking-[0.12em] text-muted/70">{label}</dt>
       <dd className="text-right text-[12px] text-foreground">{value}</dd>
     </div>
   );
@@ -107,7 +107,7 @@ function QuotaMeter({
   return (
     <div>
       <div className="flex items-baseline justify-between gap-3">
-        <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted/70">
+        <span className="font-mono text-2xs uppercase tracking-[0.12em] text-muted/70">
           {label}
         </span>
         <span className="font-mono text-lg tabular-nums text-primary">
@@ -181,7 +181,7 @@ export function MonitorView() {
       <div className="mx-auto w-full max-w-3xl space-y-3">
         <header className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-surface/60 p-5">
           <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-primary/70">
+            <p className="font-mono text-2xs uppercase tracking-[0.28em] text-primary/70">
               telemetria do núcleo
             </p>
             <h2 className="font-display text-xl tracking-[0.12em] text-foreground">Monitor</h2>
@@ -200,7 +200,7 @@ export function MonitorView() {
             }}
             disabled={demoMode || busy}
             aria-label="Atualizar telemetria"
-            className="inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-primary/35 bg-primary/10 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-primary transition hover:bg-primary/15 disabled:cursor-not-allowed disabled:opacity-40"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-primary/35 bg-primary/10 px-3 py-2 font-mono text-2xs uppercase tracking-[0.12em] text-primary transition hover:bg-primary/15 disabled:cursor-not-allowed disabled:opacity-40"
           >
             <RefreshCw className={cn('h-3.5 w-3.5', busy && 'animate-spin')} aria-hidden="true" />
             {busy ? 'Atualizando…' : 'Atualizar'}
@@ -222,22 +222,22 @@ export function MonitorView() {
             <div className="flex items-center justify-between gap-2">
               <Badge tone={healthTone} label={healthLabel} />
               {health.data?.version && (
-                <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
+                <span className="font-mono text-2xs uppercase tracking-[0.12em] text-muted">
                   v{health.data.version}
                 </span>
               )}
             </div>
             <dl className="space-y-1.5">
-              <Row label="endpoint" value={<span className="font-mono text-[11px]">{endpoint}</span>} />
+              <Row label="endpoint" value={<span className="font-mono text-2xs">{endpoint}</span>} />
               <Row label="adaptador" value={demoMode ? 'Mock local' : 'HTTP remoto'} />
             </dl>
             {healthError && (
-              <p role="alert" className="text-[11px] leading-relaxed text-danger">
+              <p role="alert" className="text-2xs leading-relaxed text-danger">
                 {healthError}
               </p>
             )}
             {!demoMode && health.data?.message && (
-              <p className="text-[11px] leading-relaxed text-muted">{health.data.message}</p>
+              <p className="text-2xs leading-relaxed text-muted">{health.data.message}</p>
             )}
           </Panel>
 
@@ -266,7 +266,7 @@ export function MonitorView() {
 
           <Panel title="COTA DIÁRIA" icon={Gauge}>
             {usageError ? (
-              <p role="alert" className="text-[11px] leading-relaxed text-danger">
+              <p role="alert" className="text-2xs leading-relaxed text-danger">
                 {usageError}
               </p>
             ) : (
@@ -285,7 +285,7 @@ export function MonitorView() {
 
           <Panel title="POR MINUTO" icon={Timer}>
             {usageError ? (
-              <p role="alert" className="text-[11px] leading-relaxed text-danger">
+              <p role="alert" className="text-2xs leading-relaxed text-danger">
                 {usageError}
               </p>
             ) : (
@@ -300,15 +300,15 @@ export function MonitorView() {
           <div className="sm:col-span-2">
             <Panel title="MODELOS E PROVEDORES" icon={Layers}>
               {demoMode ? (
-                <p className="text-[11px] leading-relaxed text-muted">
+                <p className="text-2xs leading-relaxed text-muted">
                   Catálogo indisponível no modo demonstração.
                 </p>
               ) : modelsError ? (
-                <p role="alert" className="text-[11px] leading-relaxed text-danger">
+                <p role="alert" className="text-2xs leading-relaxed text-danger">
                   {modelsError}
                 </p>
               ) : models.isLoading ? (
-                <p role="status" className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
+                <p role="status" className="font-mono text-2xs uppercase tracking-[0.12em] text-muted">
                   Carregando catálogo…
                 </p>
               ) : (
@@ -332,7 +332,7 @@ export function MonitorView() {
                                 : `${provider.name} indisponível`
                             }
                             className={cn(
-                              'inline-flex items-center gap-1 rounded-full border px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.1em]',
+                              'inline-flex items-center gap-1 rounded-full border px-2 py-0.5 font-mono text-2xs uppercase tracking-[0.1em]',
                               provider.available
                                 ? 'border-success/20 bg-success/5 text-success'
                                 : 'border-white/10 bg-white/5 text-muted',
@@ -350,11 +350,11 @@ export function MonitorView() {
                   <dl className="space-y-1.5">
                     <Row
                       label="modelo padrão"
-                      value={<span className="font-mono text-[11px]">{models.data?.default_model ?? 'Automático'}</span>}
+                      value={<span className="font-mono text-2xs">{models.data?.default_model ?? 'Automático'}</span>}
                     />
                     <Row
                       label="em uso"
-                      value={<span className="font-mono text-[11px]">{selectedModelId ?? 'Automático'}</span>}
+                      value={<span className="font-mono text-2xs">{selectedModelId ?? 'Automático'}</span>}
                     />
                   </dl>
 
@@ -381,7 +381,7 @@ export function MonitorView() {
                           )}
                           Automático
                         </span>
-                        <span className="ml-auto font-mono text-[10px] text-muted/70">
+                        <span className="ml-auto font-mono text-2xs text-muted/70">
                           o servidor escolhe
                         </span>
                       </button>
@@ -417,14 +417,14 @@ export function MonitorView() {
                                 )}
                                 {model.name}
                                 {model.selectable === false && (
-                                  <span className="text-[9px] text-muted">· indisponível</span>
+                                  <span className="text-2xs text-muted">· indisponível</span>
                                 )}
                               </span>
-                              <span className="font-mono text-[10px] text-muted/70">
+                              <span className="font-mono text-2xs text-muted/70">
                                 {model.model_id}
                               </span>
                             </div>
-                            <div className="mt-1 flex flex-wrap items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.1em]">
+                            <div className="mt-1 flex flex-wrap items-center gap-1.5 font-mono text-2xs uppercase tracking-[0.1em]">
                               {model.provider && (
                                 <span className="rounded-full border border-primary/20 bg-primary/5 px-2 py-0.5 text-primary/80">
                                   {model.provider}
@@ -460,7 +460,7 @@ export function MonitorView() {
                   </ul>
 
                   {modelList.length === 0 && (
-                    <p className="text-[11px] text-muted">
+                    <p className="text-2xs text-muted">
                       Nenhum modelo disponível; a seleção automática continua ativa.
                     </p>
                   )}
@@ -474,7 +474,7 @@ export function MonitorView() {
 
         <ApiLetter />
 
-        <p className="flex items-center gap-1.5 pb-2 font-mono text-[10px] uppercase tracking-[0.1em] text-muted/60">
+        <p className="flex items-center gap-1.5 pb-2 font-mono text-2xs uppercase tracking-[0.1em] text-muted/60">
           <Clock className="h-3 w-3" aria-hidden="true" />
           {demoMode
             ? 'telemetria desligada no modo demonstração'
@@ -498,11 +498,11 @@ function OllamaMonitor() {
     <section aria-label="Monitor Ollama" className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
       <div className="mx-auto w-full max-w-3xl space-y-3">
         <header className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-surface/60 p-5">
-          <div><p className="font-mono text-[10px] uppercase tracking-[0.28em] text-primary/70">execução local</p><h2 className="font-display text-xl tracking-[0.12em] text-foreground">Monitor Ollama</h2><p className="mt-1 text-sm text-muted">Status e modelos disponíveis nesta máquina.</p></div>
-          <button type="button" onClick={refresh} disabled={busy} className="inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-primary/35 bg-primary/10 px-3 py-2 font-mono text-[10px] uppercase text-primary disabled:opacity-40"><RefreshCw className={cn('h-3.5 w-3.5', busy && 'animate-spin')} />{busy ? 'Atualizando…' : 'Atualizar'}</button>
+          <div><p className="font-mono text-2xs uppercase tracking-[0.28em] text-primary/70">execução local</p><h2 className="font-display text-xl tracking-[0.12em] text-foreground">Monitor Ollama</h2><p className="mt-1 text-sm text-muted">Status e modelos disponíveis nesta máquina.</p></div>
+          <button type="button" onClick={refresh} disabled={busy} className="inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-primary/35 bg-primary/10 px-3 py-2 font-mono text-2xs uppercase text-primary disabled:opacity-40"><RefreshCw className={cn('h-3.5 w-3.5', busy && 'animate-spin')} />{busy ? 'Atualizando…' : 'Atualizar'}</button>
         </header>
-        <Panel title="OLLAMA LOCAL" icon={Wifi}><div className="flex justify-between"><Badge tone={tone} label={health.isError ? 'offline' : health.isLoading ? 'verificando' : 'online'} /><span className="font-mono text-[10px] text-muted">{health.data ? `v${health.data}` : ''}</span></div><dl><Row label="URL local" value={<span className="font-mono text-[11px]">{ollamaBase()}</span>} /><Row label="Modelos instalados" value={models.data?.models.length ?? '…'} /><Row label="Modelos carregados" value={processes.data?.models.length ?? (processes.isError ? 'indisponível' : '…')} /></dl>{health.isError && <p role="alert" className="text-[11px] text-danger">{health.error instanceof Error ? health.error.message : 'Ollama indisponível. Inicie com ollama serve.'}</p>}</Panel>
-        <Panel title="MODELOS LOCAIS" icon={Layers}>{models.isLoading && <p className="text-xs text-muted">Consultando Ollama…</p>}{models.isError && <p role="alert" className="text-xs text-danger">{describeError(models.error).message}</p>}{models.data?.models.length === 0 && <p className="text-xs text-muted">Nenhum modelo instalado. Execute <code>ollama pull &lt;modelo&gt;</code>.</p>}<ul className="space-y-2">{models.data?.models.map((model) => <li key={model.model_id} className="flex items-center justify-between gap-3 rounded-xl border border-white/5 bg-background/40 p-3"><span className="min-w-0"><span className="block truncate text-sm text-foreground">{model.name}</span><span className="font-mono text-[10px] text-muted">{model.family ?? 'família desconhecida'} · {model.parameter_size ?? 'parâmetros —'} · {model.quantization_level ?? 'quantização —'} · {model.context_window ?? '—'} tokens{model.size_bytes ? ` · ${(model.size_bytes / 1_000_000_000).toFixed(1)} GB` : ''}</span></span><Badge tone="success" label="local" /></li>)}</ul></Panel>
+        <Panel title="OLLAMA LOCAL" icon={Wifi}><div className="flex justify-between"><Badge tone={tone} label={health.isError ? 'offline' : health.isLoading ? 'verificando' : 'online'} /><span className="font-mono text-2xs text-muted">{health.data ? `v${health.data}` : ''}</span></div><dl><Row label="URL local" value={<span className="font-mono text-2xs">{ollamaBase()}</span>} /><Row label="Modelos instalados" value={models.data?.models.length ?? '…'} /><Row label="Modelos carregados" value={processes.data?.models.length ?? (processes.isError ? 'indisponível' : '…')} /></dl>{health.isError && <p role="alert" className="text-2xs text-danger">{health.error instanceof Error ? health.error.message : 'Ollama indisponível. Inicie com ollama serve.'}</p>}</Panel>
+        <Panel title="MODELOS LOCAIS" icon={Layers}>{models.isLoading && <p className="text-xs text-muted">Consultando Ollama…</p>}{models.isError && <p role="alert" className="text-xs text-danger">{describeError(models.error).message}</p>}{models.data?.models.length === 0 && <p className="text-xs text-muted">Nenhum modelo instalado. Execute <code>ollama pull &lt;modelo&gt;</code>.</p>}<ul className="space-y-2">{models.data?.models.map((model) => <li key={model.model_id} className="flex items-center justify-between gap-3 rounded-xl border border-white/5 bg-background/40 p-3"><span className="min-w-0"><span className="block truncate text-sm text-foreground">{model.name}</span><span className="font-mono text-2xs text-muted">{model.family ?? 'família desconhecida'} · {model.parameter_size ?? 'parâmetros —'} · {model.quantization_level ?? 'quantização —'} · {model.context_window ?? '—'} tokens{model.size_bytes ? ` · ${(model.size_bytes / 1_000_000_000).toFixed(1)} GB` : ''}</span></span><Badge tone="success" label="local" /></li>)}</ul></Panel>
       </div>
     </section>
   );

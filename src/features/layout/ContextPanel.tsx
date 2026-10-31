@@ -63,11 +63,11 @@ export function ContextPanel({ sessionId }: { sessionId: string | null }) {
     >
       <div className="flex flex-col items-center border-b border-white/5 px-4 py-5">
         <Orb state={aiState} size="md" />
-        <p className="mt-3 font-display text-[11px] tracking-[0.22em] text-primary">NÚCLEO NEXA</p>
+        <p className="mt-3 font-display text-2xs tracking-[0.22em] text-primary">NÚCLEO NEXA</p>
         <p
           role="status"
           aria-live="polite"
-          className="mt-1 font-mono text-[10px] uppercase tracking-[0.2em] text-muted"
+          className="mt-1 font-mono text-2xs uppercase tracking-[0.2em] text-muted"
         >
           {AI_STATE_LABEL[aiState]}
         </p>
@@ -80,30 +80,30 @@ export function ContextPanel({ sessionId }: { sessionId: string | null }) {
         className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4"
       >
         <section>
-          <h2 className="font-display text-[10px] tracking-[0.22em] text-primary/80">PERFIL</h2>
+          <h2 className="font-display text-2xs tracking-[0.22em] text-primary/80">PERFIL</h2>
           <p className="mt-2 truncate text-sm text-foreground">{displayName && displayName !== 'Operador' ? displayName : auth?.username ?? 'Visitante'}</p>
-          <p className="font-mono text-[10px] uppercase text-muted">{offlineMode ? 'modo offline' : `${auth?.username ?? 'sem conta'} · ${auth?.role ?? 'demo'}`}</p>
+          <p className="font-mono text-2xs uppercase text-muted">{offlineMode ? 'modo offline' : `${auth?.username ?? 'sem conta'} · ${auth?.role ?? 'demo'}`}</p>
         </section>
 
         <section>
-          <h2 className="font-display text-[10px] tracking-[0.22em] text-primary/80">IA</h2>
+          <h2 className="font-display text-2xs tracking-[0.22em] text-primary/80">IA</h2>
           <p className="mt-2 truncate text-xs text-foreground">{offlineMode ? 'Ollama (local)' : demoMode ? 'NEXA demonstração' : model?.provider ?? 'Provedor —'}</p>
-          <p className="truncate font-mono text-[10px] text-muted">
+          <p className="truncate font-mono text-2xs text-muted">
             {modelId ?? (offlineMode ? 'Automático' : 'Modelo —')}{!offlineMode && <> · chave {latest?.keySource === 'user' || model?.key_source === 'user' ? 'própria' : 'do servidor'}</>}
           </p>
         </section>
 
         <section>
-          <h2 className="font-display text-[10px] tracking-[0.22em] text-primary/80">SESSÃO</h2>
+          <h2 className="font-display text-2xs tracking-[0.22em] text-primary/80">SESSÃO</h2>
           <dl className="mt-2 grid grid-cols-2 gap-2">
             <div className="col-span-2 rounded-xl border border-white/5 bg-background/40 p-2.5">
-              <dt className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted/70">
+              <dt className="font-mono text-2xs uppercase tracking-[0.12em] text-muted/70">
                 conversa
               </dt>
               <dd className="mt-0.5 truncate text-[13px] text-foreground">{sessionLabel}</dd>
             </div>
             <div className="rounded-xl border border-white/5 bg-background/40 p-2.5">
-              <dt className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted/70">
+              <dt className="font-mono text-2xs uppercase tracking-[0.12em] text-muted/70">
                 mensagens
               </dt>
               <dd className="mt-0.5 font-mono text-lg tabular-nums text-primary">
@@ -111,7 +111,7 @@ export function ContextPanel({ sessionId }: { sessionId: string | null }) {
               </dd>
             </div>
             <div className="rounded-xl border border-white/5 bg-background/40 p-2.5">
-              <dt className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted/70">
+              <dt className="font-mono text-2xs uppercase tracking-[0.12em] text-muted/70">
                 atualizada
               </dt>
               <dd className="mt-1 font-mono text-xs text-foreground">
@@ -122,16 +122,16 @@ export function ContextPanel({ sessionId }: { sessionId: string | null }) {
         </section>
 
         <section>
-          <h2 className="font-display text-[10px] tracking-[0.22em] text-primary/80">CONSUMO</h2>
+          <h2 className="font-display text-2xs tracking-[0.22em] text-primary/80">CONSUMO</h2>
           <p className="mt-2 font-mono text-xs text-foreground">Última: {latest?.inputTokens !== undefined || latest?.outputTokens !== undefined ? `${latest.inputTokens ?? '—'} / ${latest.outputTokens ?? '—'} tokens` : '—'}</p>
-          <p className="font-mono text-[10px] text-muted">Conversa: {tokenTotals.input || tokenTotals.output ? `${tokenTotals.input} / ${tokenTotals.output} tokens` : '—'}</p>
+          <p className="font-mono text-2xs text-muted">Conversa: {tokenTotals.input || tokenTotals.output ? `${tokenTotals.input} / ${tokenTotals.output} tokens` : '—'}</p>
           {!offlineMode && (
             <div>
-              <p className="mt-1 font-mono text-[10px] text-muted">
+              <p className="mt-1 font-mono text-2xs text-muted">
                 Hoje: {usage.data?.daily_remaining ?? '—'} · minuto: {usage.data?.per_minute_remaining ?? '—'}
               </p>
               {usage.data?.resets_at && (
-                <p className="font-mono text-[10px] text-muted">
+                <p className="font-mono text-2xs text-muted">
                   Renova {new Date(usage.data.resets_at).toLocaleTimeString()}
                 </p>
               )}
@@ -140,14 +140,14 @@ export function ContextPanel({ sessionId }: { sessionId: string | null }) {
         </section>
 
         <section>
-          <h2 className="font-display text-[10px] tracking-[0.22em] text-primary/80">TEMPO E CONTEXTO</h2>
-          <p className="mt-2 font-mono text-[10px] text-muted">Conversa: {elapsedMinutes} min · latência: {averageLatency === undefined || !Number.isFinite(averageLatency) ? '—' : `${(averageLatency / 1000).toFixed(1)} s`} · tokens/s: {averageSpeed === undefined ? '—' : averageSpeed.toFixed(1)}</p>
-          <p className="mt-1 font-mono text-[10px] text-muted">Memórias ativas: {memories.isLoading ? '…' : activeMemories} · voz: {ttsEnabled ? 'ligada' : 'desligada'}</p>
-          <p className="font-mono text-[10px] text-muted">Duração última resposta: {latest ? `${(latest.durationMs / 1000).toFixed(1)} s` : '—'}</p>
+          <h2 className="font-display text-2xs tracking-[0.22em] text-primary/80">TEMPO E CONTEXTO</h2>
+          <p className="mt-2 font-mono text-2xs text-muted">Conversa: {elapsedMinutes} min · latência: {averageLatency === undefined || !Number.isFinite(averageLatency) ? '—' : `${(averageLatency / 1000).toFixed(1)} s`} · tokens/s: {averageSpeed === undefined ? '—' : averageSpeed.toFixed(1)}</p>
+          <p className="mt-1 font-mono text-2xs text-muted">Memórias ativas: {memories.isLoading ? '…' : activeMemories} · voz: {ttsEnabled ? 'ligada' : 'desligada'}</p>
+          <p className="font-mono text-2xs text-muted">Duração última resposta: {latest ? `${(latest.durationMs / 1000).toFixed(1)} s` : '—'}</p>
         </section>
 
         <section>
-          <h2 className="flex items-center gap-1.5 font-display text-[10px] tracking-[0.22em] text-primary/80">
+          <h2 className="flex items-center gap-1.5 font-display text-2xs tracking-[0.22em] text-primary/80">
             <Gauge className="h-3 w-3" aria-hidden="true" />
             SUBSISTEMAS
           </h2>
@@ -158,18 +158,18 @@ export function ContextPanel({ sessionId }: { sessionId: string | null }) {
                 className="flex items-center gap-2 rounded-lg border border-white/5 bg-background/30 px-2.5 py-2"
               >
                 <Icon className="h-3.5 w-3.5 shrink-0 text-primary/70" aria-hidden="true" />
-                <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted">
+                <span className="font-mono text-2xs uppercase tracking-[0.1em] text-muted">
                   {label}
                 </span>
-                <span className="ml-auto text-right text-[11px] text-foreground/80">{value}</span>
+                <span className="ml-auto text-right text-2xs text-foreground/80">{value}</span>
               </li>
             ))}
             <li className="flex items-center gap-2 rounded-lg border border-white/5 bg-background/30 px-2.5 py-2">
               <Cpu className="h-3.5 w-3.5 shrink-0 text-primary/70" aria-hidden="true" />
-              <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted">
+              <span className="font-mono text-2xs uppercase tracking-[0.1em] text-muted">
                 Adaptador
               </span>
-              <span className="ml-auto text-right text-[11px] text-foreground/80">
+              <span className="ml-auto text-right text-2xs text-foreground/80">
                 {offlineMode ? 'Ollama local' : demoMode ? 'Mock local' : 'HTTP remoto'}
               </span>
             </li>
@@ -177,7 +177,7 @@ export function ContextPanel({ sessionId }: { sessionId: string | null }) {
         </section>
 
         {demoMode && <div className="rounded-xl border border-warning/20 bg-warning/5 p-2.5">
-          <p className="font-mono text-[10px] uppercase leading-relaxed tracking-[0.12em] text-warning/90">
+          <p className="font-mono text-2xs uppercase leading-relaxed tracking-[0.12em] text-warning/90">
             Demonstração · respostas simuladas localmente
           </p>
         </div>}

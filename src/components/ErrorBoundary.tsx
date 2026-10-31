@@ -40,7 +40,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
         role="alert"
         className="flex min-h-dvh flex-col items-center justify-center gap-4 bg-background p-6 text-center"
       >
-        <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-danger">
+        <p className="font-mono text-2xs uppercase tracking-[0.28em] text-danger">
           falha no núcleo
         </p>
         <h1 className="font-display text-xl tracking-[0.12em] text-foreground">
@@ -54,14 +54,14 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
           <button
             type="button"
             onClick={this.retry}
-            className="inline-flex min-h-11 items-center rounded-xl border border-primary/35 bg-primary/10 px-4 py-2 font-mono text-[10px] uppercase tracking-[0.14em] text-primary transition hover:bg-primary/15"
+            className="inline-flex min-h-11 items-center rounded-xl border border-primary/35 bg-primary/10 px-4 py-2 font-mono text-2xs uppercase tracking-[0.14em] text-primary transition hover:bg-primary/15"
           >
             Tentar novamente
           </button>
           <button
             type="button"
             onClick={() => window.location.reload()}
-            className="inline-flex min-h-11 items-center rounded-xl border border-white/10 px-4 py-2 font-mono text-[10px] uppercase tracking-[0.14em] text-muted transition hover:border-white/20 hover:text-foreground"
+            className="inline-flex min-h-11 items-center rounded-xl border border-white/10 px-4 py-2 font-mono text-2xs uppercase tracking-[0.14em] text-muted transition hover:border-white/20 hover:text-foreground"
           >
             Recarregar página
           </button>

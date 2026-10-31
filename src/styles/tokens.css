@@ -25,6 +25,9 @@
   --font-display: 'Orbitron Variable', 'Orbitron', sans-serif;
   --font-ui: 'Rajdhani', 'Segoe UI', sans-serif;
   --font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', monospace;
+
+  --nexa-text-2xs: 0.6875rem;
+  --nexa-text-xs-plus: 0.75rem;
 }
 
 @theme inline {
@@ -45,6 +48,8 @@
   --font-display: var(--font-display);
   --font-ui: var(--font-ui);
   --font-mono: var(--font-mono);
+  --text-2xs: var(--nexa-text-2xs);
+  --text-xs-plus: var(--nexa-text-xs-plus);
 
   --radius-sm: var(--nexa-radius-sm);
   --radius-md: var(--nexa-radius-md);

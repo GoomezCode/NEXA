@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useApiHealth } from '@/api/health';
 import { useOllamaHealth } from '@/api/ollama';
 import { useConnectionStore } from '@/stores/connection-store';
+import { useElementSize } from '@/hooks/use-element-size';
 import { useApp } from '../ClassicContext';
 
 const orb = { fontFamily: 'Orbitron, sans-serif' };
@@ -98,6 +99,9 @@ export function AICore() {
   const offlineMode = useConnectionStore((state) => state.mode === 'offline');
   const ollama = useOllamaHealth();
   const cfg = stateConfig[aiState];
+  const orbSize = useElementSize<HTMLDivElement>();
+  const coreSize = orbSize.width || 380;
+  const ringSize = (referenceSize: number) => Math.round(coreSize * referenceSize / 380);
   const reducedMotion = useReducedMotion() ?? false;
   const coreRef = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(true);
@@ -123,14 +127,14 @@ export function AICore() {
       style={{ perspective: '600px' }}
     >
       {/* Outer data ring indicators */}
-      <div className="relative" style={{ width: 380, height: 380 }}>
+      <div ref={orbSize.ref} className="relative max-w-full" style={{ width: 'min(380px, 80vw, 50dvh)', aspectRatio: '1' }}>
         {/* Data point markers */}
         {/* Outer dashed ring */}
-        <Ring size={340} thickness={1} color="rgba(0,245,255,0.1)" duration={40} dashed motionEnabled={motionEnabled} />
+        <Ring size={ringSize(340)} thickness={1} color="rgba(0,245,255,0.1)" duration={40} dashed motionEnabled={motionEnabled} />
 
         {/* Ring 1 — large slow */}
         <Ring
-          size={300}
+          size={ringSize(300)}
           thickness={1}
           color={cfg.ringColor.replace('0.5', '0.2')}
           duration={20}
@@ -140,7 +144,7 @@ export function AICore() {
         />
         {/* Ring 2 — medium counter */}
         <Ring
-          size={260}
+          size={ringSize(260)}
           thickness={1.5}
           color={cfg.ringColor.replace('0.5', '0.3')}
           duration={14}
@@ -149,7 +153,7 @@ export function AICore() {
           motionEnabled={motionEnabled}
         />
         {/* Ring 3 — fast accent */}
-        <Ring size={210} thickness={1} color={cfg.ringColor} duration={8} direction={1} motionEnabled={motionEnabled} />
+        <Ring size={ringSize(210)} thickness={1} color={cfg.ringColor} duration={8} direction={1} motionEnabled={motionEnabled} />
 
         {/* Pulse wave rings */}
         <motion.div
@@ -157,12 +161,12 @@ export function AICore() {
           transition={{ duration: cfg.pulseSpeed * 2, repeat: motionEnabled ? Infinity : 0 }}
           className="absolute rounded-full"
           style={{
-            width: 180,
-            height: 180,
+            width: ringSize(180),
+            height: ringSize(180),
             left: '50%',
             top: '50%',
-            marginLeft: -90,
-            marginTop: -90,
+            marginLeft: -ringSize(90),
+            marginTop: -ringSize(90),
             border: `1px solid ${cfg.color}`,
           }}
         />
@@ -171,12 +175,12 @@ export function AICore() {
           transition={{ duration: cfg.pulseSpeed * 2, repeat: motionEnabled ? Infinity : 0, delay: 0.4 }}
           className="absolute rounded-full"
           style={{
-            width: 180,
-            height: 180,
+            width: ringSize(180),
+            height: ringSize(180),
             left: '50%',
             top: '50%',
-            marginLeft: -90,
-            marginTop: -90,
+            marginLeft: -ringSize(90),
+            marginTop: -ringSize(90),
             border: `1px solid ${cfg.color}`,
           }}
         />
@@ -193,12 +197,12 @@ export function AICore() {
           title={voiceListening ? 'Clique para parar o microfone' : voiceSupported ? 'Clique para falar com a NEXA' : 'Reconhecimento de voz indisponível'}
           className="absolute flex cursor-pointer items-center justify-center rounded-full p-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 disabled:cursor-not-allowed"
           style={{
-            width: 160,
-            height: 160,
+            width: ringSize(160),
+            height: ringSize(160),
             left: '50%',
             top: '50%',
-            marginLeft: -80,
-            marginTop: -80,
+            marginLeft: -ringSize(80),
+            marginTop: -ringSize(80),
             background: `radial-gradient(circle at 35% 35%, ${cfg.color}25 0%, rgba(0,5,20,0.9) 60%, rgba(0,2,10,1) 100%)`,
             border: `2px solid ${cfg.color}`,
             boxShadow: `0 0 30px ${cfg.glow}, 0 0 60px ${cfg.glow.replace('0.5', '0.2')}, inset 0 0 30px ${cfg.glow.replace('0.5', '0.15')}`,
@@ -211,8 +215,8 @@ export function AICore() {
             transition={{ duration: cfg.pulseSpeed, repeat: motionEnabled ? Infinity : 0 }}
             className="rounded-full flex items-center justify-center flex-col gap-1"
             style={{
-              width: 120,
-              height: 120,
+              width: ringSize(120),
+              height: ringSize(120),
               background: `radial-gradient(circle, ${cfg.color}20 0%, transparent 70%)`,
             }}
           >
@@ -239,7 +243,7 @@ export function AICore() {
               style={{
                 ...orb,
                 color: cfg.color,
-                fontSize: '8px',
+                fontSize: '0.6875rem',
                 letterSpacing: '0.1em',
                 textAlign: 'center',
                 opacity: 0.9,
@@ -277,7 +281,7 @@ export function AICore() {
               style={{
                 ...mono,
                 color: 'rgba(255,255,255,0.35)',
-                fontSize: '10px',
+                fontSize: '0.6875rem',
                 letterSpacing: '0.12em',
               }}
             >
@@ -300,7 +304,7 @@ export function AICore() {
                 style={{ background: active ? cfg.color : 'rgba(255,255,255,0.06)' }}
               >
               </div>
-              <span style={{ ...mono, color: 'rgba(255,255,255,0.25)', fontSize: '8px' }}>
+              <span style={{ ...mono, color: 'rgba(255,255,255,0.25)', fontSize: '0.6875rem' }}>
                 {name}
               </span>
             </div>
@@ -310,14 +314,14 @@ export function AICore() {
         <motion.p
           animate={motionEnabled ? { opacity: [0.3, 0.6, 0.3] } : { opacity: 0.5 }}
           transition={{ duration: 3, repeat: motionEnabled ? Infinity : 0 }}
-          style={{ ...raj, color: 'rgba(0,245,255,0.4)', fontSize: '11px', marginTop: 4 }}
+          style={{ ...raj, color: 'rgba(0,245,255,0.4)', fontSize: '0.6875rem', marginTop: 4 }}
         >
           {offlineMode ? ollama.isError ? 'OLLAMA LOCAL INDISPONÍVEL' : ollama.data ? `OLLAMA ${ollama.data} CONECTADO` : 'VERIFICANDO OLLAMA' : health.data?.status === 'ok' ? 'API CONNECTADA' : 'STATUS DA API INDISPONÍVEL'}
         </motion.p>
         <motion.p
           animate={motionEnabled ? { opacity: [0.35, 0.65, 0.35] } : { opacity: 0.5 }}
           transition={{ duration: 2.4, repeat: motionEnabled ? Infinity : 0 }}
-          style={{ ...mono, color: 'rgba(0,245,255,0.32)', fontSize: '8px', letterSpacing: '0.08em' }}
+          style={{ ...mono, color: 'rgba(0,245,255,0.32)', fontSize: '0.6875rem', letterSpacing: '0.08em' }}
         >
           {voiceListening ? 'TOQUE PARA ENCERRAR A ESCUTA' : voiceSupported ? 'TOQUE NO NÚCLEO PARA FALAR' : 'MICROFONE INDISPONÍVEL'}
         </motion.p>

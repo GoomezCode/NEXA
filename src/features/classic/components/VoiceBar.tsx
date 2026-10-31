@@ -211,7 +211,7 @@ export function VoiceBar() {
       {/* Mic / Status indicator */}
       <div className="flex flex-col items-center gap-1 flex-shrink-0">
         {/* State label */}
-        <span style={{ ...mono, color: stateColor, fontSize: '8px', letterSpacing: '0.1em' }}>
+        <span style={{ ...mono, color: stateColor, fontSize: '0.6875rem', letterSpacing: '0.1em' }}>
           {aiState.toUpperCase()}
         </span>
 
