@@ -240,6 +240,11 @@
 }
 
 /* Markdown das respostas */
+.nexa-message-row {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 7rem;
+}
+
 .nexa-markdown > * + * {
   margin-top: 0.65rem;
 }

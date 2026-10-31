@@ -1,6 +1,7 @@
 import { Sparkles } from 'lucide-react';
 import { Suspense, lazy, useEffect } from 'react';
 
+import { ChunkLoadBoundary } from '@/components/ChunkLoadBoundary';
 import { useSessions } from '@/features/chat/api';
 import { ChatView } from '@/features/chat/ChatView';
 import { SessionsSidebar } from '@/features/chat/SessionsSidebar';
@@ -121,23 +122,25 @@ export function AppShell() {
             </aside>
           )}
 
-          <main id="nexa-main" tabIndex={-1} className="relative flex min-w-0 flex-1 flex-col">
-            {activeView === 'chat' ? (
-              <ChatView sessionId={activeSessionId} />
-            ) : activeView === 'settings' ? (
-              <Suspense fallback={<ViewLoading label="ajustes" />}>
-                <SettingsView />
-              </Suspense>
-            ) : activeView === 'memory' ? (
-              <Suspense fallback={<ViewLoading label="memória" />}>
-                <MemoryView />
-              </Suspense>
-            ) : (
-              <Suspense fallback={<ViewLoading label="monitor" />}>
-                <MonitorView />
-              </Suspense>
-            )}
-          </main>
+          <ChunkLoadBoundary key={activeView}>
+            <main id="nexa-main" tabIndex={-1} className="relative flex min-w-0 flex-1 flex-col">
+              {activeView === 'chat' ? (
+                <ChatView sessionId={activeSessionId} />
+              ) : activeView === 'settings' ? (
+                <Suspense fallback={<ViewLoading label="ajustes" />}>
+                  <SettingsView />
+                </Suspense>
+              ) : activeView === 'memory' ? (
+                <Suspense fallback={<ViewLoading label="memória" />}>
+                  <MemoryView />
+                </Suspense>
+              ) : (
+                <Suspense fallback={<ViewLoading label="monitor" />}>
+                  <MonitorView />
+                </Suspense>
+              )}
+            </main>
+          </ChunkLoadBoundary>
 
           {activeView === 'chat' && <ContextPanel sessionId={activeSessionId} />}
         </div>

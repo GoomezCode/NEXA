@@ -1,13 +1,14 @@
-import { memo } from 'react';
-import ReactMarkdown from 'react-markdown';
-import rehypeSanitize from 'rehype-sanitize';
-import remarkGfm from 'remark-gfm';
+import { lazy, memo, Suspense, useDeferredValue } from 'react';
 
 import { formatFinishReason } from '@/api/chat';
 import type { ChatMessage } from '@/api/types';
 import { NexaMark } from '@/components/brand/NexaMark';
 import { formatTime } from '@/lib/format';
 import { cn } from '@/lib/utils';
+
+const MarkdownContent = lazy(() =>
+  import('./MarkdownContent').then((module) => ({ default: module.MarkdownContent })),
+);
 
 const STATUS_NOTE: Partial<Record<ChatMessage['status'], string>> = {
   stopped: 'Resposta interrompida',
@@ -18,6 +19,7 @@ export const MessageBubble = memo(function MessageBubble({ message }: { message:
   const isUser = message.role === 'user';
   const isStreaming = message.status === 'streaming';
   const note = STATUS_NOTE[message.status];
+  const deferredContent = useDeferredValue(message.content);
 
   return (
     <article
@@ -54,11 +56,9 @@ export const MessageBubble = memo(function MessageBubble({ message }: { message:
             <p className="whitespace-pre-wrap text-sm leading-relaxed">{message.content}</p>
           ) : (
             <div className="nexa-markdown text-sm leading-relaxed">
-              <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSanitize]} components={{
-                table: ({ children }) => <div className="nexa-markdown-table"><table>{children}</table></div>,
-              }}>
-                {message.content}
-              </ReactMarkdown>
+              <Suspense fallback={<p className="whitespace-pre-wrap">{message.content}</p>}>
+                <MarkdownContent content={isStreaming ? deferredContent : message.content} />
+              </Suspense>
               {isStreaming && <span className="nexa-caret" aria-hidden="true" />}
             </div>
           )}

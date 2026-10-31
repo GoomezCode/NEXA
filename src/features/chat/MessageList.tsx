@@ -141,7 +141,9 @@ export function MessageList({
     >
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-5 px-4 py-5 sm:px-6">
         {messages.map((message) => (
-          <MessageBubble key={message.id} message={message} />
+          <div key={message.id} className="nexa-message-row">
+            <MessageBubble message={message} />
+          </div>
         ))}
 
         {error && (
