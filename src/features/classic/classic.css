@@ -1,0 +1,72 @@
+/*
+ * Modo clássico — réplica fiel de WEB_PARA_COPIAR.
+ * Todo o estilo é escopado em .classic-hud para não vazar para o NEXA HUD.
+ */
+
+.classic-hud {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: #010812;
+  color: rgba(220, 235, 255, 0.9);
+  font-family: 'Rajdhani', sans-serif;
+  color-scheme: dark;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.classic-hud * {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 245, 255, 0.2) transparent;
+}
+
+.classic-hud *::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+.classic-hud *::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.classic-hud *::-webkit-scrollbar-thumb {
+  background: rgba(0, 245, 255, 0.2);
+  border-radius: 2px;
+}
+
+.classic-hud *::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 245, 255, 0.4);
+}
+
+.classic-hud input[type='range'] {
+  height: 4px;
+  accent-color: #a855f7;
+}
+
+.classic-hud input:-webkit-autofill,
+.classic-hud input:-webkit-autofill:focus {
+  transition:
+    background-color 600000s 0s,
+    color 600000s 0s;
+}
+
+.classic-hud ::selection {
+  background: rgba(0, 245, 255, 0.28);
+  color: #ffffff;
+}
+
+.classic-hud :focus-visible {
+  outline: 2px solid #00f5ff;
+  outline-offset: 2px;
+}
+
+.classic-hud--scroll {
+  overflow: auto;
+}
+
+.classic-hud--scroll .classic-layout {
+  position: absolute;
+  inset: 0;
+  min-width: 1024px;
+  min-height: 720px;
+}

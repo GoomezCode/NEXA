@@ -1,0 +1,312 @@
+@import 'tailwindcss' source(none);
+@import './tokens.css';
+
+@source '../**/*.{ts,tsx}';
+
+@layer base {
+  * {
+    border-color: var(--nexa-border-soft);
+  }
+
+  html {
+    height: 100%;
+    background: var(--nexa-bg);
+  }
+
+  body {
+    margin: 0;
+    min-height: 100%;
+    overflow: hidden;
+    background: var(--nexa-bg);
+    color: var(--nexa-text);
+    font-family: var(--font-ui);
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  #root {
+    min-height: 100%;
+  }
+
+  ::selection {
+    background: rgba(0, 229, 255, 0.28);
+    color: #ffffff;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--nexa-primary);
+    outline-offset: 2px;
+  }
+
+  button,
+  input,
+  textarea {
+    font: inherit;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 229, 255, 0.24) transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: rgba(0, 229, 255, 0.24);
+    border-radius: 999px;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 229, 255, 0.42);
+  }
+}
+
+@layer utilities {
+  .nexa-grid {
+    background-image:
+      linear-gradient(rgba(0, 229, 255, 0.055) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 229, 255, 0.055) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: radial-gradient(circle at 50% 45%, #000 0%, transparent 72%);
+  }
+
+  .nexa-spin-slow {
+    animation: nexa-spin 26s linear infinite;
+  }
+
+  .nexa-spin-reverse {
+    animation: nexa-spin 18s linear infinite reverse;
+  }
+
+  .nexa-pulse {
+    animation: nexa-pulse 3.2s ease-in-out infinite;
+  }
+
+  .nexa-scan {
+    animation: nexa-scan 5s linear infinite;
+  }
+
+  .nexa-glow-text {
+    text-shadow:
+      0 0 18px rgba(0, 229, 255, 0.45),
+      0 0 48px rgba(0, 229, 255, 0.18);
+  }
+}
+
+@keyframes nexa-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes nexa-pulse {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.045);
+  }
+}
+
+@keyframes nexa-scan {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.65;
+  }
+  88% {
+    opacity: 0.65;
+  }
+  100% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
+@keyframes nexa-blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Drawer de conversas (mobile) */
+.nexa-sheet {
+  position: fixed;
+  inset: 0 auto 0 0;
+  margin: 0;
+  height: 100dvh;
+  max-height: none;
+  width: min(20rem, 86vw);
+  max-width: none;
+  padding: 0;
+  border: 0;
+  border-right: 1px solid var(--nexa-border);
+  background: transparent;
+  color: var(--nexa-text);
+  overflow: hidden;
+}
+
+.nexa-sheet::backdrop {
+  background: rgba(2, 5, 11, 0.72);
+  backdrop-filter: blur(4px);
+}
+
+/* Markdown das respostas */
+.nexa-markdown > * + * {
+  margin-top: 0.65rem;
+}
+
+.nexa-markdown p {
+  margin: 0;
+}
+
+.nexa-markdown strong {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.nexa-markdown a {
+  color: var(--nexa-primary);
+  text-decoration: underline;
+  text-decoration-color: rgba(0, 229, 255, 0.4);
+  text-underline-offset: 2px;
+}
+
+.nexa-markdown a:hover {
+  text-decoration-color: var(--nexa-primary);
+}
+
+.nexa-markdown ul,
+.nexa-markdown ol {
+  padding-left: 1.15rem;
+}
+
+.nexa-markdown ul {
+  list-style: disc;
+}
+
+.nexa-markdown ol {
+  list-style: decimal;
+}
+
+.nexa-markdown li + li {
+  margin-top: 0.25rem;
+}
+
+.nexa-markdown code {
+  border: 1px solid var(--nexa-border-soft);
+  border-radius: 4px;
+  background: rgba(4, 7, 15, 0.8);
+  padding: 0.1rem 0.3rem;
+  font-family: var(--font-mono);
+  font-size: 0.82em;
+  color: #9beeff;
+}
+
+.nexa-markdown pre {
+  overflow-x: auto;
+  border: 1px solid var(--nexa-border-soft);
+  border-radius: var(--nexa-radius-sm);
+  background: rgba(4, 7, 15, 0.9);
+  padding: 0.75rem;
+}
+
+.nexa-markdown pre code {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  font-size: 0.78rem;
+  color: var(--nexa-text);
+}
+
+.nexa-markdown blockquote {
+  border-left: 2px solid rgba(0, 229, 255, 0.35);
+  padding-left: 0.75rem;
+  color: var(--nexa-muted);
+}
+
+.nexa-markdown h1,
+.nexa-markdown h2,
+.nexa-markdown h3 {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+  color: #ffffff;
+}
+
+.nexa-markdown table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+.nexa-markdown th,
+.nexa-markdown td {
+  border: 1px solid var(--nexa-border-soft);
+  padding: 0.35rem 0.5rem;
+  text-align: left;
+}
+
+.nexa-markdown th {
+  background: rgba(0, 229, 255, 0.08);
+  font-weight: 600;
+}
+
+.nexa-markdown hr {
+  border-color: var(--nexa-border-soft);
+}
+
+.nexa-markdown img {
+  max-width: 100%;
+  border-radius: var(--nexa-radius-sm);
+}
+
+.nexa-caret {
+  display: inline-block;
+  width: 0.5em;
+  height: 1em;
+  margin-left: 2px;
+  vertical-align: -0.15em;
+  background: var(--nexa-primary);
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.6);
+  animation: nexa-blink 1s steps(2, start) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+[data-reduced-motion='true'] *,
+[data-reduced-motion='true'] *::before,
+[data-reduced-motion='true'] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  scroll-behavior: auto !important;
+  transition-duration: 0.01ms !important;
+}

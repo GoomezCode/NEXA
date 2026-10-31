@@ -1,0 +1,53 @@
+:root {
+  color-scheme: dark;
+
+  --nexa-bg: #04070f;
+  --nexa-surface: #0a1322;
+  --nexa-surface-2: #111c30;
+
+  --nexa-primary: #00e5ff;
+  --nexa-primary-soft: rgba(0, 229, 255, 0.12);
+  --nexa-secondary: #a78bfa;
+  --nexa-success: #34d399;
+  --nexa-warning: #fbbf24;
+  --nexa-danger: #fb7185;
+
+  --nexa-text: #e8f4ff;
+  --nexa-muted: #8fa3bf;
+  --nexa-border: rgba(0, 229, 255, 0.15);
+  --nexa-border-soft: rgba(255, 255, 255, 0.07);
+
+  --nexa-radius-sm: 8px;
+  --nexa-radius-md: 12px;
+  --nexa-radius-lg: 16px;
+  --nexa-radius-xl: 24px;
+
+  --font-display: 'Orbitron Variable', 'Orbitron', sans-serif;
+  --font-ui: 'Rajdhani', 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', monospace;
+}
+
+@theme inline {
+  --color-background: var(--nexa-bg);
+  --color-surface: var(--nexa-surface);
+  --color-surface-2: var(--nexa-surface-2);
+
+  --color-primary: var(--nexa-primary);
+  --color-secondary: var(--nexa-secondary);
+  --color-success: var(--nexa-success);
+  --color-warning: var(--nexa-warning);
+  --color-danger: var(--nexa-danger);
+
+  --color-foreground: var(--nexa-text);
+  --color-muted: var(--nexa-muted);
+  --color-border: var(--nexa-border);
+
+  --font-display: var(--font-display);
+  --font-ui: var(--font-ui);
+  --font-mono: var(--font-mono);
+
+  --radius-sm: var(--nexa-radius-sm);
+  --radius-md: var(--nexa-radius-md);
+  --radius-lg: var(--nexa-radius-lg);
+  --radius-xl: var(--nexa-radius-xl);
+}

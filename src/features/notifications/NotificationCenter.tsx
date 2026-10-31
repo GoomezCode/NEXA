@@ -1,0 +1,96 @@
+import { AlertTriangle, CheckCircle2, Info, X, XCircle } from 'lucide-react';
+import { useEffect, useState } from 'react';
+
+import { cn } from '@/lib/utils';
+import type { AppNotification, NotificationTone } from '@/stores/notification-store';
+import { useNotificationStore } from '@/stores/notification-store';
+
+const TONE: Record<
+  NotificationTone,
+  { icon: typeof Info; className: string; iconClassName: string }
+> = {
+  info: {
+    icon: Info,
+    className: 'border-primary/25 bg-surface/95',
+    iconClassName: 'text-primary',
+  },
+  success: {
+    icon: CheckCircle2,
+    className: 'border-success/25 bg-surface/95',
+    iconClassName: 'text-success',
+  },
+  warning: {
+    icon: AlertTriangle,
+    className: 'border-warning/25 bg-surface/95',
+    iconClassName: 'text-warning',
+  },
+  error: {
+    icon: XCircle,
+    className: 'border-danger/25 bg-surface/95',
+    iconClassName: 'text-danger',
+  },
+};
+
+function NotificationToast({ item }: { item: AppNotification }) {
+  const remove = useNotificationStore((state) => state.remove);
+  const [paused, setPaused] = useState(false);
+  const tone = TONE[item.tone];
+  const Icon = tone.icon;
+
+  useEffect(() => {
+    if (paused) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => remove(item.id), item.duration);
+    return () => window.clearTimeout(timer);
+  }, [item.duration, item.id, paused, remove]);
+
+  return (
+    <div
+      role={item.tone === 'error' ? 'alert' : 'status'}
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onFocusCapture={() => setPaused(true)}
+      onBlurCapture={() => setPaused(false)}
+      className={cn(
+        'pointer-events-auto flex w-full items-start gap-2.5 rounded-xl border p-3 shadow-[0_10px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl',
+        tone.className,
+      )}
+    >
+      <Icon className={cn('mt-0.5 h-4 w-4 shrink-0', tone.iconClassName)} aria-hidden="true" />
+
+      <div className="min-w-0 flex-1">
+        <p className="text-[12px] font-semibold leading-snug text-foreground">{item.title}</p>
+        {item.message && (
+          <p className="mt-0.5 text-[11px] leading-relaxed text-muted">{item.message}</p>
+        )}
+      </div>
+
+      <button
+        type="button"
+        onClick={() => remove(item.id)}
+        aria-label={`Dispensar notificação: ${item.title}`}
+        className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-muted transition hover:bg-white/10 hover:text-foreground"
+      >
+        <X className="h-3.5 w-3.5" aria-hidden="true" />
+      </button>
+    </div>
+  );
+}
+
+export function NotificationCenter() {
+  const items = useNotificationStore((state) => state.items);
+
+  return (
+    <div
+      aria-live="polite"
+      aria-relevant="additions"
+      className="pointer-events-none fixed bottom-24 right-3 z-50 flex w-[min(20rem,calc(100vw-1.5rem))] flex-col gap-2 sm:right-5"
+    >
+      {items.map((item) => (
+        <NotificationToast key={item.id} item={item} />
+      ))}
+    </div>
+  );
+}
