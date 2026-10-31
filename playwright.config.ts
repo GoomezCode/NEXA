@@ -23,7 +23,23 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
+      testIgnore: '**/responsive/**',
       use: { ...devices['Desktop Chrome'] },
+    },
+    {
+      name: 'responsive-chromium',
+      testMatch: '**/responsive/**/*.spec.ts',
+      use: { ...devices['Desktop Chrome'] },
+    },
+    {
+      name: 'responsive-firefox',
+      testMatch: '**/responsive/**/*.spec.ts',
+      use: { ...devices['Desktop Firefox'] },
+    },
+    {
+      name: 'responsive-webkit',
+      testMatch: '**/responsive/**/*.spec.ts',
+      use: { ...devices['Desktop Safari'] },
     },
   ],
 });

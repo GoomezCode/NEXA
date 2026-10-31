@@ -1,0 +1,55 @@
+import { expect, test } from '@playwright/test';
+
+import { expectNoHorizontalScroll, useDemoMode } from './helpers';
+
+const VIEWPORTS = [
+  { width: 320, height: 568 },
+  { width: 390, height: 844 },
+  { width: 568, height: 320 },
+  { width: 768, height: 1024 },
+  { width: 1024, height: 768 },
+  { width: 1440, height: 900 },
+  { width: 2560, height: 1440 },
+  { width: 3840, height: 2160 },
+];
+
+test('HUD não cria rolagem horizontal na matriz de larguras e alturas', async ({ page }) => {
+  await useDemoMode(page);
+  await page.goto('/');
+  await expect(page.getByRole('heading', { name: 'Boas-vindas' })).toBeVisible();
+
+  for (const viewport of VIEWPORTS) {
+    await page.setViewportSize(viewport);
+    await expectNoHorizontalScroll(page);
+  }
+});
+
+test('Clássico mantém o console e navegação acessíveis na matriz responsiva', async ({ page }) => {
+  await useDemoMode(page);
+  await page.goto('/?ui=classic');
+  const consoleInput = page.getByPlaceholder('Enter command or speak...');
+  await expect(consoleInput).toBeVisible();
+
+  for (const viewport of VIEWPORTS) {
+    await page.setViewportSize(viewport);
+    await expectNoHorizontalScroll(page);
+    await expect(consoleInput).toBeVisible();
+    if (viewport.width < 768) {
+      await expect(page.getByRole('navigation', { name: 'Painéis do modo clássico' })).toBeVisible();
+    }
+  }
+});
+
+test('aba ativa e rascunho do console sobrevivem à rotação', async ({ page }) => {
+  await useDemoMode(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/?ui=classic');
+  const input = page.getByPlaceholder('Enter command or speak...');
+  await input.fill('rascunho preservado');
+  const panelTabs = page.getByRole('navigation', { name: 'Painéis do modo clássico' });
+  await panelTabs.getByRole('button', { name: 'MONITOR', exact: true }).click();
+  await page.setViewportSize({ width: 844, height: 390 });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await panelTabs.getByRole('button', { name: 'CONSOLE', exact: true }).click();
+  await expect(input).toHaveValue('rascunho preservado');
+});

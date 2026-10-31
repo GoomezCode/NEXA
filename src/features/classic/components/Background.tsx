@@ -120,7 +120,7 @@ export function Background() {
   }, []);
 
   return (
-    <div className="fixed inset-0 overflow-hidden" style={{ zIndex: 0 }}>
+    <div className="pointer-events-none fixed inset-0 overflow-hidden" style={{ zIndex: 0 }}>
       {/* Deep space base */}
       <div
         className="absolute inset-0"

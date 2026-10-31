@@ -1,5 +1,11 @@
 import { expect, test } from '@playwright/test';
 
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('nexa:settings:v1', JSON.stringify({ demoMode: true }));
+  });
+});
+
 test('alterna para o modo clássico e volta ao NEXA HUD', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { name: 'Boas-vindas' })).toBeVisible();
@@ -82,13 +88,10 @@ test('abre e fecha os overlays clássicos, inclusive com Esc', async ({ page }) 
 test.describe('em viewport móvel', () => {
   test.use({ viewport: { width: 390, height: 844 } });
 
-  test('mostra o aviso de compatibilidade e permite continuar', async ({ page }) => {
+  test('abre o modo clássico funcional em telas compactas', async ({ page }) => {
     await page.goto('/?ui=classic');
 
-    await expect(page.getByText('NEXA CLASSIC')).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Voltar ao NEXA HUD' })).toBeVisible();
-
-    await page.getByRole('button', { name: 'Continuar mesmo assim' }).click();
-  await expect(page.getByText('SYSTEM STATUS')).toBeVisible();
+    await expect(page.getByRole('navigation', { name: 'Painéis do modo clássico' })).toBeVisible();
+    await expect(page.getByPlaceholder('Enter command or speak...')).toBeVisible();
   });
 });
