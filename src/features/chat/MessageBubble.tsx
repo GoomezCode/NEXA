@@ -53,9 +53,9 @@ export const MessageBubble = memo(function MessageBubble({ message }: { message:
           )}
         >
           {isUser ? (
-            <p className="whitespace-pre-wrap text-sm leading-relaxed">{message.content}</p>
+            <p className="whitespace-pre-wrap text-base leading-relaxed sm:text-sm">{message.content}</p>
           ) : (
-            <div className="nexa-markdown text-sm leading-relaxed">
+            <div className="nexa-markdown text-base leading-relaxed sm:text-sm">
               <Suspense fallback={<p className="whitespace-pre-wrap">{message.content}</p>}>
                 <MarkdownContent content={isStreaming ? deferredContent : message.content} />
               </Suspense>

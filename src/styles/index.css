@@ -245,6 +245,23 @@
   contain-intrinsic-size: auto 7rem;
 }
 
+.nexa-content-container { container-type: inline-size; }
+.nexa-cards-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--nexa-space-3);
+}
+
+@container (min-width: 42rem) {
+  .nexa-cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.nexa-app-root :is(button, input, textarea, select) { transition-duration: 160ms; }
+.nexa-app-root :is(button, input, textarea, select):focus-visible {
+  outline: 2px solid var(--nexa-primary);
+  outline-offset: 2px;
+}
+
 .nexa-markdown > * + * {
   margin-top: 0.65rem;
 }

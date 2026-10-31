@@ -421,7 +421,7 @@ export function MemoryView() {
         )}
 
         {filtered.length > 0 && (
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="nexa-cards-grid">
             {filtered.map((entry) => (
               <article
                 key={entry.id}
@@ -452,7 +452,7 @@ export function MemoryView() {
                           type="button"
                           onClick={() => setActiveTag(effectiveTag === tag ? null : tag)}
                           aria-pressed={effectiveTag === tag}
-                          className={`inline-flex min-h-8 items-center rounded-full border px-2.5 text-2xs uppercase tracking-[0.08em] transition ${
+                          className={`inline-flex min-h-11 items-center rounded-full border px-3 text-2xs uppercase tracking-[0.08em] transition ${
                             effectiveTag === tag
                               ? 'border-primary/35 bg-primary/10 text-primary'
                               : 'border-white/10 bg-white/5 text-muted hover:border-primary/25 hover:text-primary'

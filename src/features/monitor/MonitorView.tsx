@@ -217,7 +217,7 @@ export function MonitorView() {
           </p>
         )}
 
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="nexa-cards-grid">
           <Panel title="API" icon={Wifi}>
             <div className="flex items-center justify-between gap-2">
               <Badge tone={healthTone} label={healthLabel} />

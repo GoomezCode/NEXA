@@ -123,7 +123,7 @@ export function AppShell() {
           )}
 
           <ChunkLoadBoundary key={activeView}>
-            <main id="nexa-main" tabIndex={-1} className="relative flex min-w-0 flex-1 flex-col">
+            <main id="nexa-main" tabIndex={-1} className="nexa-content-container relative flex min-w-0 flex-1 flex-col">
               {activeView === 'chat' ? (
                 <ChatView sessionId={activeSessionId} />
               ) : activeView === 'settings' ? (
