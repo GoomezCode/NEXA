@@ -25,6 +25,28 @@ test('HUD não cria rolagem horizontal na matriz de larguras e alturas', async (
   }
 });
 
+test(
+  'o Clássico mantém o fundo escuro e os painéis abaixo do cabeçalho em mobile',
+  async ({ page }) => {
+    await useDemoMode(page);
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/?ui=classic');
+    const classicBackground = await page
+      .locator('.classic-main-area')
+      .evaluate((element) => getComputedStyle(element).backgroundImage);
+    expect(classicBackground).toContain('radial-gradient');
+    await page.getByRole('button', { name: 'Abrir Monitor' }).click();
+    const statusTitle = page.getByText('SYSTEM STATUS').first();
+    await expect(statusTitle).toBeVisible();
+    const [titleBox, headerBox] = await Promise.all([
+      statusTitle.boundingBox(),
+      page.locator('.classic-topbar').boundingBox(),
+    ]);
+    expect(titleBox && headerBox).toBeTruthy();
+    expect(titleBox!.y).toBeGreaterThanOrEqual(headerBox!.y + headerBox!.height);
+  },
+);
+
 test('Clássico mantém o núcleo e a navegação acessíveis na matriz responsiva', async ({ page }) => {
   await useDemoMode(page);
   await page.goto('/?ui=classic');
