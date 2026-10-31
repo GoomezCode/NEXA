@@ -1,5 +1,5 @@
 import { AlertTriangle, CheckCircle2, Info, X, XCircle } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { cn } from '@/lib/utils';
 import type { AppNotification, NotificationTone } from '@/stores/notification-store';
@@ -34,6 +34,7 @@ const TONE: Record<
 function NotificationToast({ item }: { item: AppNotification }) {
   const remove = useNotificationStore((state) => state.remove);
   const [paused, setPaused] = useState(false);
+  const touchStartX = useRef<number | null>(null);
   const tone = TONE[item.tone];
   const Icon = tone.icon;
 
@@ -53,6 +54,9 @@ function NotificationToast({ item }: { item: AppNotification }) {
       onMouseLeave={() => setPaused(false)}
       onFocusCapture={() => setPaused(true)}
       onBlurCapture={() => setPaused(false)}
+      onPointerDown={(event) => { if (event.pointerType === 'touch') touchStartX.current = event.clientX; }}
+      onPointerUp={(event) => { const startX = touchStartX.current; if (startX !== null && startX - event.clientX > 56) remove(item.id); touchStartX.current = null; }}
+      onPointerCancel={() => { touchStartX.current = null; }}
       className={cn(
         'pointer-events-auto flex w-full items-start gap-2.5 rounded-xl border p-3 shadow-[0_10px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl',
         tone.className,
@@ -63,7 +67,7 @@ function NotificationToast({ item }: { item: AppNotification }) {
       <div className="min-w-0 flex-1">
         <p className="text-[12px] font-semibold leading-snug text-foreground">{item.title}</p>
         {item.message && (
-          <p className="mt-0.5 text-[11px] leading-relaxed text-muted">{item.message}</p>
+          <p className="mt-0.5 text-2xs leading-relaxed text-muted">{item.message}</p>
         )}
       </div>
 
@@ -71,7 +75,7 @@ function NotificationToast({ item }: { item: AppNotification }) {
         type="button"
         onClick={() => remove(item.id)}
         aria-label={`Dispensar notificação: ${item.title}`}
-        className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-muted transition hover:bg-white/10 hover:text-foreground"
+        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-muted transition hover:bg-white/10 hover:text-foreground active:scale-95"
       >
         <X className="h-3.5 w-3.5" aria-hidden="true" />
       </button>
@@ -86,7 +90,7 @@ export function NotificationCenter() {
     <div
       aria-live="polite"
       aria-relevant="additions"
-      className="pointer-events-none fixed bottom-24 right-3 z-50 flex w-[min(20rem,calc(100vw-1.5rem))] flex-col gap-2 sm:right-5"
+      className="nexa-notification-center pointer-events-none fixed bottom-[calc(var(--safe-bottom)+6rem)] right-[max(0.75rem,var(--safe-right))] z-50 flex w-[min(20rem,calc(100vw-1.5rem))] flex-col gap-2 sm:right-5 short:bottom-auto short:right-16 short:top-14"
     >
       {items.map((item) => (
         <NotificationToast key={item.id} item={item} />

@@ -9,9 +9,6 @@ export function Background() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
     const particles: {
       x: number;
       y: number;
@@ -20,27 +17,53 @@ export function Background() {
       size: number;
       opacity: number;
     }[] = [];
-    for (let i = 0; i < 60; i++) {
-      particles.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.3,
-        vy: (Math.random() - 0.5) * 0.3,
-        size: Math.random() * 1.5 + 0.5,
-        opacity: Math.random() * 0.5 + 0.1,
-      });
-    }
+    let width = 0;
+    let height = 0;
+    let animId = 0;
+    let running = false;
+    let compact = false;
+    let lastFrameAt = 0;
+    let resizeTimer = 0;
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-    let animId: number;
+    const resize = () => {
+      const rect = canvas.getBoundingClientRect();
+      compact = window.matchMedia('(max-width: 47.999rem), (pointer: coarse)').matches;
+      const dpr = Math.min(window.devicePixelRatio || 1, compact ? 1.5 : 2);
+      width = rect.width;
+      height = rect.height;
+      canvas.width = Math.floor(width * dpr);
+      canvas.height = Math.floor(height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const count = Math.max(10, Math.min(compact ? 20 : 54, Math.floor((width * height / 18000) * (compact ? 0.55 : 1))));
+      particles.length = 0;
+      for (let i = 0; i < count; i++) {
+        particles.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          vx: (Math.random() - 0.5) * 0.3,
+          vy: (Math.random() - 0.5) * 0.3,
+          size: Math.random() * 1.5 + 0.5,
+          opacity: Math.random() * 0.5 + 0.1,
+        });
+      }
+      draw();
+    };
+
     function draw() {
       if (!ctx || !canvas) return;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0, 0, width, height);
 
-      // Draw connecting lines between nearby particles
-      particles.forEach((p, i) => {
-        particles.slice(i + 1).forEach((p2) => {
-          const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
-          if (dist < 120) {
+      // Draw nearby connections without allocating a sliced array per particle.
+      for (let i = 0; i < particles.length; i += 1) {
+        const p = particles[i];
+        for (let j = i + 1; j < particles.length; j += 1) {
+          const p2 = particles[j];
+          const dx = p.x - p2.x;
+          const dy = p.y - p2.y;
+          const distanceSquared = dx * dx + dy * dy;
+          if (distanceSquared < 14400) {
+            const dist = Math.sqrt(distanceSquared);
             ctx.strokeStyle = `rgba(0, 245, 255, ${0.04 * (1 - dist / 120)})`;
             ctx.lineWidth = 0.5;
             ctx.beginPath();
@@ -48,7 +71,7 @@ export function Background() {
             ctx.lineTo(p2.x, p2.y);
             ctx.stroke();
           }
-        });
+        }
 
         // Draw particle
         ctx.beginPath();
@@ -56,32 +79,71 @@ export function Background() {
         ctx.fillStyle = `rgba(0, 245, 255, ${p.opacity})`;
         ctx.fill();
 
-        // Move
-        p.x += p.vx;
-        p.y += p.vy;
-        if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
-        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
-      });
-
-      animId = requestAnimationFrame(draw);
+      }
     }
 
-    draw();
-
-    const handleResize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+    const tick = (timestamp: number) => {
+      const frameInterval = compact ? 1000 / 30 : 1000 / 45;
+      if (timestamp - lastFrameAt >= frameInterval) {
+        const delta = lastFrameAt ? Math.min((timestamp - lastFrameAt) / (1000 / 60), 2) : 1;
+        lastFrameAt = timestamp;
+        particles.forEach((p) => {
+          p.x += p.vx * delta;
+          p.y += p.vy * delta;
+          if (p.x < 0 || p.x > width) p.vx *= -1;
+          if (p.y < 0 || p.y > height) p.vy *= -1;
+        });
+        draw();
+      }
+      animId = requestAnimationFrame(tick);
     };
-    window.addEventListener('resize', handleResize);
+
+    const start = () => {
+      // Keep the mobile scene static: the gradient and grid remain visible,
+      // while avoiding a perpetual canvas animation on touch devices.
+      if (running || compact || document.hidden || reducedMotion.matches || document.documentElement.dataset.reducedMotion === 'true') return;
+      running = true;
+      lastFrameAt = 0;
+      animId = requestAnimationFrame(tick);
+    };
+    const stop = () => {
+      running = false;
+      cancelAnimationFrame(animId);
+    };
+    const visibilityChange = () => document.hidden ? stop() : start();
+    const motionChange = () => reducedMotion.matches || document.documentElement.dataset.reducedMotion === 'true' ? (stop(), draw()) : start();
+
+    resize();
+    start();
+    const scheduleResize = () => {
+      window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(() => {
+        resize();
+        if (compact) stop();
+        else start();
+      }, 120);
+    };
+    const resizeObserver = new ResizeObserver(scheduleResize);
+    resizeObserver.observe(canvas);
+    window.addEventListener('resize', scheduleResize);
+    document.addEventListener('visibilitychange', visibilityChange);
+    reducedMotion.addEventListener('change', motionChange);
+    const motionObserver = new MutationObserver(motionChange);
+    motionObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-reduced-motion'] });
 
     return () => {
-      cancelAnimationFrame(animId);
-      window.removeEventListener('resize', handleResize);
+      stop();
+      window.clearTimeout(resizeTimer);
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', scheduleResize);
+      document.removeEventListener('visibilitychange', visibilityChange);
+      reducedMotion.removeEventListener('change', motionChange);
+      motionObserver.disconnect();
     };
   }, []);
 
   return (
-    <div className="fixed inset-0 overflow-hidden" style={{ zIndex: 0 }}>
+    <div className="classic-background pointer-events-none absolute inset-0 overflow-hidden" style={{ zIndex: 0 }}>
       {/* Deep space base */}
       <div
         className="absolute inset-0"

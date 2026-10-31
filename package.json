@@ -17,9 +17,11 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.node.json",
+    "check:bundle": "node scripts/check-bundle-budget.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
+    "test:responsive": "playwright test --project=responsive-chromium --project=responsive-touch --project=responsive-firefox --project=responsive-webkit",
     "check": "npm run lint && npm run typecheck && npm run test && npm run build",
     "api:types": "openapi-typescript http://localhost:8000/openapi.json -o src/api/generated/openapi.d.ts",
     "api:types:check": "openapi-typescript http://localhost:8000/openapi.json -o src/api/generated/openapi.d.ts --check"

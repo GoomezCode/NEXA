@@ -1,5 +1,11 @@
 import { expect, test } from '@playwright/test';
 
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('nexa:settings:v1', JSON.stringify({ demoMode: true }));
+  });
+});
+
 test('alterna para o modo clássico e volta ao NEXA HUD', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { name: 'Boas-vindas' })).toBeVisible();
@@ -69,9 +75,10 @@ test('abre e fecha os overlays clássicos, inclusive com Esc', async ({ page }) 
   await expect(page.getByText('SYSTEM STATUS')).toBeVisible();
 
   await page.getByRole('button', { name: 'Settings' }).first().click();
-  await expect(page.getByRole('heading', { name: 'Ajustes' })).toBeVisible();
+  const settingsOverlay = page.locator('.classic-settings-overlay');
+  await expect(settingsOverlay).toBeVisible();
   await page.keyboard.press('Escape');
-  await expect(page.getByRole('heading', { name: 'Ajustes' })).toBeHidden();
+  await expect(settingsOverlay).toBeHidden();
 
   await page.getByRole('button', { name: 'Apps' }).first().click();
   await expect(page.getByText('ATALHOS DISPONÍVEIS')).toBeVisible();
@@ -79,16 +86,58 @@ test('abre e fecha os overlays clássicos, inclusive com Esc', async ({ page }) 
   await expect(page.getByText('ATALHOS DISPONÍVEIS')).toBeHidden();
 });
 
+test('o chat desktop fica acima da barra de voz', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 766 });
+  await page.goto('/?ui=classic');
+  await page.getByRole('button', { name: 'Abrir Chat' }).click();
+  const chat = page.getByRole('dialog', { name: 'Conversa com a NEXA' });
+  const input = page.getByPlaceholder('Enter command or speak...');
+  const voiceBar = page.locator('.classic-voice-bar');
+  await expect(chat).toBeVisible();
+  await expect(input).toBeVisible();
+  const [windowBox, inputBox, voiceBox] = await Promise.all([
+    page.locator('.classic-mobile-chat-window').boundingBox(),
+    input.boundingBox(),
+    voiceBar.boundingBox(),
+  ]);
+  expect(windowBox && inputBox && voiceBox).toBeTruthy();
+  expect(inputBox!.y + inputBox!.height).toBeLessThanOrEqual(windowBox!.y + windowBox!.height);
+  expect(windowBox!.y + windowBox!.height).toBeLessThanOrEqual(voiceBox!.y);
+});
+
 test.describe('em viewport móvel', () => {
   test.use({ viewport: { width: 390, height: 844 } });
 
-  test('mostra o aviso de compatibilidade e permite continuar', async ({ page }) => {
+  test('abre o modo clássico funcional em telas compactas', async ({ page }) => {
     await page.goto('/?ui=classic');
 
-    await expect(page.getByText('NEXA CLASSIC')).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Voltar ao NEXA HUD' })).toBeVisible();
+    await expect(page.locator('.classic-ai-core-orb')).toBeVisible();
+    await expect(page.getByRole('navigation', { name: 'Painéis do modo clássico' })).toBeHidden();
+    await expect(page.getByPlaceholder('Escreva sua mensagem...')).toBeHidden();
+    await page.getByRole('button', { name: 'Abrir Chat' }).click();
+    await expect(page.getByRole('dialog', { name: 'Conversa com a NEXA' })).toBeVisible();
+    await expect(page.getByPlaceholder('Escreva sua mensagem...')).toBeVisible();
+  });
 
-    await page.getByRole('button', { name: 'Continuar mesmo assim' }).click();
-  await expect(page.getByText('SYSTEM STATUS')).toBeVisible();
+  test('voltar fecha a conversa clássica e restaura o núcleo', async ({ page }) => {
+    await page.goto('/?ui=classic');
+    await page.getByRole('button', { name: 'Abrir Chat' }).click();
+    const conversation = page.getByRole('dialog', { name: 'Conversa com a NEXA' });
+    await expect(conversation).toBeVisible();
+
+    await page.goBack();
+    await expect(conversation).toBeHidden();
+    await expect(page.locator('.classic-ai-core-orb')).toBeVisible();
+  });
+
+  test('voltar fecha os Ajustes clássicos no celular', async ({ page }) => {
+    await page.goto('/?ui=classic');
+    await page.getByRole('button', { name: 'Abrir Ajustes' }).click();
+    const settings = page.locator('.classic-settings-overlay');
+    await expect(settings).toBeVisible();
+
+    await page.goBack();
+    await expect(settings).toBeHidden();
+    await expect(page.locator('.classic-ai-core-orb')).toBeVisible();
   });
 });

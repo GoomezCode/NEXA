@@ -72,19 +72,19 @@ export function Composer({
   };
 
   return (
-    <div className="shrink-0 border-t border-white/5 bg-background/50 px-3 py-3 sm:px-5">
+    <div className="nexa-composer-shell shrink-0 border-t border-white/5 bg-background/50 px-3 py-3 pb-[max(0.75rem,var(--safe-bottom))] sm:px-5">
       {voiceEnabled && (listening || interim || voiceError) && (
         <div
           role={voiceError ? 'alert' : 'status'}
           aria-live="polite"
           className={cn(
-            'mx-auto mb-2 w-full max-w-3xl rounded-xl border px-3 py-2 text-[11px] leading-relaxed',
+            'mx-auto mb-2 w-full max-w-3xl rounded-xl border px-3 py-2 text-2xs leading-relaxed',
             voiceError
               ? 'border-danger/25 bg-danger/5 text-danger'
               : 'border-primary/25 bg-primary/5 text-primary',
           )}
         >
-          <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.14em]">
+          <span className="flex items-center gap-1.5 font-mono text-2xs uppercase tracking-[0.14em]">
             <Mic className="h-3 w-3 shrink-0" aria-hidden="true" />
             {listening ? 'Ouvindo · solte para encerrar' : 'Transcrição de voz'}
           </span>
@@ -107,6 +107,7 @@ export function Composer({
           id="nexa-composer"
           ref={textareaRef}
           rows={1}
+          enterKeyHint="send"
           value={value}
           disabled={disabled}
           maxLength={maxLength}
@@ -122,7 +123,7 @@ export function Composer({
           }
           aria-label="Mensagem para a NEXA"
           aria-keyshortcuts="Control+K Meta+K"
-          className="max-h-40 min-h-10 flex-1 resize-none bg-transparent px-2 py-2 text-sm leading-relaxed text-foreground outline-none placeholder:text-muted/70 disabled:cursor-not-allowed"
+          className="nexa-field max-h-40 min-h-10 flex-1 resize-none bg-transparent px-2 py-2 text-base leading-relaxed text-foreground outline-none placeholder:text-muted/70 disabled:cursor-not-allowed sm:text-sm"
         />
 
         {voiceEnabled && (
@@ -212,14 +213,14 @@ export function Composer({
       </div>
 
       <div className="mx-auto mt-2 flex w-full max-w-3xl items-center justify-between gap-3 px-1">
-        <p className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-muted/70">
+        <p className="hidden items-center gap-1.5 font-mono text-2xs uppercase tracking-[0.12em] text-muted/70 pointer-fine:flex">
           <CornerDownLeft className="h-3 w-3" aria-hidden="true" />
           Enter envia · Shift + Enter quebra linha
         </p>
-        <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted/70">
+        <p className="font-mono text-2xs uppercase tracking-[0.12em] text-muted/70">
           {value.length > 0
             ? `${value.length}${maxLength ? `/${maxLength}` : ''} caracteres`
-            : 'Ctrl+K foca o campo'}
+            : <span className="hidden pointer-fine:inline">Ctrl+K foca o campo</span>}
         </p>
       </div>
     </div>

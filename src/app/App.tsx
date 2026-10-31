@@ -39,7 +39,7 @@ class ClassicBoundary extends Component<ClassicBoundaryProps, { failed: boolean 
           <button
             type="button"
             onClick={this.props.onExit}
-            className="rounded-xl border border-primary/35 bg-primary/10 px-4 py-2 font-mono text-[10px] uppercase tracking-[0.14em] text-primary transition hover:bg-primary/15"
+            className="rounded-xl border border-primary/35 bg-primary/10 px-4 py-2 font-mono text-2xs uppercase tracking-[0.14em] text-primary transition hover:bg-primary/15"
           >
             Voltar ao NEXA HUD
           </button>
@@ -59,7 +59,7 @@ function ClassicLoading() {
       aria-live="polite"
     >
       <span className="h-10 w-10 animate-spin rounded-full border border-primary/25 border-t-primary" />
-      <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-primary/70">
+      <p className="font-mono text-2xs uppercase tracking-[0.28em] text-primary/70">
         carregando interface clássica
       </p>
     </div>

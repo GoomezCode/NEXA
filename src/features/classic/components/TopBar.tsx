@@ -19,7 +19,8 @@ import { useSettingsStore } from '@/stores/settings-store';
 import { useConnectionStore } from '@/stores/connection-store';
 import { useOllamaHealth } from '@/api/ollama';
 import { useAuthStore } from '@/stores/auth-store';
-import { useApp } from '../ClassicContext';
+import { usePointerType } from '@/hooks/use-pointer-type';
+import { useAppUi } from '../ClassicContext';
 
 const orb = { fontFamily: 'Orbitron, sans-serif' };
 const mono = { fontFamily: 'Share Tech Mono, monospace' };
@@ -27,7 +28,9 @@ const raj = { fontFamily: 'Rajdhani, sans-serif' };
 
 export function TopBar({ onExit }: { onExit: () => void }) {
   const [time, setTime] = useState(new Date());
-  const { setSettingsOpen, setAppGridOpen, setGestureOpen, aiState, addNotification } = useApp();
+  const pointerType = usePointerType();
+  const touchOptimized = pointerType === 'coarse';
+  const { setSettingsOpen, setAppGridOpen, setGestureOpen, aiState, addNotification } = useAppUi();
   const health = useApiHealth();
   const models = useModels();
   const usage = useUsage();
@@ -36,11 +39,11 @@ export function TopBar({ onExit }: { onExit: () => void }) {
   const ollama = useOllamaHealth();
 
   useEffect(() => {
-    const interval = setInterval(() => setTime(new Date()), 1000);
+    const interval = setInterval(() => setTime(new Date()), 60_000);
     return () => clearInterval(interval);
   }, []);
 
-  const fmtTime = (d: Date) => d.toLocaleTimeString('en-US', { hour12: false });
+  const fmtTime = (d: Date) => d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
   const fmtDate = (d: Date) =>
     d.toLocaleDateString('en-US', {
       weekday: 'short',
@@ -67,7 +70,7 @@ export function TopBar({ onExit }: { onExit: () => void }) {
 
   return (
     <div
-      className="fixed top-0 left-0 right-0 h-14 flex items-center px-5 gap-4"
+      className="classic-topbar fixed top-0 left-0 right-0 h-14 flex items-center px-5 gap-4"
       style={{
         zIndex: 100,
         background: 'rgba(1, 11, 26, 0.85)',
@@ -79,8 +82,8 @@ export function TopBar({ onExit }: { onExit: () => void }) {
       {/* Logo */}
       <div className="flex items-center gap-3 flex-shrink-0">
         <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
+          animate={{ rotate: touchOptimized ? 0 : 360 }}
+          transition={{ duration: 10, repeat: touchOptimized ? 0 : Infinity, ease: 'linear' }}
           className="w-8 h-8 rounded-full flex items-center justify-center relative"
           style={{
             border: '1.5px solid rgba(0,245,255,0.6)',
@@ -108,7 +111,7 @@ export function TopBar({ onExit }: { onExit: () => void }) {
           >
             NEXA AI
           </div>
-          <div style={{ ...mono, color: 'rgba(0,245,255,0.45)', fontSize: '10px' }}>
+          <div style={{ ...mono, color: 'rgba(0,245,255,0.45)', fontSize: '0.6875rem' }}>
             OS v3.7.2 — ALPHA
           </div>
         </div>
@@ -120,12 +123,12 @@ export function TopBar({ onExit }: { onExit: () => void }) {
       {/* AI State */}
       <div className="flex items-center gap-2 flex-shrink-0">
         <motion.div
-          animate={{ opacity: [1, 0.2, 1] }}
-          transition={{ duration: aiState === 'idle' ? 3 : 0.6, repeat: Infinity }}
+          animate={touchOptimized ? { opacity: 1 } : { opacity: [1, 0.2, 1] }}
+          transition={{ duration: aiState === 'idle' ? 3 : 0.6, repeat: touchOptimized ? 0 : Infinity }}
           className="w-2 h-2 rounded-full"
           style={{ background: stateColor, boxShadow: `0 0 8px ${stateColor}` }}
         />
-        <span style={{ ...mono, color: stateColor, fontSize: '11px', letterSpacing: '0.12em' }}>
+        <span style={{ ...mono, color: stateColor, fontSize: '0.6875rem', letterSpacing: '0.12em' }}>
           {stateLabel}
         </span>
       </div>
@@ -139,10 +142,10 @@ export function TopBar({ onExit }: { onExit: () => void }) {
         ].map(({ icon: Icon, label, val, color }) => (
           <div key={label} className="flex items-center gap-1.5">
             <Icon className="w-3 h-3" style={{ color }} />
-            <span style={{ ...mono, color: 'rgba(255,255,255,0.4)', fontSize: '10px' }}>
+            <span style={{ ...mono, color: 'rgba(255,255,255,0.4)', fontSize: '0.6875rem' }}>
               {label}
             </span>
-            <span style={{ ...mono, color, fontSize: '10px' }}>{val}</span>
+            <span style={{ ...mono, color, fontSize: '0.6875rem' }}>{val}</span>
           </div>
         ))}
       </div>
@@ -159,7 +162,7 @@ export function TopBar({ onExit }: { onExit: () => void }) {
         >
           {fmtTime(time)}
         </div>
-        <div style={{ ...raj, color: 'rgba(0,245,255,0.5)', fontSize: '10px' }}>
+        <div style={{ ...raj, color: 'rgba(0,245,255,0.5)', fontSize: '0.6875rem' }}>
           {fmtDate(time)}
         </div>
       </div>
@@ -168,7 +171,7 @@ export function TopBar({ onExit }: { onExit: () => void }) {
       <div className="w-px h-8 flex-shrink-0" style={{ background: 'rgba(0,245,255,0.12)' }} />
 
       {/* Quick actions */}
-      <div className="flex items-center gap-2 flex-shrink-0">
+      <div className="classic-topbar-actions flex items-center gap-2 flex-shrink-0">
         {[
           {
             icon: Bell,

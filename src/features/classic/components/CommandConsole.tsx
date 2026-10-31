@@ -1,6 +1,6 @@
-import { useState, useRef, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Terminal, Send } from 'lucide-react';
+import { Terminal, Send, Mic } from 'lucide-react';
 import { useApp } from '../ClassicContext';
 
 const orb = { fontFamily: 'Orbitron, sans-serif' };
@@ -9,7 +9,7 @@ const raj = { fontFamily: 'Rajdhani, sans-serif' };
 
 const SUGGESTIONS = ['Como você pode me ajudar?', 'Resuma esta conversa', 'diagnóstico', 'gestos'];
 
-export function CommandConsole() {
+export function CommandConsole({ conversationMode = false }: { conversationMode?: boolean }) {
   const {
     messages,
     isStreaming,
@@ -20,14 +20,23 @@ export function CommandConsole() {
     setAppGridOpen,
     setScanningActive,
     setGestureOpen,
+    consoleDraft: input,
+    setConsoleDraft: setInput,
+    voiceSupported,
+    voiceListening,
+    startVoice,
+    stopVoice,
   } = useApp();
-  const [input, setInput] = useState('');
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  useEffect(() => {
+    if (conversationMode) inputRef.current?.focus();
+  }, [conversationMode]);
 
   const handleSubmit = () => {
     if (!input.trim() || isStreaming) return;
@@ -42,20 +51,20 @@ export function CommandConsole() {
   };
 
   return (
-    <div className="flex flex-col h-full gap-3 overflow-hidden">
+    <div className="flex flex-col h-full min-h-0 gap-3 overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between flex-shrink-0">
         <div className="flex items-center gap-2">
-          <Terminal className="w-4 h-4" style={{ color: '#00f5ff' }} />
-          <span style={{ ...orb, color: '#00f5ff', fontSize: '11px', letterSpacing: '0.15em' }}>
-            COMMAND CONSOLE
+          {conversationMode ? <span className="classic-chat-presence" aria-hidden="true" /> : <Terminal className="w-4 h-4" style={{ color: '#00f5ff' }} />}
+          <span style={{ ...orb, color: '#00f5ff', fontSize: '0.6875rem', letterSpacing: '0.15em' }}>
+            {conversationMode ? 'CONVERSA NEXA' : 'COMMAND CONSOLE'}
           </span>
         </div>
       </div>
 
       {/* Messages */}
       <div
-        className="flex-1 overflow-y-auto flex flex-col gap-3 pr-1"
+        className="flex-1 min-h-0 overflow-y-auto flex flex-col gap-3 pr-1"
         style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(0,245,255,0.2) transparent' }}
       >
         <AnimatePresence initial={false}>
@@ -122,7 +131,7 @@ export function CommandConsole() {
                   </p>
                 )}
                 <div className="mt-1 flex justify-end">
-                  <span style={{ ...mono, color: 'rgba(255,255,255,0.2)', fontSize: '9px' }}>
+                  <span style={{ ...mono, color: 'rgba(255,255,255,0.2)', fontSize: '0.6875rem' }}>
                     {msg.timestamp.toLocaleTimeString('en-US', { hour12: false })}
                   </span>
                 </div>
@@ -202,7 +211,7 @@ export function CommandConsole() {
               border: '1px solid rgba(0,245,255,0.15)',
             }}
           >
-            <span style={{ ...mono, color: 'rgba(0,245,255,0.6)', fontSize: '9px' }}>{s}</span>
+            <span style={{ ...mono, color: 'rgba(0,245,255,0.6)', fontSize: '0.6875rem' }}>{s}</span>
           </motion.button>
         ))}
       </div>
@@ -222,7 +231,7 @@ export function CommandConsole() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-          placeholder="Enter command or speak..."
+          placeholder={conversationMode ? 'Escreva sua mensagem...' : 'Enter command or speak...'}
           className="flex-1 outline-none bg-transparent"
           style={{ ...raj, color: 'rgba(255,255,255,0.85)', fontSize: '13px' }}
         />
@@ -242,8 +251,18 @@ export function CommandConsole() {
             style={{ color: input.trim() && !isStreaming ? '#00f5ff' : 'rgba(0,245,255,0.3)' }}
           />
         </motion.button>
+        <button
+          type="button"
+          onClick={() => voiceListening ? stopVoice() : startVoice()}
+          disabled={!voiceSupported || isStreaming}
+          aria-label={voiceListening ? 'Parar entrada por voz' : 'Iniciar entrada por voz'}
+          aria-pressed={voiceListening}
+          className="classic-console-mic"
+        >
+          <Mic aria-hidden="true" />
+        </button>
         {isStreaming && (
-          <button type="button" onClick={stop} className="px-2 font-mono text-[9px] text-warning">
+          <button type="button" onClick={stop} className="px-2 font-mono text-2xs text-warning">
             PARAR
           </button>
         )}

@@ -75,7 +75,7 @@ export function VoiceBar() {
 
   return (
     <div
-      className="fixed left-0 right-0 flex items-center px-6 gap-4"
+      className="classic-voice-bar fixed left-0 right-0 flex items-center px-6 gap-4"
       style={{
         bottom: 72,
         height: 72,
@@ -91,7 +91,7 @@ export function VoiceBar() {
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
         onClick={() => setTextMode(!textMode)}
-        className="w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer flex-shrink-0"
+        className="w-11 h-11 rounded-xl flex items-center justify-center cursor-pointer flex-shrink-0"
         style={{
           background: textMode ? 'rgba(168,85,247,0.15)' : 'rgba(0,245,255,0.05)',
           border: `1px solid ${textMode ? 'rgba(168,85,247,0.4)' : 'rgba(0,245,255,0.15)'}`,
@@ -117,7 +117,7 @@ export function VoiceBar() {
           updateSettings({ ttsEnabled: !ttsEnabled });
           if (!ttsEnabled && !isStreaming && latestAnswer) speakText(latestAnswer.text);
         }}
-        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
+        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
         style={{
           background: ttsEnabled ? 'rgba(34,197,94,.14)' : 'rgba(255,255,255,.035)',
           border: `1px solid ${ttsEnabled ? 'rgba(34,197,94,.45)' : 'rgba(255,255,255,.1)'}`,
@@ -211,7 +211,7 @@ export function VoiceBar() {
       {/* Mic / Status indicator */}
       <div className="flex flex-col items-center gap-1 flex-shrink-0">
         {/* State label */}
-        <span style={{ ...mono, color: stateColor, fontSize: '8px', letterSpacing: '0.1em' }}>
+        <span style={{ ...mono, color: stateColor, fontSize: '0.6875rem', letterSpacing: '0.1em' }}>
           {aiState.toUpperCase()}
         </span>
 

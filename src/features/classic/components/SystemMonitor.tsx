@@ -41,9 +41,9 @@ export function SystemMonitor() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Activity className="h-4 w-4 text-primary" />
-          <span style={{ ...orb, color: '#00f5ff', fontSize: '11px', letterSpacing: '0.15em' }}>SYSTEM STATUS</span>
+          <span style={{ ...orb, color: '#00f5ff', fontSize: '0.6875rem', letterSpacing: '0.15em' }}>SYSTEM STATUS</span>
         </div>
-        <button type="button" onClick={() => { void health.refetch(); void usage.refetch(); void models.refetch(); }} style={{ ...mono, color: '#00f5ff', fontSize: '9px' }}>
+        <button type="button" onClick={() => { void health.refetch(); void usage.refetch(); void models.refetch(); }} style={{ ...mono, color: '#00f5ff', fontSize: '0.6875rem' }}>
           ATUALIZAR
         </button>
       </div>
@@ -67,20 +67,20 @@ export function SystemMonitor() {
           <motion.span animate={{ opacity: [1, 0.45, 1] }} transition={{ duration: 1.8, repeat: Infinity }} className="h-2 w-2 rounded-full" style={{ background: online ? '#22c55e' : '#f59e0b' }} />
           <div>
             <p style={{ ...raj, color: 'rgba(255,255,255,0.8)', fontSize: '14px' }}>{offlineMode ? ollama.isError ? 'Ollama indisponível' : ollama.data ? 'Ollama local conectado' : 'Consultando Ollama' : demoMode ? 'Modo demonstração' : health.data?.status === 'ok' ? 'API conectada' : health.isLoading ? 'Consultando API' : 'API indisponível'}</p>
-            <p style={{ ...mono, color: 'rgba(255,255,255,0.4)', fontSize: '9px' }}>{offlineMode ? ollama.data ? `VERSÃO ${ollama.data}` : 'Inicie o serviço com ollama serve' : health.data?.version ? `VERSÃO ${health.data.version}` : health.data?.message ?? 'Métricas vêm da API configurada'}</p>
+            <p style={{ ...mono, color: 'rgba(255,255,255,0.4)', fontSize: '0.6875rem' }}>{offlineMode ? ollama.data ? `VERSÃO ${ollama.data}` : 'Inicie o serviço com ollama serve' : health.data?.version ? `VERSÃO ${health.data.version}` : health.data?.message ?? 'Métricas vêm da API configurada'}</p>
           </div>
         </div>
       </div>
       {metrics.map(({ label, value, icon: Icon, color }) => (
         <div key={label} className="flex items-center justify-between rounded-xl p-3" style={{ background: 'rgba(0,8,20,0.5)', border: `1px solid ${color}25` }}>
-          <div className="flex items-center gap-2"><Icon className="h-3.5 w-3.5" style={{ color }} /><span style={{ ...mono, color: 'rgba(255,255,255,0.5)', fontSize: '9px' }}>{label}</span></div>
-          <span style={{ ...orb, color, fontSize: '11px' }}>{value}</span>
+          <div className="flex items-center gap-2"><Icon className="h-3.5 w-3.5" style={{ color }} /><span style={{ ...mono, color: 'rgba(255,255,255,0.5)', fontSize: '0.6875rem' }}>{label}</span></div>
+          <span style={{ ...orb, color, fontSize: '0.6875rem' }}>{value}</span>
         </div>
       ))}
       {models.data?.providers.map((provider) => (
         <div key={`${provider.provider}-${provider.key_source}`} className="flex items-center justify-between px-2">
           <span style={{ ...raj, color: 'rgba(255,255,255,0.65)', fontSize: '12px' }}>{provider.name}</span>
-          <span style={{ ...mono, color: provider.available ? '#22c55e' : '#f59e0b', fontSize: '8px' }}>{provider.available ? 'DISPONÍVEL' : 'INDISPONÍVEL'}</span>
+          <span style={{ ...mono, color: provider.available ? '#22c55e' : '#f59e0b', fontSize: '0.6875rem' }}>{provider.available ? 'DISPONÍVEL' : 'INDISPONÍVEL'}</span>
         </div>
       ))}
         </div>

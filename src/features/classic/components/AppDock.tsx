@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   MessageSquare,
@@ -8,7 +8,7 @@ import {
   ChevronUp,
   Grid,
 } from 'lucide-react';
-import { useApp } from '../ClassicContext';
+import { useAppUi } from '../ClassicContext';
 
 const orb = { fontFamily: 'Orbitron, sans-serif' };
 const mono = { fontFamily: 'Share Tech Mono, monospace' };
@@ -21,15 +21,25 @@ const DOCK_APPS = [
 ];
 
 export function AppDock() {
-  const { setAppGridOpen, setSettingsOpen, setLeftPanel, setRightPanel, leftPanel, rightPanel, settingsOpen } = useApp();
+  const { setAppGridOpen, setSettingsOpen, setLeftPanel, setActivePanel, setConversationOpen, activePanel, conversationOpen, settingsOpen } = useAppUi();
   const [hovered, setHovered] = useState<string | null>(null);
   const [tooltip, setTooltip] = useState<string | null>(null);
+  const touchStartY = useRef<number | null>(null);
 
   const handleClick = (app: (typeof DOCK_APPS)[0]) => {
     if (app.id === 'settings') {
       setSettingsOpen(true);
-    } else if (app.id === 'console') setRightPanel('console');
-    else setLeftPanel(app.id as 'monitor' | 'memory');
+    } else if (app.id === 'console') {
+      const close = conversationOpen;
+      setConversationOpen(!close);
+      setActivePanel('console');
+    }
+    else {
+      const close = activePanel === app.id;
+      setConversationOpen(false);
+      if (close) setActivePanel('console');
+      else setLeftPanel(app.id as 'monitor' | 'memory');
+    }
   };
 
   const getScale = (id: string) => {
@@ -43,7 +53,7 @@ export function AppDock() {
 
   return (
     <div
-      className="fixed bottom-0 left-0 right-0 flex items-center justify-center gap-2 px-4"
+      className="classic-app-dock fixed bottom-0 left-0 right-0 flex items-center justify-center gap-2 px-4"
       style={{
         height: 72,
         zIndex: 60,
@@ -51,15 +61,23 @@ export function AppDock() {
         backdropFilter: 'blur(20px)',
         borderTop: '1px solid rgba(0, 245, 255, 0.1)',
       }}
+      onPointerDown={(event) => {
+        if (event.pointerType === 'touch' || event.pointerType === 'pen') touchStartY.current = event.clientY;
+      }}
+      onPointerUp={(event) => {
+        if (touchStartY.current !== null && touchStartY.current - event.clientY > 48) setAppGridOpen(true);
+        touchStartY.current = null;
+      }}
+      onPointerCancel={() => { touchStartY.current = null; }}
     >
       {/* Left label */}
       <div className="absolute left-6 flex flex-col">
         <span
-          style={{ ...orb, color: 'rgba(0,245,255,0.5)', fontSize: '8px', letterSpacing: '0.15em' }}
+          style={{ ...orb, color: 'rgba(0,245,255,0.5)', fontSize: '0.6875rem', letterSpacing: '0.15em' }}
         >
           NEXA
         </span>
-        <span style={{ ...mono, color: 'rgba(0,245,255,0.3)', fontSize: '7px' }}>APP DOCK</span>
+        <span style={{ ...mono, color: 'rgba(0,245,255,0.3)', fontSize: '0.6875rem' }}>APP DOCK</span>
       </div>
 
       {/* Dock inner container */}
@@ -72,7 +90,7 @@ export function AppDock() {
         }}
       >
         {DOCK_APPS.map((app) => {
-          const active = app.id === 'settings' ? settingsOpen : app.id === 'console' ? rightPanel === 'console' : leftPanel === app.id;
+          const active = app.id === 'settings' ? settingsOpen : app.id === 'console' ? conversationOpen : activePanel === app.id;
           return (
           <div
             key={app.id}
@@ -101,7 +119,7 @@ export function AppDock() {
                     boxShadow: `0 0 12px ${app.color}20`,
                   }}
                 >
-                  <span style={{ ...mono, color: app.color, fontSize: '10px' }}>{app.name}</span>
+                  <span style={{ ...mono, color: app.color, fontSize: '0.6875rem' }}>{app.name}</span>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -123,6 +141,7 @@ export function AppDock() {
               }}
             >
               <app.icon className="w-5 h-5" style={{ color: app.color }} />
+              <span className="classic-dock-label">{app.name}</span>
 
               <AnimatePresence>{active && <motion.span initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0 }} className="absolute -bottom-1.5 h-1.5 w-1.5 rounded-full" style={{ background: app.color, boxShadow: `0 0 7px ${app.color}` }} />}</AnimatePresence>
             </motion.button>
@@ -152,7 +171,7 @@ export function AppDock() {
                   border: '1px solid rgba(0,245,255,0.2)',
                 }}
               >
-                <span style={{ ...mono, color: '#00f5ff', fontSize: '10px' }}>All Apps</span>
+                <span style={{ ...mono, color: '#00f5ff', fontSize: '0.6875rem' }}>All Apps</span>
               </motion.div>
             )}
           </AnimatePresence>
@@ -167,6 +186,7 @@ export function AppDock() {
             }}
           >
             <Grid className="w-5 h-5" style={{ color: '#00f5ff' }} />
+            <span className="classic-dock-label">Apps</span>
           </motion.button>
         </div>
       </div>
@@ -174,7 +194,7 @@ export function AppDock() {
       {/* Right: swipe hint */}
       <div className="absolute right-6 flex items-center gap-1 opacity-50">
         <ChevronUp className="w-3 h-3" style={{ color: 'rgba(0,245,255,0.5)' }} />
-        <span style={{ ...mono, color: 'rgba(0,245,255,0.4)', fontSize: '8px' }}>SWIPE UP</span>
+        <span style={{ ...mono, color: 'rgba(0,245,255,0.4)', fontSize: '0.6875rem' }}>SWIPE UP</span>
       </div>
     </div>
   );

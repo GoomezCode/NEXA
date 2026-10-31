@@ -40,7 +40,7 @@ function NavButton({
       <span
         className={cn(
           'font-mono uppercase tracking-[0.1em]',
-          compact ? 'text-[10px]' : 'text-[10px]',
+          compact ? 'text-2xs' : 'text-2xs',
         )}
       >
         {item.label}
@@ -73,7 +73,7 @@ export function Dock() {
 
       <nav
         aria-label="Navegação móvel"
-        className="relative z-20 flex shrink-0 items-stretch gap-1 border-t border-white/5 bg-background/85 px-2 pt-1.5 backdrop-blur-xl md:hidden"
+        className="nexa-mobile-dock relative z-20 flex shrink-0 items-stretch gap-1 border-t border-white/5 bg-background/85 px-2 pt-1.5 backdrop-blur-xl md:hidden short:fixed short:inset-y-14 short:right-0 short:z-30 short:w-14 short:flex-col short:border-l short:border-t-0 short:px-1 short:pt-1"
         style={{ paddingBottom: 'max(0.375rem, env(safe-area-inset-bottom))' }}
       >
         {NAV_ITEMS.map((item) => (

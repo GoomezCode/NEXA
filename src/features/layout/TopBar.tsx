@@ -19,7 +19,7 @@ function StatusChip({ tone, label }: { tone: 'success' | 'warning'; label: strin
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.14em] ${styles}`}
+      className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 font-mono text-2xs uppercase tracking-[0.14em] ${styles}`}
     >
       <span
         className={`h-1.5 w-1.5 rounded-full ${tone === 'success' ? 'bg-success' : 'bg-warning'}`}
@@ -50,11 +50,11 @@ export function TopBar() {
   }, []);
 
   return (
-    <header className="relative z-20 flex h-14 shrink-0 items-center gap-2 border-b border-white/5 bg-background/70 px-3 backdrop-blur-xl sm:gap-3 sm:px-5">
+    <header className="relative z-20 flex h-14 min-h-[calc(3.5rem+var(--safe-top))] shrink-0 items-center gap-2 border-b border-white/5 bg-background/70 px-3 ps-[max(0.75rem,var(--safe-left))] pe-[max(0.75rem,var(--safe-right))] pt-[var(--safe-top)] backdrop-blur-xl sm:gap-3 sm:px-5">
       <button
         type="button"
         onClick={() => setSessionsSheetOpen(true)}
-        className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-muted transition hover:border-primary/30 hover:text-primary lg:hidden"
+        className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-muted transition hover:border-primary/30 hover:text-primary md:hidden"
         aria-label="Abrir conversas"
       >
         <Menu className="h-4 w-4" aria-hidden="true" />
@@ -63,7 +63,7 @@ export function TopBar() {
       <button
         type="button"
         onClick={toggleSidebar}
-        className="hidden h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-muted transition hover:border-primary/30 hover:text-primary lg:flex"
+        className="hidden h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-muted transition hover:border-primary/30 hover:text-primary md:flex"
         aria-label="Alternar barra lateral"
       >
         <PanelLeft className="h-4 w-4" aria-hidden="true" />
@@ -73,7 +73,7 @@ export function TopBar() {
         <NexaMark size={28} />
         <div>
           <h1 className="font-display text-[13px] tracking-[0.3em] text-foreground">NEXA</h1>
-          <p className="hidden font-mono text-[10px] uppercase tracking-[0.2em] text-muted sm:block">
+          <p className="hidden font-mono text-2xs uppercase tracking-[0.2em] text-muted sm:block">
             interface neural
           </p>
         </div>
@@ -90,7 +90,7 @@ export function TopBar() {
                 useConnectionStore.getState().setMode('api');
                 useAuthStore.getState().clear();
               }}
-              className="min-h-11 rounded-xl border border-white/10 px-3 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition hover:border-primary/30 hover:text-primary disabled:opacity-40"
+              className="min-h-11 rounded-xl border border-white/10 px-3 font-mono text-2xs uppercase tracking-[0.12em] text-muted transition hover:border-primary/30 hover:text-primary disabled:opacity-40"
             >Sair do offline</button>
           </>
         ) : <>
@@ -111,7 +111,7 @@ export function TopBar() {
             <button
               type="button"
               onClick={logout}
-              className="min-h-11 rounded-xl border border-white/10 px-3 font-mono text-[10px] uppercase tracking-[0.12em] text-muted transition hover:border-primary/30 hover:text-primary"
+              className="min-h-11 rounded-xl border border-white/10 px-3 font-mono text-2xs uppercase tracking-[0.12em] text-muted transition hover:border-primary/30 hover:text-primary"
             >
               {session.role === 'guest' ? 'Entrar' : 'Sair'}
             </button>
@@ -153,9 +153,19 @@ export function TopBar() {
           </button>
         </div>
 
+        <button
+          type="button"
+          onClick={() => setMode(mode === 'classic' ? 'nexa' : 'classic')}
+          disabled={busy}
+          aria-label={mode === 'classic' ? 'Voltar ao NEXA HUD' : 'Abrir modo clássico'}
+          className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-muted transition hover:border-primary/30 hover:text-primary disabled:opacity-40 sm:hidden"
+        >
+          {mode === 'classic' ? <MessageSquare className="h-4 w-4" aria-hidden="true" /> : <MonitorPlay className="h-4 w-4" aria-hidden="true" />}
+        </button>
+
         <div className="text-right leading-tight">
           <p className="font-mono text-sm tabular-nums text-primary">{formatClock(now)}</p>
-          <p className="hidden font-mono text-[10px] uppercase tracking-[0.12em] text-muted sm:block">
+          <p className="hidden font-mono text-2xs uppercase tracking-[0.12em] text-muted sm:block">
             {formatShortDate(now)}
           </p>
         </div>

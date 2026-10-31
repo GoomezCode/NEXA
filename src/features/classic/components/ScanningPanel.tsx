@@ -9,7 +9,8 @@ import { useSettingsStore } from '@/stores/settings-store';
 import { useConnectionStore } from '@/stores/connection-store';
 import { useOllamaHealth } from '@/api/ollama';
 
-import { useApp } from '../ClassicContext';
+import { useAppUi } from '../ClassicContext';
+import { useOverlayHistory } from '@/hooks/use-overlay-history';
 
 type CheckResult = { label: string; detail: string; ok: boolean | null };
 
@@ -17,7 +18,8 @@ const mono = { fontFamily: 'Share Tech Mono, monospace' };
 const orb = { fontFamily: 'Orbitron, sans-serif' };
 
 export function ScanningPanel() {
-  const { scanningActive, setScanningActive } = useApp();
+  const { scanningActive, setScanningActive } = useAppUi();
+  useOverlayHistory(scanningActive, setScanningActive, 'classic-scan');
   const demoMode = useSettingsStore((state) => state.settings.demoMode);
   const offlineMode = useConnectionStore((state) => state.mode === 'offline');
   const ollama = useOllamaHealth();
@@ -107,10 +109,10 @@ export function ScanningPanel() {
                 <motion.div animate={{ rotate: phase === 'checking' ? 360 : 0 }} transition={{ duration: 2, repeat: phase === 'checking' ? Infinity : 0, ease: 'linear' }}>
                   <Scan className="h-5 w-5 text-cyan-300" aria-hidden="true" />
                 </motion.div>
-                <div><h2 id="classic-scan-title" style={{ ...orb, letterSpacing: '.14em' }} className="text-sm text-cyan-200">DIAGNÓSTICO NEXA</h2><p style={mono} className="text-[10px] text-cyan-100/45">CONSULTAS REAIS DA SESSÃO</p></div>
+                <div><h2 id="classic-scan-title" style={{ ...orb, letterSpacing: '.14em' }} className="text-sm text-cyan-200">DIAGNÓSTICO NEXA</h2><p style={mono} className="text-2xs text-cyan-100/45">CONSULTAS REAIS DA SESSÃO</p></div>
               </div>
               <div className="flex items-center gap-3">
-                <span role="status" style={mono} className="text-[10px] uppercase text-cyan-100/70">{phase === 'ready' ? 'PRONTO' : phase === 'checking' ? 'CONSULTANDO' : 'CONCLUÍDO'}</span>
+                <span role="status" style={mono} className="text-2xs uppercase text-cyan-100/70">{phase === 'ready' ? 'PRONTO' : phase === 'checking' ? 'CONSULTANDO' : 'CONCLUÍDO'}</span>
                 <motion.button type="button" whileHover={{ scale: 1.08, rotate: 90 }} whileTap={{ scale: .9 }} aria-label="Fechar diagnóstico" onClick={() => setScanningActive(false)} className="flex h-10 w-10 items-center justify-center rounded-xl border border-red-300/20 text-red-200"><X className="h-4 w-4" /></motion.button>
               </div>
             </header>
@@ -126,12 +128,12 @@ export function ScanningPanel() {
               </div>
 
               <div className="space-y-3">
-                <div><div className="mb-1 flex justify-between" style={mono}><span className="text-[10px] text-white/40">VERIFICAÇÕES</span><span className="text-[10px] text-cyan-200">{checks.length}/{offlineMode ? 2 : demoMode ? 1 : 3}</span></div><div className="h-1.5 overflow-hidden rounded-full bg-white/5"><motion.div animate={{ width: `${progress}%` }} transition={{ duration: .45 }} className="h-full rounded-full bg-cyan-300 shadow-[0_0_10px_rgba(0,245,255,.8)]" /></div></div>
+                <div><div className="mb-1 flex justify-between" style={mono}><span className="text-2xs text-white/40">VERIFICAÇÕES</span><span className="text-2xs text-cyan-200">{checks.length}/{offlineMode ? 2 : demoMode ? 1 : 3}</span></div><div className="h-1.5 overflow-hidden rounded-full bg-white/5"><motion.div animate={{ width: `${progress}%` }} transition={{ duration: .45 }} className="h-full rounded-full bg-cyan-300 shadow-[0_0_10px_rgba(0,245,255,.8)]" /></div></div>
                 <div className="space-y-2" aria-live="polite">
                   {checks.map((check, index) => (
                     <motion.article key={check.label} initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: index * .05 }} className="flex items-start gap-3 rounded-xl border border-white/5 bg-white/[.025] p-3">
                       {check.ok === null ? <Activity className="mt-0.5 h-4 w-4 shrink-0 text-amber-300" aria-hidden="true" /> : check.ok ? <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-300" aria-hidden="true" /> : <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-300" aria-hidden="true" />}
-                      <div className="min-w-0"><h3 style={mono} className="text-[10px] text-white/75">{check.label}</h3><p className="mt-0.5 text-xs leading-relaxed text-white/45">{check.detail}</p></div>
+                      <div className="min-w-0"><h3 style={mono} className="text-2xs text-white/75">{check.label}</h3><p className="mt-0.5 text-xs leading-relaxed text-white/45">{check.detail}</p></div>
                     </motion.article>
                   ))}
                   {phase === 'checking' && <div role="status" className="flex items-center gap-2 px-1 py-2 text-xs text-cyan-100/50"><LoaderCircle className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />Verificando serviços configurados…</div>}

@@ -11,6 +11,7 @@
   html {
     height: 100%;
     background: var(--nexa-bg);
+    -webkit-text-size-adjust: 100%;
   }
 
   body {
@@ -24,6 +25,11 @@
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+  }
+
+  button,
+  a {
+    touch-action: manipulation;
   }
 
   #root {
@@ -71,6 +77,16 @@
 }
 
 @layer utilities {
+  .nexa-field {
+    min-height: 2.75rem;
+  }
+
+  @media (pointer: coarse) {
+    .nexa-field {
+      font-size: 1rem;
+    }
+  }
+
   .nexa-grid {
     background-image:
       linear-gradient(rgba(0, 229, 255, 0.055) 1px, transparent 1px),
@@ -100,6 +116,21 @@
       0 0 18px rgba(0, 229, 255, 0.45),
       0 0 48px rgba(0, 229, 255, 0.18);
   }
+}
+
+@custom-variant short (@media (max-height: 32rem));
+@custom-variant xs (@media (min-width: 30rem));
+
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+}
+
+.overflow-y-auto,
+.overflow-x-auto {
+  overscroll-behavior: contain;
 }
 
 @keyframes nexa-spin {
@@ -154,8 +185,8 @@
   inset: 0 auto 0 0;
   margin: 0;
   height: 100dvh;
-  max-height: none;
-  width: min(20rem, 86vw);
+  max-height: 100dvh;
+  width: min(20rem, calc(86vw - var(--safe-left) - var(--safe-right)));
   max-width: none;
   padding: 0;
   border: 0;
@@ -165,12 +196,77 @@
   overflow: hidden;
 }
 
+.nexa-composer-shell {
+  padding-inline: max(0.75rem, var(--safe-left)) max(0.75rem, var(--safe-right));
+}
+
+@media (max-width: 767px) {
+  .nexa-app-root {
+    position: fixed;
+    inset: var(--visual-viewport-top, 0px) 0 auto;
+    height: var(--visual-viewport-height, 100dvh);
+    min-height: 0;
+  }
+}
+
+@media (pointer: coarse) {
+  .nexa-spin-slow,
+  .nexa-spin-reverse,
+  .nexa-pulse {
+    animation: none !important;
+  }
+}
+
+.nexa-mobile-dock {
+  padding-inline: max(0.5rem, var(--safe-left)) max(0.5rem, var(--safe-right));
+}
+
+.nexa-notification-center {
+  left: max(0.75rem, var(--safe-left));
+  right: max(0.75rem, var(--safe-right));
+  width: min(20rem, calc(100vw - var(--safe-left) - var(--safe-right) - 1.5rem));
+}
+
+@media (max-height: 32rem) and (max-width: 767px) and (orientation: landscape) {
+  .nexa-shell-content { padding-right: 3.5rem; }
+  .nexa-shell-content > header { height: 2.75rem; }
+  .nexa-sheet { height: 100dvh; max-height: 100dvh; }
+  .nexa-markdown-table { scrollbar-width: thin; }
+}
+
 .nexa-sheet::backdrop {
   background: rgba(2, 5, 11, 0.72);
   backdrop-filter: blur(4px);
 }
 
 /* Markdown das respostas */
+.nexa-message-row {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 7rem;
+}
+
+.nexa-content-container { container-type: inline-size; }
+.nexa-cards-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--nexa-space-3);
+}
+
+@container (min-width: 42rem) {
+  .nexa-cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.nexa-app-root :is(button, input, textarea, select) { transition-duration: 160ms; }
+.nexa-app-root :is(button, input, textarea, select):focus-visible {
+  outline: 2px solid var(--nexa-primary);
+  outline-offset: 2px;
+}
+
+.nexa-app-root button:not(:disabled):active,
+.classic-hud button:not(:disabled):active {
+  filter: brightness(1.2);
+}
+
 .nexa-markdown > * + * {
   margin-top: 0.65rem;
 }
@@ -257,6 +353,42 @@
   width: 100%;
   border-collapse: collapse;
   font-size: 0.8rem;
+}
+
+.nexa-markdown { overflow-wrap: anywhere; }
+.nexa-markdown img { max-width: 100%; height: auto; }
+.nexa-markdown pre { max-width: 100%; overflow-x: auto; }
+.nexa-markdown-table { max-width: 100%; overflow-x: auto; }
+
+@media (min-width: 96rem) {
+  html { font-size: clamp(16px, calc(0.55vw + 8px), 20px); }
+}
+
+@media (max-width: 47.999rem) {
+  [class*='backdrop-blur'] { backdrop-filter: none !important; }
+  .nexa-sheet::backdrop { backdrop-filter: none; }
+}
+
+@media (pointer: coarse) {
+  button,
+  [role='button'],
+  [role='tab'] {
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+  }
+
+  input:not([type='range']),
+  textarea,
+  select {
+    min-height: 2.75rem;
+    font-size: 1rem;
+  }
+
+  .text-2xs { font-size: var(--text-xs-plus); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }
 
 .nexa-markdown th,

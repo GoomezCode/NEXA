@@ -2,11 +2,11 @@ import '@fontsource/share-tech-mono/400.css';
 
 import './classic.css';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Brain, Terminal, Search, Activity } from 'lucide-react';
 
-import { AppProvider, useApp } from './ClassicContext';
+import { AppProvider, useAppUi, useChatActions, useChatStatus } from './ClassicContext';
 import { Background } from './components/Background';
 import { TopBar } from './components/TopBar';
 import { AICore } from './components/AICore';
@@ -26,6 +26,9 @@ import { useUsage } from '@/api/usage';
 import { useModelStore } from '@/stores/model-store';
 import { useSessionMetricsStore } from '@/stores/session-metrics-store';
 import { useConnectionStore } from '@/stores/connection-store';
+import { useLayoutClass } from '@/hooks/use-layout-class';
+import { useVisualViewport } from '@/hooks/use-visual-viewport';
+import { useOverlayHistory } from '@/hooks/use-overlay-history';
 
 const orb = { fontFamily: 'Orbitron, sans-serif' };
 const mono = { fontFamily: 'Share Tech Mono, monospace' };
@@ -69,7 +72,7 @@ function PanelTab({
         style={{
           ...mono,
           color: active ? color : 'rgba(255,255,255,0.35)',
-          fontSize: '9px',
+          fontSize: '0.6875rem',
           letterSpacing: '0.08em',
         }}
       >
@@ -80,11 +83,14 @@ function PanelTab({
 }
 
 function MainLayout({ onExit }: { onExit: () => void }) {
+  useVisualViewport();
   const {
     leftPanel,
     setLeftPanel,
     rightPanel,
     setRightPanel,
+    activePanel,
+    setActivePanel,
     sessionId,
     settingsOpen,
     setSettingsOpen,
@@ -94,7 +100,10 @@ function MainLayout({ onExit }: { onExit: () => void }) {
     setScanningActive,
     gestureOpen,
     setGestureOpen,
-  } = useApp();
+    conversationOpen,
+    setConversationOpen,
+  } = useAppUi();
+  useOverlayHistory(conversationOpen, setConversationOpen, 'classic-chat');
   const selectedModelId = useModelStore((state) => state.selectedModelId);
   const modelCatalog = useModels();
   const usage = useUsage();
@@ -103,9 +112,10 @@ function MainLayout({ onExit }: { onExit: () => void }) {
     sessionId ? state.bySession[sessionId]?.at(-1) : undefined,
   );
   const selectedModel = modelCatalog.data?.models.find((model) => model.model_id === selectedModelId);
+  const layout = useLayoutClass();
 
   useEffect(() => {
-    if (!settingsOpen && !appGridOpen && !scanningActive && !gestureOpen) {
+    if (!settingsOpen && !appGridOpen && !scanningActive && !gestureOpen && !conversationOpen) {
       return;
     }
 
@@ -123,16 +133,18 @@ function MainLayout({ onExit }: { onExit: () => void }) {
       }
       if (scanningActive) setScanningActive(false);
       if (gestureOpen) setGestureOpen(false);
+      if (conversationOpen) setConversationOpen(false);
 
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [appGridOpen, gestureOpen, scanningActive, setAppGridOpen, setGestureOpen, setScanningActive, setSettingsOpen, settingsOpen]);
+  }, [appGridOpen, conversationOpen, gestureOpen, scanningActive, setAppGridOpen, setConversationOpen, setGestureOpen, setScanningActive, setSettingsOpen, settingsOpen]);
 
   return (
     <div
-      className="classic-layout fixed inset-0 flex flex-col overflow-hidden"
+      className={`classic-layout classic-layout--${layout.layout}${layout.short ? ' classic-layout--short' : ''} fixed inset-0 flex flex-col overflow-hidden`}
+      data-active-panel={activePanel}
       style={{ fontFamily: 'Rajdhani, sans-serif' }}
     >
       <Background />
@@ -140,13 +152,53 @@ function MainLayout({ onExit }: { onExit: () => void }) {
       {/* Top Bar */}
       <TopBar onExit={onExit} />
 
+      <nav className="classic-compact-tabs" aria-label="Painéis do modo clássico">
+        {([
+          ['console', 'CONSOLE', Terminal],
+          ['monitor', 'MONITOR', Activity],
+          ['memory', 'MEMORY', Brain],
+          ['search', 'SEARCH', Search],
+        ] as const).map(([panel, label, Icon]) => (
+          <button
+            key={panel}
+            type="button"
+            aria-pressed={activePanel === panel}
+            onClick={() => setActivePanel(panel)}
+            className={activePanel === panel ? 'is-active' : ''}
+          >
+            <Icon aria-hidden="true" />
+            <span>{label}</span>
+          </button>
+        ))}
+      </nav>
+      <nav className="classic-medium-tabs" aria-label="Painéis do modo clássico">
+        {([
+          ['console', 'CONSOLE', Terminal],
+          ['monitor', 'MONITOR', Activity],
+          ['memory', 'MEMORY', Brain],
+          ['search', 'SEARCH', Search],
+        ] as const).map(([panel, label, Icon]) => (
+          <button
+            key={panel}
+            type="button"
+            aria-pressed={activePanel === panel}
+            onClick={() => setActivePanel(panel)}
+            className={activePanel === panel ? 'is-active' : ''}
+          >
+            <Icon aria-hidden="true" />
+            <span>{label}</span>
+          </button>
+        ))}
+      </nav>
+
       {/* Main 3-column layout */}
       <div
-        className="flex flex-1 gap-4 px-4 overflow-hidden"
-        style={{ marginTop: 56, marginBottom: 144 }}
+        className="classic-main-area flex flex-1 gap-4 px-4 overflow-hidden"
+        style={{ marginTop: 'var(--c-main-top, 3.5rem)', marginBottom: 'var(--c-main-bottom, 9rem)' }}
       >
-        {/* LEFT PANEL */}
-        <div className="w-72 flex-shrink-0 flex flex-col gap-3 overflow-hidden pt-4 pb-2">
+        {/* Panels stay unmounted on compact screens until explicitly selected. */}
+        {(layout.layout !== 'compact' || activePanel === 'monitor' || activePanel === 'memory') && (
+        <div className="classic-panel classic-panel--left w-72 flex-shrink-0 flex flex-col gap-3 overflow-hidden pt-4 pb-2">
           {/* Panel tabs */}
           <div className="flex gap-2 flex-shrink-0">
             <PanelTab
@@ -197,9 +249,10 @@ function MainLayout({ onExit }: { onExit: () => void }) {
             </AnimatePresence>
           </div>
         </div>
+        )}
 
         {/* CENTER — AI Core */}
-        <div className="flex-1 flex flex-col items-center justify-center gap-4 overflow-hidden">
+        <div className="classic-center flex-1 flex flex-col items-center justify-center gap-4 overflow-hidden">
           {/* Top data strip */}
           <motion.div
             initial={{ opacity: 0, y: -10 }}
@@ -221,7 +274,7 @@ function MainLayout({ onExit }: { onExit: () => void }) {
                 <span style={{ ...orb, color, fontSize: '13px', textShadow: `0 0 8px ${color}` }}>
                   {value}
                 </span>
-                <span style={{ ...mono, color: 'rgba(255,255,255,0.3)', fontSize: '8px' }}>
+                <span style={{ ...mono, color: 'rgba(255,255,255,0.3)', fontSize: '0.6875rem' }}>
                   {label}
                 </span>
               </div>
@@ -253,8 +306,9 @@ function MainLayout({ onExit }: { onExit: () => void }) {
           </motion.div>
         </div>
 
-        {/* RIGHT PANEL */}
-        <div className="w-72 flex-shrink-0 flex flex-col gap-3 overflow-hidden pt-4 pb-2">
+        {/* The text panel is shown in its own conversation overlay on compact screens. */}
+        {layout.layout !== 'compact' && (
+        <div className="classic-panel classic-panel--right w-72 flex-shrink-0 flex flex-col gap-3 overflow-hidden pt-4 pb-2">
           {/* Panel tabs */}
           <div className="flex gap-2 flex-shrink-0">
             <PanelTab
@@ -305,13 +359,22 @@ function MainLayout({ onExit }: { onExit: () => void }) {
             </AnimatePresence>
           </div>
         </div>
+        )}
       </div>
 
       {/* Voice Bar */}
-      <VoiceBar />
+      {layout.layout !== 'compact' && <VoiceBar />}
 
       {/* App Dock */}
       <AppDock />
+
+      {conversationOpen && (
+        <div className="classic-mobile-chat-overlay" role="dialog" aria-modal="true" aria-label="Conversa com a NEXA">
+          <div className="classic-mobile-chat-window">
+            <CommandConsole conversationMode />
+          </div>
+        </div>
+      )}
 
       {/* Overlays */}
       <AppGrid />
@@ -334,7 +397,9 @@ function QuickActionButton({
   color: string;
   action: string;
 }) {
-  const { sendMessage, isStreaming, setScanningActive } = useApp();
+  const { setScanningActive } = useAppUi();
+  const { sendMessage } = useChatActions();
+  const isStreaming = useChatStatus();
 
   const handleClick = () => {
     if (isStreaming) return;
@@ -368,77 +433,14 @@ function QuickActionButton({
       }
       onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.boxShadow = 'none')}
     >
-        <span style={{ ...mono, color, fontSize: '10px', letterSpacing: '0.08em' }}>{label}</span>
+        <span style={{ ...mono, color, fontSize: '0.6875rem', letterSpacing: '0.08em' }}>{label}</span>
     </motion.button>
   );
 }
 
 export default function ClassicApp({ onExit }: { onExit: () => void }) {
-  const [narrow, setNarrow] = useState(
-    () => typeof window !== 'undefined' && window.innerWidth < 1024,
-  );
-  const [forceWide, setForceWide] = useState(false);
-
-  useEffect(() => {
-    const handleResize = () => setNarrow(window.innerWidth < 1024);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  if (narrow && !forceWide) {
-    return (
-      <div className="classic-hud flex items-center justify-center p-6">
-        <div
-          className="max-w-sm rounded-2xl p-6 text-center"
-          style={{
-            background: 'rgba(0, 10, 28, 0.8)',
-            border: '1px solid rgba(0, 245, 255, 0.22)',
-            boxShadow: '0 0 40px rgba(0,0,0,0.5)',
-          }}
-        >
-          <p
-            className="text-lg tracking-[0.14em]"
-            style={{ fontFamily: 'Orbitron, sans-serif', color: '#00f5ff' }}
-          >
-            NEXA CLASSIC
-          </p>
-          <p className="mt-3 text-sm leading-relaxed text-white/60">
-            A réplica clássica foi desenhada para telas a partir de 1024px. Em telas menores, o
-            layout pode ficar comprimido.
-          </p>
-          <div className="mt-5 flex flex-col gap-2">
-            <button
-              type="button"
-              onClick={onExit}
-              className="rounded-xl px-4 py-2.5 text-[11px] uppercase tracking-[0.12em]"
-              style={{
-                fontFamily: 'Share Tech Mono, monospace',
-                background: 'rgba(0,245,255,0.12)',
-                border: '1px solid rgba(0,245,255,0.4)',
-                color: '#00f5ff',
-              }}
-            >
-              Voltar ao NEXA HUD
-            </button>
-            <button
-              type="button"
-              onClick={() => setForceWide(true)}
-              className="rounded-xl px-4 py-2.5 text-[11px] uppercase tracking-[0.12em] text-white/50"
-              style={{
-                fontFamily: 'Share Tech Mono, monospace',
-                border: '1px solid rgba(255,255,255,0.12)',
-              }}
-            >
-              Continuar mesmo assim
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className={`classic-hud${forceWide ? ' classic-hud--scroll' : ''}`}>
+    <div className="classic-hud">
       <AppProvider>
         <MainLayout onExit={onExit} />
       </AppProvider>

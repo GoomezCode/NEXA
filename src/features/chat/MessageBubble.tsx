@@ -1,6 +1,4 @@
-import ReactMarkdown from 'react-markdown';
-import rehypeSanitize from 'rehype-sanitize';
-import remarkGfm from 'remark-gfm';
+import { lazy, memo, Suspense, useDeferredValue } from 'react';
 
 import { formatFinishReason } from '@/api/chat';
 import type { ChatMessage } from '@/api/types';
@@ -8,15 +6,20 @@ import { NexaMark } from '@/components/brand/NexaMark';
 import { formatTime } from '@/lib/format';
 import { cn } from '@/lib/utils';
 
+const MarkdownContent = lazy(() =>
+  import('./MarkdownContent').then((module) => ({ default: module.MarkdownContent })),
+);
+
 const STATUS_NOTE: Partial<Record<ChatMessage['status'], string>> = {
   stopped: 'Resposta interrompida',
   error: 'Falha ao gerar a resposta',
 };
 
-export function MessageBubble({ message }: { message: ChatMessage }) {
+export const MessageBubble = memo(function MessageBubble({ message }: { message: ChatMessage }) {
   const isUser = message.role === 'user';
   const isStreaming = message.status === 'streaming';
   const note = STATUS_NOTE[message.status];
+  const deferredContent = useDeferredValue(message.content);
 
   return (
     <article
@@ -27,7 +30,7 @@ export function MessageBubble({ message }: { message: ChatMessage }) {
         className={cn(
           'mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border',
           isUser
-            ? 'border-white/10 bg-white/5 font-mono text-[10px] text-muted'
+            ? 'border-white/10 bg-white/5 font-mono text-2xs text-muted'
             : 'border-primary/25 bg-primary/10',
         )}
         aria-hidden="true"
@@ -50,12 +53,12 @@ export function MessageBubble({ message }: { message: ChatMessage }) {
           )}
         >
           {isUser ? (
-            <p className="whitespace-pre-wrap text-sm leading-relaxed">{message.content}</p>
+            <p className="whitespace-pre-wrap text-base leading-relaxed sm:text-sm">{message.content}</p>
           ) : (
-            <div className="nexa-markdown text-sm leading-relaxed">
-              <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSanitize]}>
-                {message.content}
-              </ReactMarkdown>
+            <div className="nexa-markdown text-base leading-relaxed sm:text-sm">
+              <Suspense fallback={<p className="whitespace-pre-wrap">{message.content}</p>}>
+                <MarkdownContent content={isStreaming ? deferredContent : message.content} />
+              </Suspense>
               {isStreaming && <span className="nexa-caret" aria-hidden="true" />}
             </div>
           )}
@@ -63,7 +66,7 @@ export function MessageBubble({ message }: { message: ChatMessage }) {
 
         <div
           className={cn(
-            'mt-1 flex flex-wrap items-center gap-2 px-1 font-mono text-[10px] uppercase tracking-[0.12em] text-muted/60',
+            'mt-1 flex flex-wrap items-center gap-2 px-1 font-mono text-2xs uppercase tracking-[0.12em] text-muted/60',
             isUser && 'justify-end',
           )}
         >
@@ -86,4 +89,4 @@ export function MessageBubble({ message }: { message: ChatMessage }) {
       </div>
     </article>
   );
-}
+});

@@ -1,5 +1,5 @@
-import { RefreshCw, Sparkles } from 'lucide-react';
-import { useEffect, useRef } from 'react';
+import { ArrowDown, RefreshCw, Sparkles } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 
 import type { ChatMessage } from '@/api/types';
 import { NexaMark } from '@/components/brand/NexaMark';
@@ -32,6 +32,7 @@ export function MessageList({
 }: MessageListProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const stickToBottom = useRef(true);
+  const [showJumpButton, setShowJumpButton] = useState(false);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -41,6 +42,7 @@ export function MessageList({
     }
 
     container.scrollTop = container.scrollHeight;
+    setShowJumpButton(false);
   }, [messages]);
 
   if (isLoading) {
@@ -74,7 +76,7 @@ export function MessageList({
           <button
             type="button"
             onClick={onRetry}
-            className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-xl border border-danger/30 bg-danger/10 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-danger transition hover:bg-danger/15"
+            className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-xl border border-danger/30 bg-danger/10 px-3 py-2 font-mono text-2xs uppercase tracking-[0.12em] text-danger transition hover:bg-danger/15"
           >
             <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" />
             Tentar novamente
@@ -94,7 +96,7 @@ export function MessageList({
             <NexaMark size={52} className="relative" />
           </div>
 
-          <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.3em] text-primary/70">
+          <p className="mt-4 font-mono text-2xs uppercase tracking-[0.3em] text-primary/70">
             canal aberto
           </p>
           <h3 className="mt-2 font-display text-lg tracking-[0.12em] text-foreground">
@@ -125,44 +127,59 @@ export function MessageList({
   }
 
   return (
-    <div
-      ref={containerRef}
-      onScroll={() => {
-        const container = containerRef.current;
+    <div className="relative min-h-0 flex-1">
+      <div
+        ref={containerRef}
+        onScroll={() => {
+          const container = containerRef.current;
+          if (!container) return;
+          stickToBottom.current = container.scrollHeight - container.scrollTop - container.clientHeight < 96;
+          setShowJumpButton(!stickToBottom.current);
+        }}
+        className="h-full overflow-y-auto"
+      >
+        <div className="mx-auto flex w-full max-w-3xl flex-col gap-5 px-4 py-5 sm:px-6">
+          {messages.map((message) => (
+            <div key={message.id} className="nexa-message-row">
+              <MessageBubble message={message} />
+            </div>
+          ))}
 
-        if (!container) {
-          return;
-        }
-
-        stickToBottom.current =
-          container.scrollHeight - container.scrollTop - container.clientHeight < 96;
-      }}
-      className="min-h-0 flex-1 overflow-y-auto"
-    >
-      <div className="mx-auto flex w-full max-w-3xl flex-col gap-5 px-4 py-5 sm:px-6">
-        {messages.map((message) => (
-          <MessageBubble key={message.id} message={message} />
-        ))}
-
-        {error && (
-          <div
-            role="alert"
-            className="flex flex-wrap items-center gap-2 rounded-xl border border-danger/25 bg-danger/5 px-3 py-2"
-          >
-            <p className="text-xs text-danger">{error}</p>
-            <button
-              type="button"
-              onClick={onRetryLast}
-              disabled={disabled}
-              title={disabled ? 'Sem conexão — aguardando a rede…' : undefined}
-              className="ml-auto inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-danger/30 bg-danger/10 px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-danger transition hover:bg-danger/20 disabled:cursor-not-allowed disabled:opacity-50"
+          {error && (
+            <div
+              role="alert"
+              className="flex flex-wrap items-center gap-2 rounded-xl border border-danger/25 bg-danger/5 px-3 py-2"
             >
-              <RefreshCw className="h-3 w-3" aria-hidden="true" />
-              Tentar novamente
-            </button>
-          </div>
-        )}
+              <p className="text-xs text-danger">{error}</p>
+              <button
+                type="button"
+                onClick={onRetryLast}
+                disabled={disabled}
+                title={disabled ? 'Sem conexão — aguardando a rede…' : undefined}
+                className="ml-auto inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-danger/30 bg-danger/10 px-2.5 py-1.5 font-mono text-2xs uppercase tracking-[0.12em] text-danger transition hover:bg-danger/20 disabled:cursor-not-allowed disabled:opacity-50 active:scale-[0.98]"
+              >
+                <RefreshCw className="h-3 w-3" aria-hidden="true" />
+                Tentar novamente
+              </button>
+            </div>
+          )}
+        </div>
       </div>
+      {showJumpButton && (
+        <button
+          type="button"
+          onClick={() => {
+            stickToBottom.current = true;
+            const container = containerRef.current;
+            if (container) container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+            setShowJumpButton(false);
+          }}
+          className="absolute bottom-3 right-4 inline-flex min-h-11 items-center gap-2 rounded-full border border-primary/30 bg-surface px-4 font-mono text-xs text-primary shadow-xl active:scale-95"
+        >
+          <ArrowDown className="h-4 w-4" aria-hidden="true" />
+          Ir para o fim
+        </button>
+      )}
     </div>
   );
 }

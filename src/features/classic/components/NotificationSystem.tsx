@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Info, CheckCircle, AlertTriangle, XCircle } from 'lucide-react';
-import { useApp, type Notification } from '../ClassicContext';
+import { useAppUi, type Notification } from '../ClassicContext';
 
 const mono = { fontFamily: 'Share Tech Mono, monospace' };
 const raj = { fontFamily: 'Rajdhani, sans-serif' };
@@ -33,7 +33,7 @@ const typeConfig = {
 };
 
 function NotifCard({ notif }: { notif: Notification }) {
-  const { removeNotification } = useApp();
+  const { removeNotification } = useAppUi();
   const cfg = typeConfig[notif.type];
   const Icon = cfg.icon;
 
@@ -68,7 +68,7 @@ function NotifCard({ notif }: { notif: Notification }) {
         </div>
 
         <div className="flex-1 min-w-0">
-          <p style={{ ...mono, color: cfg.color, fontSize: '10px', letterSpacing: '0.05em' }}>
+          <p style={{ ...mono, color: cfg.color, fontSize: '0.6875rem', letterSpacing: '0.05em' }}>
             {notif.title}
           </p>
           <p
@@ -111,7 +111,7 @@ function NotifCard({ notif }: { notif: Notification }) {
 }
 
 export function NotificationSystem() {
-  const { notifications } = useApp();
+  const { notifications } = useAppUi();
 
   return (
     <div
