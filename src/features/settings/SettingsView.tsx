@@ -1,11 +1,8 @@
 import {
   AudioLines,
-  Check,
   Gauge,
   LogOut,
-  MessageSquare,
   Mic,
-  MonitorPlay,
   Palette,
   Plug,
   RotateCcw,
@@ -20,9 +17,7 @@ import { isSpeechRecognitionSupported } from '@/features/voice/use-speech-recogn
 import { cancelSpeech, isSpeechSynthesisSupported, speakText } from '@/lib/speech';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/auth-store';
-import { useInterfaceModeStore } from '@/stores/interface-mode-store';
 import { DEFAULT_SETTINGS, useSettingsStore } from '@/stores/settings-store';
-import { useUiStore } from '@/stores/ui-store';
 import { useConnectionStore } from '@/stores/connection-store';
 import { ollamaVersion } from '@/api/ollama';
 
@@ -98,80 +93,6 @@ function SectionCard({
       </h3>
       <div className="mt-3 space-y-2.5">{children}</div>
     </section>
-  );
-}
-
-function InterfaceModeSettings() {
-  const mode = useInterfaceModeStore((state) => state.mode);
-  const setMode = useInterfaceModeStore((state) => state.setMode);
-  const aiState = useUiStore((state) => state.aiState);
-  const busy = aiState === 'processing' || aiState === 'responding';
-
-  const options = [
-    {
-      id: 'nexa' as const,
-      name: 'NEXA HUD',
-      description: 'Chat-first, responsivo e conectado ao histórico.',
-      icon: MessageSquare,
-    },
-    {
-      id: 'classic' as const,
-      name: 'Clássico',
-      description: 'Réplica fiel da interface original, com a marca NEXA.',
-      icon: MonitorPlay,
-    },
-  ];
-
-  return (
-    <div>
-      <div className="grid gap-2 sm:grid-cols-2">
-        {options.map((option) => {
-          const OptionIcon = option.icon;
-          const active = mode === option.id;
-
-          return (
-            <button
-              key={option.id}
-              type="button"
-              onClick={() => setMode(option.id)}
-              disabled={busy}
-              aria-pressed={active}
-              aria-label={`Usar ${option.name} ${option.description}`}
-              title={busy ? 'Aguarde a resposta terminar' : undefined}
-              className={`rounded-xl border p-3 text-left transition disabled:cursor-not-allowed disabled:opacity-50 ${
-                active
-                  ? 'border-primary/40 bg-primary/10'
-                  : 'border-white/10 bg-background/40 hover:border-primary/25'
-              }`}
-            >
-              <span className="flex items-center gap-2">
-                <OptionIcon
-                  className={`h-3.5 w-3.5 ${active ? 'text-primary' : 'text-muted'}`}
-                  aria-hidden="true"
-                />
-                <span
-                  className={`text-[12px] font-semibold ${
-                    active ? 'text-primary' : 'text-foreground'
-                  }`}
-                >
-                  {option.name}
-                </span>
-                {active && (
-                  <Check className="ml-auto h-3.5 w-3.5 text-primary" aria-hidden="true" />
-                )}
-              </span>{' '}
-              <span className="mt-1 block text-2xs leading-relaxed text-muted">
-                {option.description}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-
-      <p className="mt-2 font-mono text-2xs uppercase tracking-[0.12em] text-muted/70">
-        {busy ? 'Aguarde a resposta terminar' : 'Atalho: Alt+M'}
-      </p>
-    </div>
   );
 }
 
@@ -369,13 +290,6 @@ export function SettingsView() {
         </SectionCard>
 
         <SectionCard id="settings-appearance" title="APARÊNCIA" icon={Palette}>
-          <div>
-            <p className="text-2xs text-muted">Modo de interface</p>
-            <div className="mt-2">
-              <InterfaceModeSettings />
-            </div>
-          </div>
-
           <SettingSwitch
             label="Reduzir animações"
             description="Desliga pulsos, giros e transições do HUD."

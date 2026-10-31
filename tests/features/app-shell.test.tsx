@@ -6,7 +6,6 @@ import { clearPersistedChat } from '@/api/storage/indexed-db';
 import { App } from '@/app/App';
 import { queryClient } from '@/app/query-client';
 import { clearMemoryStorage, resetMemoryCacheForTests } from '@/features/memory/api';
-import { resetInterfaceModeForTests } from '@/stores/interface-mode-store';
 import { resetNotificationsForTests } from '@/stores/notification-store';
 import { DEFAULT_SETTINGS, resetSettingsForTests, useSettingsStore } from '@/stores/settings-store';
 import { useUiStore } from '@/stores/ui-store';
@@ -18,12 +17,10 @@ beforeEach(async () => {
   await clearMemoryStorage();
   resetMemoryCacheForTests();
   queryClient.clear();
-  resetInterfaceModeForTests();
   resetSettingsForTests();
   // Estes cenários exercitam o HUD no modo demonstração, independente do .env local.
   useSettingsStore.setState({ settings: { ...DEFAULT_SETTINGS, demoMode: true } });
   resetNotificationsForTests();
-  window.localStorage.removeItem('nexa.interface-mode');
   useUiStore.setState({
     activeView: 'chat',
     activeSessionId: null,
@@ -171,22 +168,6 @@ describe('AppShell', () => {
 
     expect((await screen.findAllByText(/Nenhuma conversa ainda/)).length).toBeGreaterThan(0);
     expect(screen.queryByRole('heading', { name: 'Boas-vindas' })).not.toBeInTheDocument();
-  });
-
-  it('oferece os dois modos de interface em Ajustes', async () => {
-    const user = userEvent.setup();
-    render(<App />);
-
-    await screen.findByRole('heading', { name: 'Boas-vindas' });
-    await user.click(screen.getByRole('button', { name: 'Abrir ajustes' }));
-
-    expect(await screen.findByText('Modo de interface')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Usar NEXA HUD/ })).toHaveAttribute(
-      'aria-pressed',
-      'true',
-    );
-    expect(screen.getByRole('button', { name: /Usar Clássico/ })).toBeInTheDocument();
-    expect(screen.getByText('Atalho: Alt+M')).toBeInTheDocument();
   });
 
   it('salva o nome de exibição nos ajustes', async () => {

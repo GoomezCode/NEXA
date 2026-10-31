@@ -62,5 +62,5 @@ test('o aviso de demonstração leva aos ajustes', async ({ page }) => {
 
   await banner.getByRole('button', { name: 'Ajustes' }).click();
   await expect(page.getByRole('heading', { name: 'Ajustes' })).toBeVisible();
-  await expect(page.getByText('Modo de interface')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'PERFIL' })).toBeVisible();
 });

@@ -1,5 +1,7 @@
 # NEXA Web UI — Correção da autenticação (Login, Cadastro e token)
 
+> Nota (31/10/2026): a interface Clássica e a pasta `web_referencia` foram removidas. As fases e itens que tratam do Clássico estão encerrados e não representam o código atual.
+
 > **Data:** 30/10/2026
 > **Base analisada:** repositório `NEXA_WEB_UI` (árvore, `src/`, `tests/`, `e2e/`, configs) e `docs/PLANO_INTEGRACAO_NEXA_API.md`.
 > **Método:** leitura estática do código. **Não executei** o projeto nem vi o código da API; o contrato da API vem do plano de integração (SRS v2.0). Onde eu suponho algo, está marcado como *suposição*.

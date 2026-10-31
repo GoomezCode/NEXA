@@ -1,5 +1,7 @@
 # NEXA Web — Plano de implementação do modo OFFLINE (Ollama local)
 
+> Nota (31/10/2026): a interface Clássica e a pasta `web_referencia` foram removidas. As fases e itens que tratam do Clássico estão encerrados e não representam o código atual.
+
 > Repositório alvo: **NEXA Web** (React 19 + TypeScript + Vite + Zustand + TanStack Query).
 > Repositório da API: **não muda**. Este plano não altera nenhuma linha da NEXA API.
 > Local sugerido para o arquivo: `docs/PLANO_MODO_OFFLINE_OLLAMA.md`.

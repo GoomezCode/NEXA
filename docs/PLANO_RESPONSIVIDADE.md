@@ -1,5 +1,7 @@
 # NEXA Web — Plano de implementação: responsividade total (HUD + Clássico)
 
+> Nota (31/10/2026): a interface Clássica e a pasta `web_referencia` foram removidas. As fases e itens que tratam do Clássico estão encerrados e não representam o código atual.
+
 > Repositório alvo: `GoomezCode/NEXA` (React 19, TypeScript, Vite 8, Tailwind 4, Zustand, Motion).
 > Base da análise: commit `6846f80` (`main`), com o modo OFFLINE já implementado.
 > Local sugerido: `docs/PLANO_RESPONSIVIDADE.md`.

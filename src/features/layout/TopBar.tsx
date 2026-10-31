@@ -1,4 +1,4 @@
-import { Menu, MessageSquare, MonitorPlay, PanelLeft, Settings } from 'lucide-react';
+import { Menu, PanelLeft, Settings } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import { logout } from '@/api/auth';
@@ -6,7 +6,6 @@ import { NexaMark } from '@/components/brand/NexaMark';
 import { useOnlineStatus } from '@/hooks/use-online-status';
 import { formatClock, formatShortDate } from '@/lib/format';
 import { useAuthStore } from '@/stores/auth-store';
-import { useInterfaceModeStore } from '@/stores/interface-mode-store';
 import { useSettingsStore } from '@/stores/settings-store';
 import { useUiStore } from '@/stores/ui-store';
 import { useConnectionStore } from '@/stores/connection-store';
@@ -36,8 +35,6 @@ export function TopBar() {
   const demoMode = useSettingsStore((state) => state.settings.demoMode);
   const offlineMode = useConnectionStore((state) => state.mode === 'offline');
   const session = useAuthStore((state) => state.session);
-  const mode = useInterfaceModeStore((state) => state.mode);
-  const setMode = useInterfaceModeStore((state) => state.setMode);
   const aiState = useUiStore((state) => state.aiState);
   const busy = aiState === 'processing' || aiState === 'responding';
   const setActiveView = useUiStore((state) => state.setActiveView);
@@ -121,48 +118,6 @@ export function TopBar() {
       </div>
 
       <div className="ml-auto flex items-center gap-2 sm:gap-3">
-        <div
-          role="group"
-          aria-label="Modo de interface"
-          title={busy ? 'Aguarde a resposta terminar' : undefined}
-          className="hidden items-center gap-0.5 rounded-xl border border-white/10 bg-white/5 p-0.5 sm:flex"
-        >
-          <button
-            type="button"
-            onClick={() => setMode('nexa')}
-            disabled={busy}
-            aria-label="NEXA HUD"
-            aria-pressed={mode === 'nexa'}
-            className={`flex h-11 w-11 items-center justify-center rounded-lg transition ${
-              mode === 'nexa' ? 'bg-primary/15 text-primary' : 'text-muted hover:text-foreground'
-            } disabled:cursor-not-allowed disabled:opacity-40`}
-          >
-            <MessageSquare className="h-3.5 w-3.5" aria-hidden="true" />
-          </button>
-          <button
-            type="button"
-            onClick={() => setMode('classic')}
-            disabled={busy}
-            aria-label="Modo clássico"
-            aria-pressed={mode === 'classic'}
-            className={`flex h-11 w-11 items-center justify-center rounded-lg transition ${
-              mode === 'classic' ? 'bg-primary/15 text-primary' : 'text-muted hover:text-foreground'
-            } disabled:cursor-not-allowed disabled:opacity-40`}
-          >
-            <MonitorPlay className="h-3.5 w-3.5" aria-hidden="true" />
-          </button>
-        </div>
-
-        <button
-          type="button"
-          onClick={() => setMode(mode === 'classic' ? 'nexa' : 'classic')}
-          disabled={busy}
-          aria-label={mode === 'classic' ? 'Voltar ao NEXA HUD' : 'Abrir modo clássico'}
-          className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-muted transition hover:border-primary/30 hover:text-primary disabled:opacity-40 sm:hidden"
-        >
-          {mode === 'classic' ? <MessageSquare className="h-4 w-4" aria-hidden="true" /> : <MonitorPlay className="h-4 w-4" aria-hidden="true" />}
-        </button>
-
         <div className="text-right leading-tight">
           <p className="font-mono text-sm tabular-nums text-primary">{formatClock(now)}</p>
           <p className="hidden font-mono text-2xs uppercase tracking-[0.12em] text-muted sm:block">

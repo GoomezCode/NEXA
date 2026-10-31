@@ -21,7 +21,7 @@ Interface conversacional da NEXA, construída com React, TypeScript e Vite. Pode
 - Modo demonstração local para explorar a interface sem a API.
 - Modo OFFLINE com Ollama local, catálogo de modelos instalados e streaming NDJSON.
 - Memórias locais, personalização, entrada por voz e leitura opcional das respostas.
-- Interfaces NEXA HUD e Clássica, monitoramento e ajustes.
+- Interface NEXA HUD, monitoramento e ajustes.
 
 ## Requisitos
 
@@ -81,7 +81,7 @@ Para sair, use **Sair do offline** no cabeçalho ou em Ajustes. Conversas e mem�
 
 ## Compatibilidade
 
-A interface adapta o HUD e o modo Clássico para celulares, tablets, notebooks, desktops e telas grandes. A base de navegadores do projeto segue os requisitos do Tailwind 4: Safari 16.4+, Chrome/Edge 111+ e Firefox 128+. O layout compacto inclui navegação por abas, suporte a toque, safe areas e teclado virtual; use zoom do navegador sem restrição.
+A interface NEXA HUD adapta-se a celulares, tablets, notebooks, desktops e telas grandes. A base de navegadores do projeto segue os requisitos do Tailwind 4: Safari 16.4+, Chrome/Edge 111+ e Firefox 128+. O layout compacto inclui navegação por abas, suporte a toque, safe areas e teclado virtual; use zoom do navegador sem restrição.
 
 Para validar tamanhos de tela e rotação nos três motores, instale os navegadores Playwright e execute:
 
@@ -152,5 +152,3 @@ tests/            Testes unitários e de componentes
 - [Autenticação](docs/PLANO_CORRECAO_AUTENTICACAO.md)
 - [Guia de responsividade](docs/GUIA_RESPONSIVIDADE.md)
 - [Plano geral API + Web](<docs/NEXA%20%E2%80%94%20Plano%20de%20implementa%C3%A7%C3%A3o%20(API%20%2B%20Web).md>)
-
-`WEB_PARA_COPIAR/` contém a referência visual histórica e não faz parte do build da aplicação.

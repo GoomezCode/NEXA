@@ -1,5 +1,7 @@
 # NEXA WEB UI — Plano de Integração com a NEXA API (Fase 7)
 
+> Nota (31/10/2026): a interface Clássica e a pasta `web_referencia` foram removidas. As fases e itens que tratam do Clássico estão encerrados e não representam o código atual.
+
 > **Versão:** 1.2 · **Estado:** integração API existente; fechamento de release permanece em andamento
 > **Escopo:** integração da `NEXA_WEB_UI` com a `NEXA_API`, incluindo os incrementos de cadastro, personalização e BYOK.
 > **Regra de ouro:** nenhuma alteração de tema. Mesmos tokens, fontes, cores, raios, tamanhos de alvo de toque e padrões de componente já existentes.

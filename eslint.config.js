@@ -10,7 +10,6 @@ export default tseslint.config(
       'dist',
       'coverage',
       'node_modules',
-      'WEB_PARA_COPIAR',
       'playwright-report',
       'test-results',
       'blob-report',
