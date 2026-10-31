@@ -1,5 +1,7 @@
 # NEXA — Plano de implementação (API + Web)
 
+> Nota (31/10/2026): a interface Clássica e a pasta `web_referencia` foram removidas. As fases e itens que tratam do Clássico estão encerrados e não representam o código atual.
+
 Base: leitura dos dois repositórios enviados (NEXA\_API e NEXA\_WEB\_UI). Cada item abaixo diz o que existe hoje, o que está errado e o que fazer em cada repositório.
 
 > O diagnóstico e as fases F0–F6 abaixo registram o ponto de partida do trabalho. Para o estado atual, consulte a matriz **Estado de implementação**; itens de diagnóstico não são uma descrição do código presente.

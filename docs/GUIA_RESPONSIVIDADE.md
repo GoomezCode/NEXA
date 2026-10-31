@@ -1,6 +1,6 @@
 # Guia de responsividade
 
-Este guia descreve os padrões usados pelo HUD e pelo modo Clássico. A adaptação visual é feita principalmente em CSS; `useLayoutClass()` só deve decidir mudanças estruturais entre layouts.
+Este guia descreve os padrões responsivos usados pela interface NEXA HUD.
 
 ## Regras de interface
 
@@ -20,7 +20,6 @@ Este guia descreve os padrões usados pelo HUD e pelo modo Clássico. A adaptaç
 - `xs`: a partir de 30 rem (480 px).
 - `sm`: 40 rem (640 px), `md`: 48 rem (768 px), `lg`: 64 rem (1024 px), `xl`: 80 rem (1280 px) e `2xl`: 96 rem (1536 px), conforme o tema Tailwind.
 - `short`: altura máxima de 32 rem (512 px), usada sobretudo em celulares paisagem.
-- `useLayoutClass()` retorna `compact`, `medium` ou `expanded` e informa se a altura é curta. Use-o quando a árvore precisar mudar; prefira variantes CSS para ajustes de tamanho e espaçamento.
 
 ## Tokens de área segura e campos
 
@@ -46,10 +45,10 @@ Use `nexa-field` nos campos de formulário. Ele estabelece altura mínima de 44 
 
 ## Desempenho e navegação em camadas
 
-- Em telas touch, o fundo do HUD e do Clássico mantém o gradiente estático e pausa o canvas. A animação só roda em ponteiro fino e para ao ocultar a aba ou ativar movimento reduzido.
+- Em telas touch, o fundo do HUD mantém o gradiente estático e pausa o canvas. A animação só roda em ponteiro fino e para ao ocultar a aba ou ativar movimento reduzido.
 - A resposta em streaming agrega tokens antes de atualizar a lista. As mensagens usam `React.memo`, conteúdo Markdown separado em chunk lazy, `useDeferredValue` e `content-visibility: auto` nas linhas antigas.
-- Ajustes, Monitor, Memória, Clássico e Markdown são carregados sob demanda; falha de download de um chunk mostra uma ação para tentar de novo.
-- O drawer de conversas e o painel móvel do núcleo fecham com Escape ou Voltar do navegador. O chat e os diálogos do Clássico também refletem a camada ativa no histórico.
+- Ajustes, Monitor, Memória e Markdown são carregados sob demanda; falha de download de um chunk mostra uma ação para tentar de novo.
+- O drawer de conversas e o painel móvel do núcleo fecham com Escape ou Voltar do navegador.
 - Mensagens antigas deixam de acompanhar automaticamente o streaming quando a pessoa rola para cima; o botão **Ir para o fim** retorna à resposta recente.
 
 O chunk principal medido antes destas otimizações foi 187,95 KB gzip; após separar Markdown, o conjunto de JavaScript inicial (entrada mais modulepreloads) ficou em 148,44 KB gzip, abaixo do limite de 200 KB. Consulte o [baseline detalhado](BASELINE_WEB_MOBILE.md). Esses valores são do build local, não substituem Web Vitals em aparelhos reais.

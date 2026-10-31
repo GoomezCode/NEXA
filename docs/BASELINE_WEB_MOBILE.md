@@ -9,7 +9,6 @@ Data coletados em 2026-10-31 antes das próximas correções do plano `NEXA Web 
 | Chunk | Tamanho bruto | Gzip |
 | --- | ---: | ---: |
 | Entrada `index` | 617,26 kB | 187,95 kB |
-| Clássico (lazy) | 84,04 kB | 22,37 kB |
 | Ajustes (lazy) | 15,17 kB | 4,68 kB |
 | Monitor (lazy) | 15,53 kB | 4,41 kB |
 | Memória (lazy) | 14,03 kB | 3,59 kB |
@@ -25,9 +24,8 @@ Após mover o renderizador Markdown para um chunk sob demanda, o chunk principal
 - As duas telas de fundo atualizam canvas continuamente, mesmo em aparelho compacto; cada quadro percorre pares de partículas.
 - O HUD já limita o canvas a 20 partículas, reduz o DPR para 1,5 em compacto e pausa quando a página fica oculta ou movimento reduzido está ativo.
 - A lista do chat usa `React.memo` nas bolhas e o stream já agrega tokens em janelas de 33 ms; as mensagens antigas continuam montadas e o markdown da resposta em andamento é reprocessado a cada flush.
-- Ajustes, Monitor e Memória já usam `React.lazy`; Clássico também é carregado sob demanda em `App.tsx`.
-- A autenticação usa campos com `text-base` (16 px em toque), safe area e contêiner rolável; viewport virtual já é compartilhado pelo HUD e Clássico.
-- O Clássico tem fundos compactos sem backdrop-filter e lógica para pausar animações fora da tela/reduzir movimento.
+- Ajustes, Monitor e Memória usam `React.lazy`.
+- A autenticação usa campos com `text-base` (16 px em toque), safe area e contêiner rolável; viewport virtual é compartilhado pelo HUD.
 
 ## Não medido nesta sessão
 

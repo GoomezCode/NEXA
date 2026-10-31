@@ -6,7 +6,7 @@ Este diretório reúne planos técnicos e registros de implementação. O README
 
 | Área | Estado resumido | Documento |
 |---|---|---|
-| Aplicação e operação local | HUD/Clássico, API, demonstração e modo OFFLINE com Ollama | [README principal](../README.md) |
+| Aplicação e operação local | HUD, API, demonstração e modo OFFLINE com Ollama | [README principal](../README.md) |
 | Modo OFFLINE e acesso pela rede local | Implementado com proxy same-origin do Vite para evitar CORS; testes dedicados e validação manual com Ollama real ainda são pendentes | [Plano do Ollama](PLANO_MODO_OFFLINE_OLLAMA.md) |
 | Integração com a API | Chat, autenticação, modelos, cotas e integrações documentados; fechamento de release permanece separado | [Plano de integração](PLANO_INTEGRACAO_NEXA_API.md) |
 | Autenticação | Login, convidado, cadastro por configuração e ciclo de sessão implementados | [Plano de autenticação](PLANO_CORRECAO_AUTENTICACAO.md) |

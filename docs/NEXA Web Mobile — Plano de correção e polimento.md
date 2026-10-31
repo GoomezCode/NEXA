@@ -1,5 +1,7 @@
 # NEXA Web Mobile — Plano de correção e polimento
 
+> Nota (31/10/2026): a interface Clássica e a pasta `web_referencia` foram removidas. As fases e itens que tratam do Clássico estão encerrados e não representam o código atual.
+
 > Complementa `docs/PLANO_RESPONSIVIDADE.md`. Escopo: somente a Web (HUD e Clássico). A API não muda. Este plano foi montado a partir das medições e dos achados do plano de responsividade. Eu ainda não li o código-fonte: a Fase 0 confirma as causas com medição antes de reescrever qualquer coisa.
 
 ## 1. Resumo
