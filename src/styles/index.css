@@ -126,7 +126,6 @@
   --safe-right: env(safe-area-inset-right, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-left: env(safe-area-inset-left, 0px);
-  --kb-inset: 0px;
 }
 
 .overflow-y-auto,
@@ -199,6 +198,15 @@
 
 .nexa-composer-shell {
   padding-inline: max(0.75rem, var(--safe-left)) max(0.75rem, var(--safe-right));
+}
+
+@media (max-width: 767px) {
+  .nexa-app-root {
+    position: fixed;
+    inset: var(--visual-viewport-top, 0px) 0 auto;
+    height: var(--visual-viewport-height, 100dvh);
+    min-height: 0;
+  }
 }
 
 .nexa-mobile-dock {

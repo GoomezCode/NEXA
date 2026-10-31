@@ -69,7 +69,7 @@ export function AppShell() {
   }, [activeSessionId, sessions.data, setActiveSessionId]);
 
   return (
-    <div className="relative flex h-dvh flex-col overflow-hidden bg-background text-foreground">
+    <div className="nexa-app-root relative flex h-dvh flex-col overflow-hidden bg-background text-foreground">
       <nav aria-label="Ir para o conteúdo">
         <a
           href="#nexa-main"

@@ -84,8 +84,8 @@
 @media (max-width: 767px) {
   :root { --c-main-top: 0px; --c-main-bottom: 3.5rem; }
   .classic-hud { overflow: hidden; }
-  .classic-layout { min-height: 0; height: 100dvh; overflow: hidden !important; }
-  .classic-layout > header { min-height: 3rem; }
+  .classic-layout { top: var(--visual-viewport-top, 0px); bottom: auto; min-height: 0; height: var(--visual-viewport-height, 100dvh); overflow: hidden !important; }
+  .classic-layout > header { position: absolute; top: 0; min-height: 3rem; }
   .classic-layout .classic-topbar { height: 3rem !important; padding-inline: 0.5rem; gap: 0.5rem; }
   .classic-layout .classic-topbar > div:nth-child(2),
   .classic-layout .classic-topbar > div:nth-child(6) { display: none; }
@@ -168,7 +168,7 @@
     overscroll-behavior: contain;
   }
   .classic-layout--compact .classic-voice-bar { display: none; }
-  .classic-layout--compact .classic-app-dock { height: 3.5rem !important; bottom: var(--kb-inset) !important; }
+  .classic-layout--compact .classic-app-dock { position: absolute; height: 3.5rem !important; bottom: 0 !important; }
   .classic-layout--compact .classic-app-dock > div:first-child,
   .classic-layout--compact .classic-app-dock > div:last-child { display: none; }
   .classic-layout--compact .classic-app-dock > div:nth-child(2) { align-items: center !important; padding: 0.1rem 0.35rem !important; }
@@ -204,13 +204,13 @@
 }
 
 .classic-mobile-chat-overlay {
-  position: fixed;
+  position: absolute;
   z-index: 55;
   inset: 0;
   display: flex;
   align-items: stretch;
   justify-content: center;
-  padding: max(0.75rem, env(safe-area-inset-top)) max(0.75rem, env(safe-area-inset-right)) calc(4.25rem + var(--kb-inset, 0px) + env(safe-area-inset-bottom)) max(0.75rem, env(safe-area-inset-left));
+  padding: max(0.75rem, env(safe-area-inset-top)) max(0.75rem, env(safe-area-inset-right)) calc(4.25rem + env(safe-area-inset-bottom)) max(0.75rem, env(safe-area-inset-left));
   background: rgba(0, 4, 14, 0.88);
   backdrop-filter: blur(16px);
 }
@@ -283,14 +283,16 @@
 
 @media (max-width: 767px) {
   .classic-settings-overlay {
+    position: absolute;
+    inset: 0;
     align-items: stretch;
     overflow: hidden;
     padding: 0;
   }
   .classic-settings-dialog {
     width: 100%;
-    height: 100dvh;
-    max-height: 100dvh;
+    height: var(--visual-viewport-height, 100dvh);
+    max-height: var(--visual-viewport-height, 100dvh);
     margin: 0;
     border-radius: 0;
   }

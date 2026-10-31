@@ -55,7 +55,7 @@ export function ContextPanel({ sessionId }: { sessionId: string | null }) {
 
   return (
     <>
-    <button type="button" aria-expanded={mobileOpen} aria-controls="nexa-context-panel" onClick={() => setMobileOpen((open) => !open)} className="fixed bottom-[calc(var(--safe-bottom)+5.5rem+var(--kb-inset))] right-3 z-30 flex h-11 w-11 items-center justify-center rounded-full border border-primary/30 bg-surface text-primary shadow-lg xl:hidden" aria-label="Abrir painel do núcleo"><PanelRight className="h-4 w-4" aria-hidden="true" /></button>
+    <button type="button" aria-expanded={mobileOpen} aria-controls="nexa-context-panel" onClick={() => setMobileOpen((open) => !open)} className="absolute bottom-[calc(var(--safe-bottom)+5.5rem)] right-3 z-30 flex h-11 w-11 items-center justify-center rounded-full border border-primary/30 bg-surface text-primary shadow-lg xl:hidden" aria-label="Abrir painel do núcleo"><PanelRight className="h-4 w-4" aria-hidden="true" /></button>
     <aside
       id="nexa-context-panel"
       aria-label="Painel do núcleo"

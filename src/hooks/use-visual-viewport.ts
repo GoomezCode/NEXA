@@ -1,14 +1,15 @@
 import { useEffect } from 'react';
 
-/** Keeps fixed controls above the on-screen keyboard on browsers with VisualViewport. */
+/** Keeps the app surface aligned with the visible browser area, including the on-screen keyboard. */
 export function useVisualViewport() {
   useEffect(() => {
     const viewport = window.visualViewport;
     if (!viewport) return;
 
     const update = () => {
-      const inset = Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop);
-      document.documentElement.style.setProperty('--kb-inset', `${inset}px`);
+      const root = document.documentElement;
+      root.style.setProperty('--visual-viewport-height', `${viewport.height}px`);
+      root.style.setProperty('--visual-viewport-top', `${viewport.offsetTop}px`);
     };
 
     update();
@@ -19,7 +20,8 @@ export function useVisualViewport() {
       viewport.removeEventListener('resize', update);
       viewport.removeEventListener('scroll', update);
       window.removeEventListener('resize', update);
-      document.documentElement.style.removeProperty('--kb-inset');
+      document.documentElement.style.removeProperty('--visual-viewport-height');
+      document.documentElement.style.removeProperty('--visual-viewport-top');
     };
   }, []);
 }

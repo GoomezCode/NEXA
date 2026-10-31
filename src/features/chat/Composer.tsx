@@ -72,7 +72,7 @@ export function Composer({
   };
 
   return (
-    <div className="nexa-composer-shell shrink-0 border-t border-white/5 bg-background/50 px-3 py-3 pb-[max(0.75rem,var(--safe-bottom),var(--kb-inset))] sm:px-5">
+    <div className="nexa-composer-shell shrink-0 border-t border-white/5 bg-background/50 px-3 py-3 pb-[max(0.75rem,var(--safe-bottom))] sm:px-5">
       {voiceEnabled && (listening || interim || voiceError) && (
         <div
           role={voiceError ? 'alert' : 'status'}
