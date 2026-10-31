@@ -72,7 +72,7 @@ export function Composer({
   };
 
   return (
-    <div className="shrink-0 border-t border-white/5 bg-background/50 px-3 py-3 pb-[max(0.75rem,var(--safe-bottom),var(--kb-inset))] sm:px-5">
+    <div className="nexa-composer-shell shrink-0 border-t border-white/5 bg-background/50 px-3 py-3 pb-[max(0.75rem,var(--safe-bottom),var(--kb-inset))] sm:px-5">
       {voiceEnabled && (listening || interim || voiceError) && (
         <div
           role={voiceError ? 'alert' : 'status'}
@@ -213,14 +213,14 @@ export function Composer({
       </div>
 
       <div className="mx-auto mt-2 flex w-full max-w-3xl items-center justify-between gap-3 px-1">
-        <p className="hidden items-center gap-1.5 font-mono text-2xs uppercase tracking-[0.12em] text-muted/70 sm:flex">
+        <p className="hidden items-center gap-1.5 font-mono text-2xs uppercase tracking-[0.12em] text-muted/70 pointer-fine:flex">
           <CornerDownLeft className="h-3 w-3" aria-hidden="true" />
           Enter envia · Shift + Enter quebra linha
         </p>
         <p className="font-mono text-2xs uppercase tracking-[0.12em] text-muted/70">
           {value.length > 0
             ? `${value.length}${maxLength ? `/${maxLength}` : ''} caracteres`
-            : <span className="hidden sm:inline">Ctrl+K foca o campo</span>}
+            : <span className="hidden pointer-fine:inline">Ctrl+K foca o campo</span>}
         </p>
       </div>
     </div>

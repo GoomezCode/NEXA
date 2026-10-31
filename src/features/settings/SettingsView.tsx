@@ -335,7 +335,7 @@ export function SettingsView() {
               type="button"
               onClick={() => speakText('Olá. Esta é a voz selecionada para a NEXA.')}
               disabled={!settings.ttsEnabled || !speechSupported}
-              className="mt-2 min-h-10 rounded-lg border border-white/10 px-3 font-mono text-2xs uppercase tracking-[0.1em] text-muted disabled:opacity-40"
+              className="mt-2 min-h-11 rounded-lg border border-white/10 px-3 font-mono text-2xs uppercase tracking-[0.1em] text-muted disabled:opacity-40"
             >Testar voz</button>
           </div>
 

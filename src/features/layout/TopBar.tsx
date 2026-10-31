@@ -50,7 +50,7 @@ export function TopBar() {
   }, []);
 
   return (
-    <header className="relative z-20 flex h-14 shrink-0 items-center gap-2 border-b border-white/5 bg-background/70 px-3 backdrop-blur-xl sm:gap-3 sm:px-5">
+    <header className="relative z-20 flex h-14 min-h-[calc(3.5rem+var(--safe-top))] shrink-0 items-center gap-2 border-b border-white/5 bg-background/70 px-3 ps-[max(0.75rem,var(--safe-left))] pe-[max(0.75rem,var(--safe-right))] pt-[var(--safe-top)] backdrop-blur-xl sm:gap-3 sm:px-5">
       <button
         type="button"
         onClick={() => setSessionsSheetOpen(true)}

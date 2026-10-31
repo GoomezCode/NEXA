@@ -187,7 +187,7 @@
   margin: 0;
   height: 100dvh;
   max-height: 100dvh;
-  width: min(20rem, 86vw);
+  width: min(20rem, calc(86vw - var(--safe-left) - var(--safe-right)));
   max-width: none;
   padding: 0;
   border: 0;
@@ -195,6 +195,20 @@
   background: transparent;
   color: var(--nexa-text);
   overflow: hidden;
+}
+
+.nexa-composer-shell {
+  padding-inline: max(0.75rem, var(--safe-left)) max(0.75rem, var(--safe-right));
+}
+
+.nexa-mobile-dock {
+  padding-inline: max(0.5rem, var(--safe-left)) max(0.5rem, var(--safe-right));
+}
+
+.nexa-notification-center {
+  left: max(0.75rem, var(--safe-left));
+  right: max(0.75rem, var(--safe-right));
+  width: min(20rem, calc(100vw - var(--safe-left) - var(--safe-right) - 1.5rem));
 }
 
 @media (max-height: 32rem) and (max-width: 767px) and (orientation: landscape) {
@@ -310,6 +324,24 @@
 @media (max-width: 47.999rem) {
   [class*='backdrop-blur'] { backdrop-filter: none !important; }
   .nexa-sheet::backdrop { backdrop-filter: none; }
+}
+
+@media (pointer: coarse) {
+  button,
+  [role='button'],
+  [role='tab'] {
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+  }
+
+  input:not([type='range']),
+  textarea,
+  select {
+    min-height: 2.75rem;
+    font-size: 1rem;
+  }
+
+  .text-2xs { font-size: var(--text-xs-plus); }
 }
 
 @media (prefers-reduced-motion: reduce) {

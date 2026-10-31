@@ -154,7 +154,7 @@ export function AuthView() {
   );
 
   return (
-    <main className="fixed inset-0 flex overflow-y-auto bg-background p-4 text-foreground">
+    <main className="fixed inset-0 flex overflow-y-auto bg-background p-4 text-foreground" style={{ padding: 'max(1rem,var(--safe-top)) max(1rem,var(--safe-right)) max(1rem,var(--safe-bottom)) max(1rem,var(--safe-left))' }}>
       <div className="nexa-grid pointer-events-none absolute inset-0" aria-hidden="true" />
 
       <div className="relative z-10 m-auto w-full max-w-sm shrink-0 rounded-2xl border border-border bg-surface/70 p-5 backdrop-blur-xl sm:p-6">
