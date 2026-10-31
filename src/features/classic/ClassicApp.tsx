@@ -365,7 +365,7 @@ function MainLayout({ onExit }: { onExit: () => void }) {
       {conversationOpen && (
         <div className="classic-mobile-chat-overlay" role="dialog" aria-modal="true" aria-label="Conversa com a NEXA">
           <div className="classic-mobile-chat-window">
-            <CommandConsole conversationMode onClose={() => setConversationOpen(false)} />
+            <CommandConsole conversationMode />
           </div>
         </div>
       )}

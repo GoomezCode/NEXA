@@ -1,6 +1,6 @@
 import { useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Terminal, Send, Mic, X } from 'lucide-react';
+import { Terminal, Send, Mic } from 'lucide-react';
 import { useApp } from '../ClassicContext';
 
 const orb = { fontFamily: 'Orbitron, sans-serif' };
@@ -9,7 +9,7 @@ const raj = { fontFamily: 'Rajdhani, sans-serif' };
 
 const SUGGESTIONS = ['Como você pode me ajudar?', 'Resuma esta conversa', 'diagnóstico', 'gestos'];
 
-export function CommandConsole({ conversationMode = false, onClose }: { conversationMode?: boolean; onClose?: () => void }) {
+export function CommandConsole({ conversationMode = false }: { conversationMode?: boolean }) {
   const {
     messages,
     isStreaming,
@@ -60,11 +60,6 @@ export function CommandConsole({ conversationMode = false, onClose }: { conversa
             {conversationMode ? 'CONVERSA NEXA' : 'COMMAND CONSOLE'}
           </span>
         </div>
-        {conversationMode && onClose && (
-          <button type="button" onClick={onClose} aria-label="Fechar conversa" className="classic-chat-close">
-            <X aria-hidden="true" />
-          </button>
-        )}
       </div>
 
       {/* Messages */}
