@@ -86,7 +86,7 @@ export function NotificationCenter() {
     <div
       aria-live="polite"
       aria-relevant="additions"
-      className="pointer-events-none fixed bottom-24 right-3 z-50 flex w-[min(20rem,calc(100vw-1.5rem))] flex-col gap-2 sm:right-5"
+      className="pointer-events-none fixed bottom-[calc(var(--safe-bottom)+6rem)] right-[max(0.75rem,var(--safe-right))] z-50 flex w-[min(20rem,calc(100vw-1.5rem))] flex-col gap-2 sm:right-5 short:bottom-auto short:right-16 short:top-14"
     >
       {items.map((item) => (
         <NotificationToast key={item.id} item={item} />

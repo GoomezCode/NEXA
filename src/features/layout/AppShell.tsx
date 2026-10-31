@@ -91,14 +91,14 @@ export function AppShell() {
         aria-hidden="true"
       />
 
-      <div className="relative z-10 flex min-h-0 flex-1 flex-col">
+      <div className="nexa-shell-content relative z-10 flex min-h-0 flex-1 flex-col">
         <TopBar />
 
         {demoMode && (
           <div
             role="status"
             aria-label="Aviso de demonstração"
-            className="flex shrink-0 items-center gap-2 border-b border-warning/15 bg-warning/5 px-3 py-1.5 sm:px-5"
+            className="flex shrink-0 items-center gap-2 border-b border-warning/15 bg-warning/5 px-3 py-1.5 sm:px-5 short:py-0"
           >
             <Sparkles className="h-3 w-3 shrink-0 text-warning" aria-hidden="true" />
             <p className="min-w-0 truncate font-mono text-[10px] uppercase tracking-[0.12em] text-warning/90">
@@ -116,7 +116,7 @@ export function AppShell() {
 
         <div className="relative flex min-h-0 flex-1">
           {sidebarOpen && (
-            <aside className="hidden w-64 shrink-0 border-r border-white/5 bg-surface/25 lg:flex lg:flex-col">
+            <aside className="hidden w-56 shrink-0 border-r border-white/5 bg-surface/25 md:flex md:flex-col lg:w-64">
               <SessionsSidebar className="min-h-0 flex-1" />
             </aside>
           )}

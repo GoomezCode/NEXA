@@ -54,7 +54,7 @@ export function TopBar() {
       <button
         type="button"
         onClick={() => setSessionsSheetOpen(true)}
-        className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-muted transition hover:border-primary/30 hover:text-primary lg:hidden"
+        className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-muted transition hover:border-primary/30 hover:text-primary md:hidden"
         aria-label="Abrir conversas"
       >
         <Menu className="h-4 w-4" aria-hidden="true" />
@@ -63,7 +63,7 @@ export function TopBar() {
       <button
         type="button"
         onClick={toggleSidebar}
-        className="hidden h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-muted transition hover:border-primary/30 hover:text-primary lg:flex"
+        className="hidden h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-muted transition hover:border-primary/30 hover:text-primary md:flex"
         aria-label="Alternar barra lateral"
       >
         <PanelLeft className="h-4 w-4" aria-hidden="true" />
@@ -152,6 +152,16 @@ export function TopBar() {
             <MonitorPlay className="h-3.5 w-3.5" aria-hidden="true" />
           </button>
         </div>
+
+        <button
+          type="button"
+          onClick={() => setMode(mode === 'classic' ? 'nexa' : 'classic')}
+          disabled={busy}
+          aria-label={mode === 'classic' ? 'Voltar ao NEXA HUD' : 'Abrir modo clássico'}
+          className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-muted transition hover:border-primary/30 hover:text-primary disabled:opacity-40 sm:hidden"
+        >
+          {mode === 'classic' ? <MessageSquare className="h-4 w-4" aria-hidden="true" /> : <MonitorPlay className="h-4 w-4" aria-hidden="true" />}
+        </button>
 
         <div className="text-right leading-tight">
           <p className="font-mono text-sm tabular-nums text-primary">{formatClock(now)}</p>
