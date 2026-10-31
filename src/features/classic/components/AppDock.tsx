@@ -21,7 +21,7 @@ const DOCK_APPS = [
 ];
 
 export function AppDock() {
-  const { setAppGridOpen, setSettingsOpen, setLeftPanel, setConversationOpen, leftPanel, rightPanel, settingsOpen } = useApp();
+  const { setAppGridOpen, setSettingsOpen, setLeftPanel, setActivePanel, setConversationOpen, activePanel, conversationOpen, settingsOpen } = useApp();
   const [hovered, setHovered] = useState<string | null>(null);
   const [tooltip, setTooltip] = useState<string | null>(null);
   const touchStartY = useRef<number | null>(null);
@@ -29,10 +29,16 @@ export function AppDock() {
   const handleClick = (app: (typeof DOCK_APPS)[0]) => {
     if (app.id === 'settings') {
       setSettingsOpen(true);
-    } else if (app.id === 'console') setConversationOpen(true);
+    } else if (app.id === 'console') {
+      const close = conversationOpen;
+      setConversationOpen(!close);
+      setActivePanel('console');
+    }
     else {
+      const close = activePanel === app.id;
       setConversationOpen(false);
-      setLeftPanel(app.id as 'monitor' | 'memory');
+      if (close) setActivePanel('console');
+      else setLeftPanel(app.id as 'monitor' | 'memory');
     }
   };
 
@@ -84,7 +90,7 @@ export function AppDock() {
         }}
       >
         {DOCK_APPS.map((app) => {
-          const active = app.id === 'settings' ? settingsOpen : app.id === 'console' ? rightPanel === 'console' : leftPanel === app.id;
+          const active = app.id === 'settings' ? settingsOpen : app.id === 'console' ? conversationOpen : activePanel === app.id;
           return (
           <div
             key={app.id}
