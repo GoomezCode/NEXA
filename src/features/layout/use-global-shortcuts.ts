@@ -31,13 +31,6 @@ export function useGlobalShortcuts(): void {
         return;
       }
 
-      if (event.key === 'Escape') {
-        const state = useUiStore.getState();
-
-        if (state.sessionsSheetOpen) {
-          state.setSessionsSheetOpen(false);
-        }
-      }
     };
 
     window.addEventListener('keydown', handleKeyDown);

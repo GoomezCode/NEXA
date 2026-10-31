@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { useDemoMode } from './responsive/helpers';
 
 test('o shell carrega a conversa inicial', async ({ page }) => {
   await page.goto('/');
@@ -148,6 +149,19 @@ test.describe('em viewport móvel', () => {
 
     await page.keyboard.press('Escape');
     await expect(sheet).toBeHidden();
+  });
+
+  test('botão voltar fecha o drawer sem sair da conversa', async ({ page }) => {
+    await useDemoMode(page);
+    await page.goto('/');
+    const trigger = page.getByRole('button', { name: 'Abrir conversas' });
+    await trigger.click();
+    const sheet = page.getByRole('dialog', { name: 'Conversas' });
+    await expect(sheet).toBeVisible();
+
+    await page.goBack();
+    await expect(sheet).toBeHidden();
+    await expect(page.getByRole('heading', { name: 'Boas-vindas' })).toBeVisible();
   });
 
   test('navega pelo dock móvel', async ({ page }) => {

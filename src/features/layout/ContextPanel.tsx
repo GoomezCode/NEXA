@@ -1,5 +1,5 @@
 import { Cpu, Gauge, Radio, ShieldCheck, PanelRight } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { useModels } from '@/api/models';
 import { useUsage } from '@/api/usage';
@@ -14,6 +14,7 @@ import { useSessionMetricsStore } from '@/stores/session-metrics-store';
 import { useSettingsStore } from '@/stores/settings-store';
 import { useUiStore } from '@/stores/ui-store';
 import { useConnectionStore } from '@/stores/connection-store';
+import { useOverlayHistory } from '@/hooks/use-overlay-history';
 
 const SUBSYSTEMS = [
   { icon: Radio, label: 'Streaming', value: 'SSE ativo' },
@@ -23,6 +24,19 @@ const EMPTY_METRICS: import('@/stores/session-metrics-store').ResponseMetric[] =
 
 export function ContextPanel({ sessionId }: { sessionId: string | null }) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const mobileTriggerRef = useRef<HTMLButtonElement>(null);
+  const wasMobileOpen = useRef(false);
+  const touchStartY = useRef<number | null>(null);
+  const closeMobilePanel = useOverlayHistory(mobileOpen, setMobileOpen, 'context');
+  useEffect(() => {
+    if (mobileOpen) {
+      wasMobileOpen.current = true;
+      document.getElementById('nexa-context-close')?.focus();
+    } else if (wasMobileOpen.current) {
+      wasMobileOpen.current = false;
+      mobileTriggerRef.current?.focus();
+    }
+  }, [mobileOpen]);
   const aiState = useUiStore((state) => state.aiState);
   const demoMode = useSettingsStore((state) => state.settings.demoMode);
   const offlineMode = useConnectionStore((state) => state.mode === 'offline');
@@ -55,12 +69,16 @@ export function ContextPanel({ sessionId }: { sessionId: string | null }) {
 
   return (
     <>
-    <button type="button" aria-expanded={mobileOpen} aria-controls="nexa-context-panel" onClick={() => setMobileOpen((open) => !open)} className="absolute bottom-[calc(var(--safe-bottom)+5.5rem)] right-3 z-30 flex h-11 w-11 items-center justify-center rounded-full border border-primary/30 bg-surface text-primary shadow-lg xl:hidden" aria-label="Abrir painel do núcleo"><PanelRight className="h-4 w-4" aria-hidden="true" /></button>
+    <button ref={mobileTriggerRef} type="button" aria-expanded={mobileOpen} aria-controls="nexa-context-panel" onClick={() => mobileOpen ? closeMobilePanel() : setMobileOpen(true)} className="absolute bottom-[calc(var(--safe-bottom)+5.5rem)] right-3 z-30 flex h-11 w-11 items-center justify-center rounded-full border border-primary/30 bg-surface text-primary shadow-lg xl:hidden" aria-label={mobileOpen ? 'Fechar painel do núcleo' : 'Abrir painel do núcleo'}><PanelRight className="h-4 w-4" aria-hidden="true" /></button>
+    {mobileOpen && <button type="button" tabIndex={-1} aria-label="Fechar painel do núcleo" onClick={closeMobilePanel} className="fixed inset-0 z-20 bg-black/55 xl:hidden" />}
     <aside
       id="nexa-context-panel"
       aria-label="Painel do núcleo"
+      role={mobileOpen ? 'dialog' : undefined}
+      aria-modal={mobileOpen ? true : undefined}
       className={`${mobileOpen ? 'fixed inset-x-3 bottom-32 top-20 z-20 flex' : 'hidden'} w-auto shrink-0 flex-col border border-white/10 bg-surface/95 shadow-xl xl:static xl:inset-auto xl:z-auto xl:flex xl:w-72 xl:border-l xl:border-y-0 xl:border-r-0 xl:bg-surface/25 xl:shadow-none`}
     >
+      {mobileOpen && <button id="nexa-context-close" type="button" aria-label="Arraste para baixo ou toque para fechar" onClick={closeMobilePanel} onTouchStart={(event) => { touchStartY.current = event.touches[0]?.clientY ?? null; }} onTouchEnd={(event) => { const startY = touchStartY.current; const endY = event.changedTouches[0]?.clientY; if (startY !== null && endY !== undefined && endY - startY > 48) closeMobilePanel(); touchStartY.current = null; }} className="flex h-11 shrink-0 items-center justify-center xl:hidden"><span className="h-1 w-10 rounded-full bg-white/30" /></button>}
       <div className="flex flex-col items-center border-b border-white/5 px-4 py-5">
         <Orb state={aiState} size="md" />
         <p className="mt-3 font-display text-2xs tracking-[0.22em] text-primary">NÚCLEO NEXA</p>
