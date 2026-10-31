@@ -55,6 +55,8 @@ interface AppContextType {
   setLeftPanel: (v: 'monitor' | 'memory') => void;
   rightPanel: 'console' | 'search';
   setRightPanel: (v: 'console' | 'search') => void;
+  conversationOpen: boolean;
+  setConversationOpen: (open: boolean) => void;
   memories: MemoryItem[];
   isStreaming: boolean;
   sendMessage: (content: string) => Promise<void>;
@@ -94,6 +96,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [leftPanel, setLeftPanel] = useState<'monitor' | 'memory'>('monitor');
   const [rightPanel, setRightPanel] = useState<'console' | 'search'>('console');
+  const [conversationOpen, setConversationOpen] = useState(false);
   const [activePanel, setActivePanel] = useState<'console' | 'monitor' | 'memory' | 'search'>('console');
   const [consoleDraft, setConsoleDraft] = useState('');
   const sendMessage = chat.sendMessage;
@@ -190,6 +193,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           setActivePanel(panel);
         },
         rightPanel,
+        conversationOpen,
+        setConversationOpen,
         setRightPanel: (panel) => {
           setRightPanel(panel);
           setActivePanel(panel);

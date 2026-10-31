@@ -99,6 +99,8 @@ function MainLayout({ onExit }: { onExit: () => void }) {
     setScanningActive,
     gestureOpen,
     setGestureOpen,
+    conversationOpen,
+    setConversationOpen,
   } = useApp();
   const selectedModelId = useModelStore((state) => state.selectedModelId);
   const modelCatalog = useModels();
@@ -111,7 +113,7 @@ function MainLayout({ onExit }: { onExit: () => void }) {
   const layout = useLayoutClass();
 
   useEffect(() => {
-    if (!settingsOpen && !appGridOpen && !scanningActive && !gestureOpen) {
+    if (!settingsOpen && !appGridOpen && !scanningActive && !gestureOpen && !conversationOpen) {
       return;
     }
 
@@ -129,12 +131,13 @@ function MainLayout({ onExit }: { onExit: () => void }) {
       }
       if (scanningActive) setScanningActive(false);
       if (gestureOpen) setGestureOpen(false);
+      if (conversationOpen) setConversationOpen(false);
 
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [appGridOpen, gestureOpen, scanningActive, setAppGridOpen, setGestureOpen, setScanningActive, setSettingsOpen, settingsOpen]);
+  }, [appGridOpen, conversationOpen, gestureOpen, scanningActive, setAppGridOpen, setConversationOpen, setGestureOpen, setScanningActive, setSettingsOpen, settingsOpen]);
 
   return (
     <div
@@ -358,6 +361,14 @@ function MainLayout({ onExit }: { onExit: () => void }) {
 
       {/* App Dock */}
       <AppDock />
+
+      {conversationOpen && (
+        <div className="classic-mobile-chat-overlay" role="dialog" aria-modal="true" aria-label="Conversa com a NEXA">
+          <div className="classic-mobile-chat-window">
+            <CommandConsole conversationMode onClose={() => setConversationOpen(false)} />
+          </div>
+        </div>
+      )}
 
       {/* Overlays */}
       <AppGrid />

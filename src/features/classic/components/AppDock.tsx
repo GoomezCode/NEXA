@@ -21,7 +21,7 @@ const DOCK_APPS = [
 ];
 
 export function AppDock() {
-  const { setAppGridOpen, setSettingsOpen, setLeftPanel, setRightPanel, leftPanel, rightPanel, settingsOpen } = useApp();
+  const { setAppGridOpen, setSettingsOpen, setLeftPanel, setConversationOpen, leftPanel, rightPanel, settingsOpen } = useApp();
   const [hovered, setHovered] = useState<string | null>(null);
   const [tooltip, setTooltip] = useState<string | null>(null);
   const touchStartY = useRef<number | null>(null);
@@ -29,7 +29,7 @@ export function AppDock() {
   const handleClick = (app: (typeof DOCK_APPS)[0]) => {
     if (app.id === 'settings') {
       setSettingsOpen(true);
-    } else if (app.id === 'console') setRightPanel('console');
+    } else if (app.id === 'console') setConversationOpen(true);
     else setLeftPanel(app.id as 'monitor' | 'memory');
   };
 

@@ -101,7 +101,7 @@
     flex: 1 1 0;
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: minmax(10rem, 0.9fr) minmax(12rem, 1.1fr);
+    grid-template-rows: minmax(0, 1fr);
     gap: 0;
     overflow: hidden;
     margin: 0 !important;
@@ -131,24 +131,20 @@
   }
   .classic-layout--compact .classic-ai-core > :not(.classic-ai-core-orb) { display: none; }
   .classic-layout--compact .classic-ai-core-orb {
-    width: min(58vw, 30dvh, 15rem) !important;
+    width: min(76vw, 38dvh, 18rem) !important;
     max-width: 100%;
     flex: 0 0 auto;
   }
-  .classic-layout--compact .classic-panel { display: none; min-width: 0; width: 100%; max-height: none; min-height: 0; padding: 0; }
-  .classic-layout--compact[data-active-panel='monitor'] .classic-panel--left,
-  .classic-layout--compact[data-active-panel='memory'] .classic-panel--left,
-  .classic-layout--compact[data-active-panel='console'] .classic-panel--right,
-  .classic-layout--compact[data-active-panel='search'] .classic-panel--right {
-    display: flex;
-    grid-column: 1;
-    grid-row: 2;
-    min-height: 0;
-    width: 100% !important;
-    overflow: hidden;
+  .classic-layout--compact .classic-center::after {
+    content: 'TOQUE NO NÚCLEO PARA CONVERSAR';
+    flex: 0 0 auto;
+    margin-top: 1rem;
+    color: rgba(0,245,255,.58);
+    font: 0.625rem 'Share Tech Mono', monospace;
+    letter-spacing: .14em;
+    text-align: center;
   }
-  .classic-layout--compact .classic-panel > div:last-child { min-height: 0; flex: 1; overflow: hidden; padding: 0.75rem; }
-  .classic-layout--compact .classic-panel > div:first-child { display: none; }
+  .classic-layout--compact .classic-panel { display: none !important; }
   .classic-layout--compact .classic-voice-bar { display: none; }
   .classic-layout--compact .classic-app-dock { height: 3.5rem !important; bottom: var(--kb-inset) !important; }
   .classic-layout--compact .classic-app-dock > div:first-child,
@@ -178,19 +174,43 @@
 
 @media (max-height: 32rem) and (max-width: 767px) {
   .classic-layout > .classic-main-area {
-    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    grid-template-columns: minmax(0, 1fr);
     grid-template-rows: minmax(0, 1fr);
   }
   .classic-layout--compact .classic-center { grid-column: 1; grid-row: 1; }
-  .classic-layout--compact .classic-ai-core-orb { width: min(30vw, 28dvh, 10rem) !important; }
-  .classic-layout--compact[data-active-panel='monitor'] .classic-panel--left,
-  .classic-layout--compact[data-active-panel='memory'] .classic-panel--left,
-  .classic-layout--compact[data-active-panel='console'] .classic-panel--right,
-  .classic-layout--compact[data-active-panel='search'] .classic-panel--right {
-    grid-column: 2;
-    grid-row: 1;
-  }
+  .classic-layout--compact .classic-ai-core-orb { width: min(68vw, 32dvh, 15rem) !important; }
 }
+
+.classic-mobile-chat-overlay {
+  position: fixed;
+  z-index: 80;
+  inset: 0;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  padding: max(0.75rem, env(safe-area-inset-top)) max(0.75rem, env(safe-area-inset-right)) calc(0.75rem + var(--kb-inset, 0px) + env(safe-area-inset-bottom)) max(0.75rem, env(safe-area-inset-left));
+  background: rgba(0, 4, 14, 0.88);
+  backdrop-filter: blur(16px);
+}
+
+.classic-mobile-chat-window {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  max-width: 44rem;
+  padding: 1rem;
+  overflow: hidden;
+  border: 1px solid rgba(0,245,255,.24);
+  border-radius: 1.25rem;
+  background: rgba(1, 8, 20, .98);
+  box-shadow: 0 0 40px rgba(0,245,255,.08);
+}
+
+.classic-mobile-chat-window > div { width: 100%; }
+.classic-chat-presence { width: .55rem; height: .55rem; border-radius: 50%; background: #00f5ff; box-shadow: 0 0 12px #00f5ff; }
+.classic-chat-close { display: inline-flex; width: 2.75rem; height: 2.75rem; align-items: center; justify-content: center; border: 1px solid rgba(0,245,255,.2); border-radius: .75rem; color: #00f5ff; background: rgba(0,245,255,.06); }
+.classic-chat-close svg { width: 1.1rem; height: 1.1rem; }
 
 @media (max-height: 32rem) and (min-width: 768px) {
   .classic-layout > .flex.flex-1 { margin-block: 0 !important; }

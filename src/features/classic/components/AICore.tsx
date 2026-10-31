@@ -94,7 +94,7 @@ function Ring({
 }
 
 export function AICore() {
-  const { aiState, memories, voiceSupported, voiceListening, startVoice, stopVoice, isStreaming, setRightPanel } = useApp();
+  const { aiState, memories, voiceSupported, voiceListening, startVoice, stopVoice, isStreaming, setConversationOpen } = useApp();
   const health = useApiHealth();
   const offlineMode = useConnectionStore((state) => state.mode === 'offline');
   const ollama = useOllamaHealth();
@@ -118,7 +118,7 @@ export function AICore() {
   const toggleVoice = () => {
     if (voiceListening) stopVoice();
     else if (voiceSupported && !isStreaming) startVoice();
-    else if (!voiceSupported) setRightPanel('console');
+    else if (!voiceSupported) setConversationOpen(true);
   };
 
   return (

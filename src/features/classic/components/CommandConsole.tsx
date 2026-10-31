@@ -1,6 +1,6 @@
 import { useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Terminal, Send, Mic } from 'lucide-react';
+import { Terminal, Send, Mic, X } from 'lucide-react';
 import { useApp } from '../ClassicContext';
 
 const orb = { fontFamily: 'Orbitron, sans-serif' };
@@ -9,7 +9,7 @@ const raj = { fontFamily: 'Rajdhani, sans-serif' };
 
 const SUGGESTIONS = ['Como você pode me ajudar?', 'Resuma esta conversa', 'diagnóstico', 'gestos'];
 
-export function CommandConsole() {
+export function CommandConsole({ conversationMode = false, onClose }: { conversationMode?: boolean; onClose?: () => void }) {
   const {
     messages,
     isStreaming,
@@ -34,6 +34,10 @@ export function CommandConsole() {
     endRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  useEffect(() => {
+    if (conversationMode) inputRef.current?.focus();
+  }, [conversationMode]);
+
   const handleSubmit = () => {
     if (!input.trim() || isStreaming) return;
     const text = input.trim();
@@ -51,11 +55,16 @@ export function CommandConsole() {
       {/* Header */}
       <div className="flex items-center justify-between flex-shrink-0">
         <div className="flex items-center gap-2">
-          <Terminal className="w-4 h-4" style={{ color: '#00f5ff' }} />
+          {conversationMode ? <span className="classic-chat-presence" aria-hidden="true" /> : <Terminal className="w-4 h-4" style={{ color: '#00f5ff' }} />}
           <span style={{ ...orb, color: '#00f5ff', fontSize: '0.6875rem', letterSpacing: '0.15em' }}>
-            COMMAND CONSOLE
+            {conversationMode ? 'CONVERSA NEXA' : 'COMMAND CONSOLE'}
           </span>
         </div>
+        {conversationMode && onClose && (
+          <button type="button" onClick={onClose} aria-label="Fechar conversa" className="classic-chat-close">
+            <X aria-hidden="true" />
+          </button>
+        )}
       </div>
 
       {/* Messages */}
@@ -227,7 +236,7 @@ export function CommandConsole() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-          placeholder="Enter command or speak..."
+          placeholder={conversationMode ? 'Escreva sua mensagem...' : 'Enter command or speak...'}
           className="flex-1 outline-none bg-transparent"
           style={{ ...raj, color: 'rgba(255,255,255,0.85)', fontSize: '13px' }}
         />
