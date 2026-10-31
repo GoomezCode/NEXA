@@ -1,6 +1,6 @@
-import { useState, useRef, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Terminal, Send } from 'lucide-react';
+import { Terminal, Send, Mic } from 'lucide-react';
 import { useApp } from '../ClassicContext';
 
 const orb = { fontFamily: 'Orbitron, sans-serif' };
@@ -20,8 +20,13 @@ export function CommandConsole() {
     setAppGridOpen,
     setScanningActive,
     setGestureOpen,
+    consoleDraft: input,
+    setConsoleDraft: setInput,
+    voiceSupported,
+    voiceListening,
+    startVoice,
+    stopVoice,
   } = useApp();
-  const [input, setInput] = useState('');
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -242,6 +247,16 @@ export function CommandConsole() {
             style={{ color: input.trim() && !isStreaming ? '#00f5ff' : 'rgba(0,245,255,0.3)' }}
           />
         </motion.button>
+        <button
+          type="button"
+          onClick={() => voiceListening ? stopVoice() : startVoice()}
+          disabled={!voiceSupported || isStreaming}
+          aria-label={voiceListening ? 'Parar entrada por voz' : 'Iniciar entrada por voz'}
+          aria-pressed={voiceListening}
+          className="classic-console-mic"
+        >
+          <Mic aria-hidden="true" />
+        </button>
         {isStreaming && (
           <button type="button" onClick={stop} className="px-2 font-mono text-[9px] text-warning">
             PARAR

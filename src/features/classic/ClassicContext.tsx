@@ -32,6 +32,10 @@ export interface MemoryItem {
 }
 
 interface AppContextType {
+  activePanel: 'console' | 'monitor' | 'memory' | 'search';
+  setActivePanel: (v: 'console' | 'monitor' | 'memory' | 'search') => void;
+  consoleDraft: string;
+  setConsoleDraft: (v: string) => void;
   aiState: AIState;
   setAiState: (s: AIState) => void;
   messages: Message[];
@@ -90,6 +94,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [leftPanel, setLeftPanel] = useState<'monitor' | 'memory'>('monitor');
   const [rightPanel, setRightPanel] = useState<'console' | 'search'>('console');
+  const [activePanel, setActivePanel] = useState<'console' | 'monitor' | 'memory' | 'search'>('console');
+  const [consoleDraft, setConsoleDraft] = useState('');
   const sendMessage = chat.sendMessage;
   const voice = useSpeechRecognition({
     onFinal: (text) => {
@@ -155,6 +161,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   return (
     <AppContext.Provider
       value={{
+        activePanel,
+        setActivePanel: (panel) => {
+          setActivePanel(panel);
+          if (panel === 'monitor' || panel === 'memory') setLeftPanel(panel);
+          else setRightPanel(panel);
+        },
+        consoleDraft,
+        setConsoleDraft,
         aiState,
         setAiState,
         messages,
@@ -171,9 +185,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         settingsOpen,
         setSettingsOpen,
         leftPanel,
-        setLeftPanel,
+        setLeftPanel: (panel) => {
+          setLeftPanel(panel);
+          setActivePanel(panel);
+        },
         rightPanel,
-        setRightPanel,
+        setRightPanel: (panel) => {
+          setRightPanel(panel);
+          setActivePanel(panel);
+        },
         memories,
         isStreaming: chat.isStreaming,
         sendMessage: chat.sendMessage,

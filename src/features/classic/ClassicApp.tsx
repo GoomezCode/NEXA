@@ -26,6 +26,8 @@ import { useUsage } from '@/api/usage';
 import { useModelStore } from '@/stores/model-store';
 import { useSessionMetricsStore } from '@/stores/session-metrics-store';
 import { useConnectionStore } from '@/stores/connection-store';
+import { useLayoutClass } from '@/hooks/use-layout-class';
+import { useVisualViewport } from '@/hooks/use-visual-viewport';
 
 const orb = { fontFamily: 'Orbitron, sans-serif' };
 const mono = { fontFamily: 'Share Tech Mono, monospace' };
@@ -80,11 +82,14 @@ function PanelTab({
 }
 
 function MainLayout({ onExit }: { onExit: () => void }) {
+  useVisualViewport();
   const {
     leftPanel,
     setLeftPanel,
     rightPanel,
     setRightPanel,
+    activePanel,
+    setActivePanel,
     sessionId,
     settingsOpen,
     setSettingsOpen,
@@ -103,6 +108,7 @@ function MainLayout({ onExit }: { onExit: () => void }) {
     sessionId ? state.bySession[sessionId]?.at(-1) : undefined,
   );
   const selectedModel = modelCatalog.data?.models.find((model) => model.model_id === selectedModelId);
+  const layout = useLayoutClass();
 
   useEffect(() => {
     if (!settingsOpen && !appGridOpen && !scanningActive && !gestureOpen) {
@@ -132,7 +138,8 @@ function MainLayout({ onExit }: { onExit: () => void }) {
 
   return (
     <div
-      className="classic-layout fixed inset-0 flex flex-col overflow-hidden"
+      className={`classic-layout classic-layout--${layout.layout}${layout.short ? ' classic-layout--short' : ''} fixed inset-0 flex flex-col overflow-hidden`}
+      data-active-panel={activePanel}
       style={{ fontFamily: 'Rajdhani, sans-serif' }}
     >
       <Background />
@@ -140,13 +147,33 @@ function MainLayout({ onExit }: { onExit: () => void }) {
       {/* Top Bar */}
       <TopBar onExit={onExit} />
 
+      <nav className="classic-compact-tabs" aria-label="Painéis do modo clássico">
+        {([
+          ['console', 'CONSOLE', Terminal],
+          ['monitor', 'MONITOR', Activity],
+          ['memory', 'MEMORY', Brain],
+          ['search', 'SEARCH', Search],
+        ] as const).map(([panel, label, Icon]) => (
+          <button
+            key={panel}
+            type="button"
+            aria-pressed={activePanel === panel}
+            onClick={() => setActivePanel(panel)}
+            className={activePanel === panel ? 'is-active' : ''}
+          >
+            <Icon aria-hidden="true" />
+            <span>{label}</span>
+          </button>
+        ))}
+      </nav>
+
       {/* Main 3-column layout */}
       <div
-        className="flex flex-1 gap-4 px-4 overflow-hidden"
-        style={{ marginTop: 56, marginBottom: 144 }}
+        className="classic-main-area flex flex-1 gap-4 px-4 overflow-hidden"
+        style={{ marginTop: 'var(--c-main-top, 3.5rem)', marginBottom: 'var(--c-main-bottom, 9rem)' }}
       >
         {/* LEFT PANEL */}
-        <div className="w-72 flex-shrink-0 flex flex-col gap-3 overflow-hidden pt-4 pb-2">
+        <div className="classic-panel classic-panel--left w-72 flex-shrink-0 flex flex-col gap-3 overflow-hidden pt-4 pb-2">
           {/* Panel tabs */}
           <div className="flex gap-2 flex-shrink-0">
             <PanelTab
@@ -199,7 +226,7 @@ function MainLayout({ onExit }: { onExit: () => void }) {
         </div>
 
         {/* CENTER — AI Core */}
-        <div className="flex-1 flex flex-col items-center justify-center gap-4 overflow-hidden">
+        <div className="classic-center flex-1 flex flex-col items-center justify-center gap-4 overflow-hidden">
           {/* Top data strip */}
           <motion.div
             initial={{ opacity: 0, y: -10 }}
@@ -254,7 +281,7 @@ function MainLayout({ onExit }: { onExit: () => void }) {
         </div>
 
         {/* RIGHT PANEL */}
-        <div className="w-72 flex-shrink-0 flex flex-col gap-3 overflow-hidden pt-4 pb-2">
+        <div className="classic-panel classic-panel--right w-72 flex-shrink-0 flex flex-col gap-3 overflow-hidden pt-4 pb-2">
           {/* Panel tabs */}
           <div className="flex gap-2 flex-shrink-0">
             <PanelTab

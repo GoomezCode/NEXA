@@ -43,7 +43,7 @@ export function AppDock() {
 
   return (
     <div
-      className="fixed bottom-0 left-0 right-0 flex items-center justify-center gap-2 px-4"
+      className="classic-app-dock fixed bottom-0 left-0 right-0 flex items-center justify-center gap-2 px-4"
       style={{
         height: 72,
         zIndex: 60,

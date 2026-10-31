@@ -63,9 +63,11 @@
 :root {
   --c-topbar-h: 3.5rem;
   --c-dock-h: 4.5rem;
-  --c-voice-h: 5rem;
+  --c-voice-h: 4.5rem;
   --c-panel-w: clamp(16rem, 22vw, 22rem);
   --c-gap: clamp(0.5rem, 1vw, 1rem);
+  --c-main-top: var(--c-topbar-h);
+  --c-main-bottom: calc(var(--c-voice-h) + var(--c-dock-h));
 }
 
 @media (max-width: 1279px) {
@@ -80,17 +82,77 @@
 }
 
 @media (max-width: 767px) {
-  .classic-hud { overflow: auto; }
-  .classic-layout { min-height: 100dvh; height: auto; overflow: visible !important; }
-  .classic-layout > .flex.flex-1 {
-    min-height: 0;
-    flex-direction: column;
-    overflow: visible;
-    margin: 0 !important;
+  :root { --c-main-top: 0px; --c-main-bottom: 3.5rem; }
+  .classic-hud { overflow: hidden; }
+  .classic-layout { min-height: 0; height: 100dvh; overflow: hidden !important; }
+  .classic-layout > header { min-height: 3rem; }
+  .classic-layout .classic-topbar { height: 3rem !important; padding-inline: 0.5rem; gap: 0.5rem; }
+  .classic-layout .classic-topbar > .flex-1,
+  .classic-layout .classic-topbar > .text-right { display: none; }
+  .classic-layout .classic-compact-tabs {
+    display: flex;
+    flex: 0 0 auto;
+    margin-top: 3rem;
+    gap: 0.25rem;
+    overflow-x: auto;
+    padding: 0.25rem 0.5rem;
+    border-bottom: 1px solid rgba(0, 245, 255, 0.12);
+    background: rgba(1, 8, 20, 0.94);
   }
-  .classic-layout > .flex.flex-1 > .w-72 { width: 100%; max-height: 42dvh; }
-  .classic-layout > .flex.flex-1 > .flex-1 { min-height: 20rem; }
-  .classic-layout > .flex.flex-1 > .w-72:last-child { min-height: 24rem; }
+  .classic-compact-tabs button {
+    min-width: 4.5rem;
+    min-height: 2.75rem;
+    display: flex;
+    flex: 1 0 auto;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.1rem;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 0.65rem;
+    color: rgba(255,255,255,.65);
+    background: rgba(255,255,255,.025);
+    font: 0.6875rem 'Share Tech Mono', monospace;
+  }
+  .classic-compact-tabs button svg { width: 1rem; height: 1rem; }
+  .classic-compact-tabs button.is-active { color: #00f5ff; border-color: rgba(0,245,255,.4); background: rgba(0,245,255,.1); }
+  .classic-layout > .classic-main-area {
+    min-height: 0;
+    flex: 1 1 0;
+    flex-direction: column;
+    gap: 0;
+    overflow: hidden;
+    margin: 0 !important;
+    padding: 0.5rem !important;
+  }
+  .classic-layout--compact .classic-center { display: none; }
+  .classic-layout--compact .classic-panel { display: none; width: 100%; max-height: none; padding: 0; }
+  .classic-layout--compact[data-active-panel='monitor'] .classic-panel--left,
+  .classic-layout--compact[data-active-panel='memory'] .classic-panel--left,
+  .classic-layout--compact[data-active-panel='console'] .classic-panel--right,
+  .classic-layout--compact[data-active-panel='search'] .classic-panel--right { display: flex; flex: 1; }
+  .classic-layout--compact .classic-panel > div:last-child { min-height: 0; flex: 1; overflow: auto; padding: 0.75rem; }
+  .classic-layout--compact .classic-voice-bar { display: none; }
+  .classic-layout--compact .classic-app-dock { height: 3.5rem !important; bottom: var(--kb-inset) !important; }
+  .classic-layout--compact .classic-app-dock > div:first-child,
+  .classic-layout--compact .classic-app-dock > div:last-child { display: none; }
+  .classic-layout--compact .classic-app-dock > div:nth-child(2) { padding: 0.15rem 0.35rem !important; }
+  .classic-layout--compact .classic-app-dock > div:nth-child(2) button { width: 2.75rem; height: 2.75rem; }
+  .classic-layout--compact .classic-main-area { padding-bottom: calc(4rem + var(--kb-inset)) !important; }
+  .classic-layout--compact .classic-console-mic {
+    display: inline-flex;
+    width: 2.75rem;
+    height: 2.75rem;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(0,245,255,.25);
+    border-radius: 0.65rem;
+    color: #00f5ff;
+    background: rgba(0,245,255,.08);
+  }
+  .classic-layout--compact .classic-console-mic svg { width: 1rem; height: 1rem; }
+  .classic-layout--compact .classic-panel input { min-height: 2.75rem; font-size: 1rem !important; }
   .classic-hud button { touch-action: manipulation; }
 }
 
@@ -101,4 +163,20 @@
 
 @media (max-width: 767px) {
   .classic-hud [style*="backdrop-filter"] { backdrop-filter: none !important; }
+}
+
+.classic-compact-tabs { display: none; }
+.classic-console-mic { display: none; }
+
+@media (min-width: 768px) and (max-width: 1279px) {
+  :root { --c-main-top: 3.5rem; --c-main-bottom: 8rem; }
+}
+
+@media (max-height: 32rem) and (min-width: 768px) {
+  :root { --c-main-top: 2.75rem; --c-main-bottom: 7rem; }
+  .classic-layout--short .classic-panel--left { display: none; }
+  .classic-layout--short .classic-center { flex: 1 1 60%; }
+  .classic-layout--short .classic-panel--right { width: min(38vw, 26rem); }
+  .classic-layout--short .classic-voice-bar { height: 3rem !important; }
+  .classic-layout--short .classic-app-dock { height: 2.75rem !important; }
 }

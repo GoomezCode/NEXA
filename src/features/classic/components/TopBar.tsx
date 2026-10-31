@@ -67,7 +67,7 @@ export function TopBar({ onExit }: { onExit: () => void }) {
 
   return (
     <div
-      className="fixed top-0 left-0 right-0 h-14 flex items-center px-5 gap-4"
+      className="classic-topbar fixed top-0 left-0 right-0 h-14 flex items-center px-5 gap-4"
       style={{
         zIndex: 100,
         background: 'rgba(1, 11, 26, 0.85)',

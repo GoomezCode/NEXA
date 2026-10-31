@@ -75,7 +75,7 @@ export function VoiceBar() {
 
   return (
     <div
-      className="fixed left-0 right-0 flex items-center px-6 gap-4"
+      className="classic-voice-bar fixed left-0 right-0 flex items-center px-6 gap-4"
       style={{
         bottom: 72,
         height: 72,
