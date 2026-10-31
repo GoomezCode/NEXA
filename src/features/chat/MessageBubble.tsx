@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeSanitize from 'rehype-sanitize';
 import remarkGfm from 'remark-gfm';
@@ -13,7 +14,7 @@ const STATUS_NOTE: Partial<Record<ChatMessage['status'], string>> = {
   error: 'Falha ao gerar a resposta',
 };
 
-export function MessageBubble({ message }: { message: ChatMessage }) {
+export const MessageBubble = memo(function MessageBubble({ message }: { message: ChatMessage }) {
   const isUser = message.role === 'user';
   const isStreaming = message.status === 'streaming';
   const note = STATUS_NOTE[message.status];
@@ -88,4 +89,4 @@ export function MessageBubble({ message }: { message: ChatMessage }) {
       </div>
     </article>
   );
-}
+});

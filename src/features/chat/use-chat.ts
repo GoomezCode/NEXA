@@ -120,6 +120,28 @@ export function useChat(sessionId: string | null): UseChatResult {
       // The stream must own a speech queue before the first token arrives. Without
       // this instance every push/finish below is a no-op, including the final tail.
       speechRef.current = new SpeechStreamer();
+      let pendingContent = '';
+      let pendingFlushTimer = 0;
+      const flushContent = () => {
+        if (pendingFlushTimer) window.clearTimeout(pendingFlushTimer);
+        pendingFlushTimer = 0;
+        const contentChunk = pendingContent;
+        pendingContent = '';
+        if (!contentChunk) return;
+        updateMessages((current) =>
+          current.map((message) =>
+            message.id === assistantId
+              ? { ...message, content: message.content + contentChunk }
+              : message,
+          ),
+        );
+      };
+      const queueContent = (value: string) => {
+        pendingContent += value;
+        if (!pendingFlushTimer) {
+          pendingFlushTimer = window.setTimeout(flushContent, 33);
+        }
+      };
 
       updateMessages((current) => [
         ...current,
@@ -156,14 +178,7 @@ export function useChat(sessionId: string | null): UseChatResult {
             }
 
             speechRef.current?.push(event.value);
-
-            updateMessages((current) =>
-              current.map((message) =>
-                message.id === assistantId
-                  ? { ...message, content: message.content + event.value }
-                  : message,
-              ),
-            );
+            queueContent(event.value);
           }
 
           if (event.type === 'done') {
@@ -197,6 +212,7 @@ export function useChat(sessionId: string | null): UseChatResult {
           }
         }
 
+        flushContent();
         updateMessages((current) =>
           current.map((message) =>
             message.id === assistantId ? { ...message, status: 'done' } : message,
@@ -227,6 +243,7 @@ export function useChat(sessionId: string | null): UseChatResult {
           });
         }
       } catch (caught) {
+        flushContent();
         if (caught instanceof DOMException && caught.name === 'AbortError') {
           updateMessages((current) =>
             current.map((message) =>
@@ -252,6 +269,7 @@ export function useChat(sessionId: string | null): UseChatResult {
         speechRef.current = null;
         notify({ tone: 'error', title: info.title, message: info.message });
       } finally {
+        if (pendingFlushTimer) window.clearTimeout(pendingFlushTimer);
         setIsStreaming(false);
         abortRef.current = null;
         void queryClient.invalidateQueries({ queryKey: sessionKeys.all });

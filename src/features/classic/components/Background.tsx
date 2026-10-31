@@ -21,21 +21,21 @@ export function Background() {
     let height = 0;
     let animId = 0;
     let running = false;
+    let compact = false;
+    let lastFrameAt = 0;
+    let resizeTimer = 0;
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
     const resize = () => {
       const rect = canvas.getBoundingClientRect();
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      compact = window.matchMedia('(max-width: 47.999rem), (pointer: coarse)').matches;
+      const dpr = Math.min(window.devicePixelRatio || 1, compact ? 1.5 : 2);
       width = rect.width;
       height = rect.height;
       canvas.width = Math.floor(width * dpr);
       canvas.height = Math.floor(height * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      const compact = window.matchMedia('(max-width: 47.999rem)').matches;
-      const count = Math.max(
-        12,
-        Math.min(54, Math.floor((width * height / 18000) * (compact ? 0.65 : 1))),
-      );
+      const count = Math.max(10, Math.min(compact ? 20 : 54, Math.floor((width * height / 18000) * (compact ? 0.55 : 1))));
       particles.length = 0;
       for (let i = 0; i < count; i++) {
         particles.push({
@@ -82,20 +82,26 @@ export function Background() {
       }
     }
 
-    const tick = () => {
-      particles.forEach((p) => {
-        p.x += p.vx;
-        p.y += p.vy;
-        if (p.x < 0 || p.x > width) p.vx *= -1;
-        if (p.y < 0 || p.y > height) p.vy *= -1;
-      });
-      draw();
+    const tick = (timestamp: number) => {
+      const frameInterval = compact ? 1000 / 30 : 1000 / 45;
+      if (timestamp - lastFrameAt >= frameInterval) {
+        const delta = lastFrameAt ? Math.min((timestamp - lastFrameAt) / (1000 / 60), 2) : 1;
+        lastFrameAt = timestamp;
+        particles.forEach((p) => {
+          p.x += p.vx * delta;
+          p.y += p.vy * delta;
+          if (p.x < 0 || p.x > width) p.vx *= -1;
+          if (p.y < 0 || p.y > height) p.vy *= -1;
+        });
+        draw();
+      }
       animId = requestAnimationFrame(tick);
     };
 
     const start = () => {
-      if (running || document.hidden || reducedMotion.matches) return;
+      if (running || document.hidden || reducedMotion.matches || document.documentElement.dataset.reducedMotion === 'true') return;
       running = true;
+      lastFrameAt = 0;
       animId = requestAnimationFrame(tick);
     };
     const stop = () => {
@@ -103,24 +109,35 @@ export function Background() {
       cancelAnimationFrame(animId);
     };
     const visibilityChange = () => document.hidden ? stop() : start();
-    const motionChange = () => reducedMotion.matches ? (stop(), draw()) : start();
+    const motionChange = () => reducedMotion.matches || document.documentElement.dataset.reducedMotion === 'true' ? (stop(), draw()) : start();
 
     resize();
     start();
-    window.addEventListener('resize', resize);
+    const scheduleResize = () => {
+      window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(resize, 120);
+    };
+    const resizeObserver = new ResizeObserver(scheduleResize);
+    resizeObserver.observe(canvas);
+    window.addEventListener('resize', scheduleResize);
     document.addEventListener('visibilitychange', visibilityChange);
     reducedMotion.addEventListener('change', motionChange);
+    const motionObserver = new MutationObserver(motionChange);
+    motionObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-reduced-motion'] });
 
     return () => {
       stop();
-      window.removeEventListener('resize', resize);
+      window.clearTimeout(resizeTimer);
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', scheduleResize);
       document.removeEventListener('visibilitychange', visibilityChange);
       reducedMotion.removeEventListener('change', motionChange);
+      motionObserver.disconnect();
     };
   }, []);
 
   return (
-    <div className="pointer-events-none fixed inset-0 overflow-hidden" style={{ zIndex: 0 }}>
+    <div className="pointer-events-none absolute inset-0 overflow-hidden" style={{ zIndex: 0 }}>
       {/* Deep space base */}
       <div
         className="absolute inset-0"

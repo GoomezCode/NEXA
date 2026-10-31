@@ -27,6 +27,9 @@ export function BackgroundCanvas() {
     let height = 0;
     let frame = 0;
     let running = false;
+    let compact = false;
+    let lastFrameAt = 0;
+    let resizeTimer = 0;
 
     const draw = () => {
       context.clearRect(0, 0, width, height);
@@ -61,9 +64,9 @@ export function BackgroundCanvas() {
     };
 
     const createParticles = () => {
-      const compact = window.matchMedia('(max-width: 47.999rem)').matches;
+      compact = window.matchMedia('(max-width: 47.999rem), (pointer: coarse)').matches;
       const areaCount = Math.floor((width * height) / 18000);
-      const count = Math.max(12, Math.min(54, Math.floor(areaCount * (compact ? 0.65 : 1))));
+      const count = Math.max(10, Math.min(compact ? 20 : 54, Math.floor(areaCount * (compact ? 0.55 : 1))));
 
       particles = Array.from({ length: count }, () => ({
         x: Math.random() * width,
@@ -78,7 +81,8 @@ export function BackgroundCanvas() {
 
     const resize = () => {
       const rect = canvas.getBoundingClientRect();
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const compact = window.matchMedia('(max-width: 47.999rem), (pointer: coarse)').matches;
+      const dpr = Math.min(window.devicePixelRatio || 1, compact ? 1.5 : 2);
 
       width = rect.width;
       height = rect.height;
@@ -89,27 +93,34 @@ export function BackgroundCanvas() {
       draw();
     };
 
-    const tick = () => {
-      for (const particle of particles) {
-        particle.x += particle.vx;
-        particle.y += particle.vy;
+    const tick = (timestamp: number) => {
+      const frameInterval = compact ? 1000 / 30 : 1000 / 45;
+      if (timestamp - lastFrameAt >= frameInterval) {
+        const delta = lastFrameAt ? Math.min((timestamp - lastFrameAt) / (1000 / 60), 2) : 1;
+        lastFrameAt = timestamp;
 
-        if (particle.x < -10) particle.x = width + 10;
-        if (particle.x > width + 10) particle.x = -10;
-        if (particle.y < -10) particle.y = height + 10;
-        if (particle.y > height + 10) particle.y = -10;
+        for (const particle of particles) {
+          particle.x += particle.vx * delta;
+          particle.y += particle.vy * delta;
+
+          if (particle.x < -10) particle.x = width + 10;
+          if (particle.x > width + 10) particle.x = -10;
+          if (particle.y < -10) particle.y = height + 10;
+          if (particle.y > height + 10) particle.y = -10;
+        }
+
+        draw();
       }
-
-      draw();
       frame = requestAnimationFrame(tick);
     };
 
     const start = () => {
-      if (running || reducedMotion.matches) {
+      if (running || reducedMotion.matches || document.documentElement.dataset.reducedMotion === 'true') {
         return;
       }
 
       running = true;
+      lastFrameAt = 0;
       frame = requestAnimationFrame(tick);
     };
 
@@ -127,7 +138,7 @@ export function BackgroundCanvas() {
     };
 
     const handleMotionPreference = () => {
-      if (reducedMotion.matches) {
+      if (reducedMotion.matches || document.documentElement.dataset.reducedMotion === 'true') {
         stop();
         draw();
       } else {
@@ -138,15 +149,26 @@ export function BackgroundCanvas() {
     resize();
     start();
 
-    window.addEventListener('resize', resize);
+    const scheduleResize = () => {
+      window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(resize, 120);
+    };
+    const resizeObserver = new ResizeObserver(scheduleResize);
+    resizeObserver.observe(canvas);
+    window.addEventListener('resize', scheduleResize);
     document.addEventListener('visibilitychange', handleVisibility);
     reducedMotion.addEventListener('change', handleMotionPreference);
+    const motionObserver = new MutationObserver(handleMotionPreference);
+    motionObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-reduced-motion'] });
 
     return () => {
       stop();
-      window.removeEventListener('resize', resize);
+      window.clearTimeout(resizeTimer);
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', scheduleResize);
       document.removeEventListener('visibilitychange', handleVisibility);
       reducedMotion.removeEventListener('change', handleMotionPreference);
+      motionObserver.disconnect();
     };
   }, []);
 

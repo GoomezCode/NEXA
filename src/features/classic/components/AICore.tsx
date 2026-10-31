@@ -4,6 +4,7 @@ import { useApiHealth } from '@/api/health';
 import { useOllamaHealth } from '@/api/ollama';
 import { useConnectionStore } from '@/stores/connection-store';
 import { useElementSize } from '@/hooks/use-element-size';
+import { usePointerType } from '@/hooks/use-pointer-type';
 import { useApp } from '../ClassicContext';
 
 const orb = { fontFamily: 'Orbitron, sans-serif' };
@@ -103,9 +104,10 @@ export function AICore() {
   const coreSize = orbSize.width || 380;
   const ringSize = (referenceSize: number) => Math.round(coreSize * referenceSize / 380);
   const reducedMotion = useReducedMotion() ?? false;
+  const pointerType = usePointerType();
   const coreRef = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(true);
-  const motionEnabled = !reducedMotion && visible;
+  const motionEnabled = !reducedMotion && visible && pointerType !== 'coarse';
 
   useEffect(() => {
     const element = coreRef.current;

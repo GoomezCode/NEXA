@@ -19,6 +19,7 @@ import { useSettingsStore } from '@/stores/settings-store';
 import { useConnectionStore } from '@/stores/connection-store';
 import { useOllamaHealth } from '@/api/ollama';
 import { useAuthStore } from '@/stores/auth-store';
+import { usePointerType } from '@/hooks/use-pointer-type';
 import { useApp } from '../ClassicContext';
 
 const orb = { fontFamily: 'Orbitron, sans-serif' };
@@ -27,6 +28,8 @@ const raj = { fontFamily: 'Rajdhani, sans-serif' };
 
 export function TopBar({ onExit }: { onExit: () => void }) {
   const [time, setTime] = useState(new Date());
+  const pointerType = usePointerType();
+  const touchOptimized = pointerType === 'coarse';
   const { setSettingsOpen, setAppGridOpen, setGestureOpen, aiState, addNotification } = useApp();
   const health = useApiHealth();
   const models = useModels();
@@ -36,11 +39,11 @@ export function TopBar({ onExit }: { onExit: () => void }) {
   const ollama = useOllamaHealth();
 
   useEffect(() => {
-    const interval = setInterval(() => setTime(new Date()), 1000);
+    const interval = setInterval(() => setTime(new Date()), 60_000);
     return () => clearInterval(interval);
   }, []);
 
-  const fmtTime = (d: Date) => d.toLocaleTimeString('en-US', { hour12: false });
+  const fmtTime = (d: Date) => d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
   const fmtDate = (d: Date) =>
     d.toLocaleDateString('en-US', {
       weekday: 'short',
@@ -79,8 +82,8 @@ export function TopBar({ onExit }: { onExit: () => void }) {
       {/* Logo */}
       <div className="flex items-center gap-3 flex-shrink-0">
         <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
+          animate={{ rotate: touchOptimized ? 0 : 360 }}
+          transition={{ duration: 10, repeat: touchOptimized ? 0 : Infinity, ease: 'linear' }}
           className="w-8 h-8 rounded-full flex items-center justify-center relative"
           style={{
             border: '1.5px solid rgba(0,245,255,0.6)',
@@ -120,8 +123,8 @@ export function TopBar({ onExit }: { onExit: () => void }) {
       {/* AI State */}
       <div className="flex items-center gap-2 flex-shrink-0">
         <motion.div
-          animate={{ opacity: [1, 0.2, 1] }}
-          transition={{ duration: aiState === 'idle' ? 3 : 0.6, repeat: Infinity }}
+          animate={touchOptimized ? { opacity: 1 } : { opacity: [1, 0.2, 1] }}
+          transition={{ duration: aiState === 'idle' ? 3 : 0.6, repeat: touchOptimized ? 0 : Infinity }}
           className="w-2 h-2 rounded-full"
           style={{ background: stateColor, boxShadow: `0 0 8px ${stateColor}` }}
         />

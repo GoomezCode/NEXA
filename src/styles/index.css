@@ -209,6 +209,14 @@
   }
 }
 
+@media (pointer: coarse) {
+  .nexa-spin-slow,
+  .nexa-spin-reverse,
+  .nexa-pulse {
+    animation: none !important;
+  }
+}
+
 .nexa-mobile-dock {
   padding-inline: max(0.5rem, var(--safe-left)) max(0.5rem, var(--safe-right));
 }
