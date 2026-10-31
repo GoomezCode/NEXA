@@ -75,9 +75,10 @@ test('abre e fecha os overlays clássicos, inclusive com Esc', async ({ page }) 
   await expect(page.getByText('SYSTEM STATUS')).toBeVisible();
 
   await page.getByRole('button', { name: 'Settings' }).first().click();
-  await expect(page.getByRole('heading', { name: 'Ajustes' })).toBeVisible();
+  const settingsOverlay = page.locator('.classic-settings-overlay');
+  await expect(settingsOverlay).toBeVisible();
   await page.keyboard.press('Escape');
-  await expect(page.getByRole('heading', { name: 'Ajustes' })).toBeHidden();
+  await expect(settingsOverlay).toBeHidden();
 
   await page.getByRole('button', { name: 'Apps' }).first().click();
   await expect(page.getByText('ATALHOS DISPONÍVEIS')).toBeVisible();
@@ -91,7 +92,11 @@ test.describe('em viewport móvel', () => {
   test('abre o modo clássico funcional em telas compactas', async ({ page }) => {
     await page.goto('/?ui=classic');
 
-    await expect(page.getByRole('navigation', { name: 'Painéis do modo clássico' })).toBeVisible();
-    await expect(page.getByPlaceholder('Enter command or speak...')).toBeVisible();
+    await expect(page.locator('.classic-ai-core-orb')).toBeVisible();
+    await expect(page.getByRole('navigation', { name: 'Painéis do modo clássico' })).toBeHidden();
+    await expect(page.getByPlaceholder('Escreva sua mensagem...')).toBeHidden();
+    await page.getByRole('button', { name: 'Abrir Chat' }).click();
+    await expect(page.getByRole('dialog', { name: 'Conversa com a NEXA' })).toBeVisible();
+    await expect(page.getByPlaceholder('Escreva sua mensagem...')).toBeVisible();
   });
 });

@@ -6,7 +6,7 @@ import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Brain, Terminal, Search, Activity } from 'lucide-react';
 
-import { AppProvider, useApp } from './ClassicContext';
+import { AppProvider, useAppUi, useChatActions, useChatStatus } from './ClassicContext';
 import { Background } from './components/Background';
 import { TopBar } from './components/TopBar';
 import { AICore } from './components/AICore';
@@ -101,7 +101,7 @@ function MainLayout({ onExit }: { onExit: () => void }) {
     setGestureOpen,
     conversationOpen,
     setConversationOpen,
-  } = useApp();
+  } = useAppUi();
   const selectedModelId = useModelStore((state) => state.selectedModelId);
   const modelCatalog = useModels();
   const usage = useUsage();
@@ -194,7 +194,8 @@ function MainLayout({ onExit }: { onExit: () => void }) {
         className="classic-main-area flex flex-1 gap-4 px-4 overflow-hidden"
         style={{ marginTop: 'var(--c-main-top, 3.5rem)', marginBottom: 'var(--c-main-bottom, 9rem)' }}
       >
-        {/* LEFT PANEL */}
+        {/* Panels stay unmounted on compact screens until explicitly selected. */}
+        {(layout.layout !== 'compact' || activePanel === 'monitor' || activePanel === 'memory') && (
         <div className="classic-panel classic-panel--left w-72 flex-shrink-0 flex flex-col gap-3 overflow-hidden pt-4 pb-2">
           {/* Panel tabs */}
           <div className="flex gap-2 flex-shrink-0">
@@ -246,6 +247,7 @@ function MainLayout({ onExit }: { onExit: () => void }) {
             </AnimatePresence>
           </div>
         </div>
+        )}
 
         {/* CENTER — AI Core */}
         <div className="classic-center flex-1 flex flex-col items-center justify-center gap-4 overflow-hidden">
@@ -302,7 +304,8 @@ function MainLayout({ onExit }: { onExit: () => void }) {
           </motion.div>
         </div>
 
-        {/* RIGHT PANEL */}
+        {/* The text panel is shown in its own conversation overlay on compact screens. */}
+        {layout.layout !== 'compact' && (
         <div className="classic-panel classic-panel--right w-72 flex-shrink-0 flex flex-col gap-3 overflow-hidden pt-4 pb-2">
           {/* Panel tabs */}
           <div className="flex gap-2 flex-shrink-0">
@@ -354,10 +357,11 @@ function MainLayout({ onExit }: { onExit: () => void }) {
             </AnimatePresence>
           </div>
         </div>
+        )}
       </div>
 
       {/* Voice Bar */}
-      <VoiceBar />
+      {layout.layout !== 'compact' && <VoiceBar />}
 
       {/* App Dock */}
       <AppDock />
@@ -391,7 +395,9 @@ function QuickActionButton({
   color: string;
   action: string;
 }) {
-  const { sendMessage, isStreaming, setScanningActive } = useApp();
+  const { setScanningActive } = useAppUi();
+  const { sendMessage } = useChatActions();
+  const isStreaming = useChatStatus();
 
   const handleClick = () => {
     if (isStreaming) return;

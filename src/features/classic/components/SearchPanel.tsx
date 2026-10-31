@@ -4,13 +4,13 @@ import { Search } from 'lucide-react';
 
 import { getChatAdapter } from '@/api';
 import { messageKeys, useSessions } from '@/features/chat/api';
-import { useApp } from '../ClassicContext';
+import { useAppUi } from '../ClassicContext';
 
 const mono = { fontFamily: 'Share Tech Mono, monospace' };
 const raj = { fontFamily: 'Rajdhani, sans-serif' };
 
 export function SearchPanel() {
-  const { memories } = useApp();
+  const { memories } = useAppUi();
   const sessions = useSessions();
   const [query, setQuery] = useState('');
   const conversationQueries = useQueries({

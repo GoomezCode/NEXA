@@ -5,7 +5,7 @@ import { useOllamaHealth } from '@/api/ollama';
 import { useConnectionStore } from '@/stores/connection-store';
 import { useElementSize } from '@/hooks/use-element-size';
 import { usePointerType } from '@/hooks/use-pointer-type';
-import { useApp } from '../ClassicContext';
+import { useAppUi, useChatStatus } from '../ClassicContext';
 
 const orb = { fontFamily: 'Orbitron, sans-serif' };
 const mono = { fontFamily: 'Share Tech Mono, monospace' };
@@ -95,7 +95,8 @@ function Ring({
 }
 
 export function AICore() {
-  const { aiState, memories, voiceSupported, voiceListening, startVoice, stopVoice, isStreaming, setConversationOpen } = useApp();
+  const { aiState, memories, voiceSupported, voiceListening, startVoice, stopVoice, setConversationOpen } = useAppUi();
+  const isStreaming = useChatStatus();
   const health = useApiHealth();
   const offlineMode = useConnectionStore((state) => state.mode === 'offline');
   const ollama = useOllamaHealth();

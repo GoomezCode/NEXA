@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from 'motion/react';
 import { Activity, Brain, Hand, MessageSquare, Settings, X } from 'lucide-react';
 
-import { useApp } from '../ClassicContext';
+import { useAppUi } from '../ClassicContext';
 
 const orb = { fontFamily: 'Orbitron, sans-serif' };
 const mono = { fontFamily: 'Share Tech Mono, monospace' };
@@ -14,7 +14,7 @@ const APPS = [
 ];
 
 export function AppGrid() {
-  const { appGridOpen, setAppGridOpen, setSettingsOpen, setLeftPanel, setRightPanel, setGestureOpen } = useApp();
+  const { appGridOpen, setAppGridOpen, setSettingsOpen, setLeftPanel, setRightPanel, setGestureOpen } = useAppUi();
   return (
     <AnimatePresence>
       {appGridOpen && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 flex flex-col" style={{ zIndex: 150, background: 'rgba(0,4,12,.96)', backdropFilter: 'blur(20px)' }}>

@@ -2,12 +2,12 @@ import { lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X } from 'lucide-react';
 
-import { useApp } from '../ClassicContext';
+import { useAppUi } from '../ClassicContext';
 
 const SettingsView = lazy(() => import('@/features/settings/SettingsView').then((module) => ({ default: module.SettingsView })));
 
 export function SettingsPanel() {
-  const { settingsOpen, setSettingsOpen } = useApp();
+  const { settingsOpen, setSettingsOpen } = useAppUi();
 
   return (
     <AnimatePresence>

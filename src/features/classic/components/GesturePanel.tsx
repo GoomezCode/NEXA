@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Activity, ArrowUpRight, Brain, Grid2X2, MessageSquare, Monitor, X, Zap } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 
-import { useApp } from '../ClassicContext';
+import { useAppUi } from '../ClassicContext';
 
 const mono = { fontFamily: 'Share Tech Mono, monospace' };
 const orb = { fontFamily: 'Orbitron, sans-serif' };
@@ -15,7 +15,7 @@ const shortcuts = [
 ] as const;
 
 export function GesturePanel() {
-  const { gestureOpen, setGestureOpen, setLeftPanel, setRightPanel, setAppGridOpen } = useApp();
+  const { gestureOpen, setGestureOpen, setLeftPanel, setRightPanel, setAppGridOpen } = useAppUi();
   const [selected, setSelected] = useState<(typeof shortcuts)[number]['id']>('monitor');
   const active = shortcuts.find((shortcut) => shortcut.id === selected) ?? shortcuts[0];
   const ActiveIcon = active.icon;

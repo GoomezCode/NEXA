@@ -9,7 +9,7 @@ import { useSettingsStore } from '@/stores/settings-store';
 import { useConnectionStore } from '@/stores/connection-store';
 import { useOllamaHealth } from '@/api/ollama';
 
-import { useApp } from '../ClassicContext';
+import { useAppUi } from '../ClassicContext';
 
 type CheckResult = { label: string; detail: string; ok: boolean | null };
 
@@ -17,7 +17,7 @@ const mono = { fontFamily: 'Share Tech Mono, monospace' };
 const orb = { fontFamily: 'Orbitron, sans-serif' };
 
 export function ScanningPanel() {
-  const { scanningActive, setScanningActive } = useApp();
+  const { scanningActive, setScanningActive } = useAppUi();
   const demoMode = useSettingsStore((state) => state.settings.demoMode);
   const offlineMode = useConnectionStore((state) => state.mode === 'offline');
   const ollama = useOllamaHealth();

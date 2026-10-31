@@ -8,7 +8,7 @@ import {
   ChevronUp,
   Grid,
 } from 'lucide-react';
-import { useApp } from '../ClassicContext';
+import { useAppUi } from '../ClassicContext';
 
 const orb = { fontFamily: 'Orbitron, sans-serif' };
 const mono = { fontFamily: 'Share Tech Mono, monospace' };
@@ -21,7 +21,7 @@ const DOCK_APPS = [
 ];
 
 export function AppDock() {
-  const { setAppGridOpen, setSettingsOpen, setLeftPanel, setActivePanel, setConversationOpen, activePanel, conversationOpen, settingsOpen } = useApp();
+  const { setAppGridOpen, setSettingsOpen, setLeftPanel, setActivePanel, setConversationOpen, activePanel, conversationOpen, settingsOpen } = useAppUi();
   const [hovered, setHovered] = useState<string | null>(null);
   const [tooltip, setTooltip] = useState<string | null>(null);
   const touchStartY = useRef<number | null>(null);

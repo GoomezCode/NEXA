@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { useChat } from '@/features/chat/use-chat';
 import { useCreateSession, useSessions } from '@/features/chat/api';
 import { useMemories } from '@/features/memory/api';
@@ -70,7 +70,17 @@ interface AppContextType {
   stopVoice: () => void;
 }
 
-const AppContext = createContext<AppContextType | null>(null);
+type ChatContextType = Pick<
+  AppContextType,
+  'consoleDraft' | 'setConsoleDraft' | 'messages' | 'chatError'
+>;
+type ChatActionsContextType = Pick<AppContextType, 'addMessage' | 'sendMessage' | 'stop'>;
+type AppUiContextType = Omit<AppContextType, keyof ChatContextType | keyof ChatActionsContextType | 'isStreaming'>;
+
+const AppUiContext = createContext<AppUiContextType | null>(null);
+const ChatContext = createContext<ChatContextType | null>(null);
+const ChatActionsContext = createContext<ChatActionsContextType | null>(null);
+const ChatStatusContext = createContext(false);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const sessions = useSessions();
@@ -83,12 +93,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const savedMemories = useMemories();
   const aiState = useUiStore((state) => state.aiState);
   const setAiState = useUiStore((state) => state.setAiState);
-  const messages: Message[] = chat.messages.map((message) => ({
+  const messages = useMemo<Message[]>(() => chat.messages.map((message) => ({
     id: message.id,
     type: message.role === 'user' ? 'user' : 'ai',
     text: message.content,
     timestamp: new Date(message.createdAt),
-  }));
+  })), [chat.messages]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [appGridOpen, setAppGridOpen] = useState(false);
   const [scanningActive, setScanningActive] = useState(false);
@@ -109,14 +119,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     },
     onError: (message) => notify({ tone: 'error', title: 'Entrada por voz', message }),
   });
-  const memories: MemoryItem[] = (savedMemories.data ?? []).map((entry) => ({
+  const memories = useMemo<MemoryItem[]>(() => (savedMemories.data ?? []).map((entry) => ({
     id: entry.id,
     title: entry.title,
     content: entry.content,
     tags: entry.tags,
     timestamp: new Date(entry.updatedAt),
     synced: false,
-  }));
+  })), [savedMemories.data]);
 
   useEffect(() => {
     if (!sessionId && sessions.isSuccess && !sessionCreationStarted.current) {
@@ -141,7 +151,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const addMessage = useCallback((msg: Omit<Message, 'id' | 'timestamp'>) => {
     if (msg.type === 'user') void chat.sendMessage(msg.text);
-  }, [chat]);
+  }, [chat.sendMessage]);
 
   const removeNotification = useCallback((id: string) => {
     setNotifications((prev) => prev.filter((n) => n.id !== id));
@@ -161,21 +171,25 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     [removeNotification],
   );
 
-  return (
-    <AppContext.Provider
-      value={{
+  const selectPanel = useCallback((panel: AppContextType['activePanel']) => {
+    setActivePanel(panel);
+    if (panel === 'monitor' || panel === 'memory') setLeftPanel(panel);
+    else setRightPanel(panel);
+  }, []);
+  const selectLeftPanel = useCallback((panel: 'monitor' | 'memory') => {
+    setLeftPanel(panel);
+    setActivePanel(panel);
+  }, []);
+  const selectRightPanel = useCallback((panel: 'console' | 'search') => {
+    setRightPanel(panel);
+    setActivePanel(panel);
+  }, []);
+
+  const uiValue = useMemo<AppUiContextType>(() => ({
         activePanel,
-        setActivePanel: (panel) => {
-          setActivePanel(panel);
-          if (panel === 'monitor' || panel === 'memory') setLeftPanel(panel);
-          else setRightPanel(panel);
-        },
-        consoleDraft,
-        setConsoleDraft,
+        setActivePanel: selectPanel,
         aiState,
         setAiState,
-        messages,
-        addMessage,
         notifications,
         addNotification,
         removeNotification,
@@ -188,37 +202,56 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         settingsOpen,
         setSettingsOpen,
         leftPanel,
-        setLeftPanel: (panel) => {
-          setLeftPanel(panel);
-          setActivePanel(panel);
-        },
+        setLeftPanel: selectLeftPanel,
         rightPanel,
         conversationOpen,
         setConversationOpen,
-        setRightPanel: (panel) => {
-          setRightPanel(panel);
-          setActivePanel(panel);
-        },
+        setRightPanel: selectRightPanel,
         memories,
-        isStreaming: chat.isStreaming,
-        sendMessage: chat.sendMessage,
-        stop: chat.stop,
-        chatError: chat.error,
         sessionId,
         voiceSupported: voice.supported,
         voiceListening: voice.listening,
         voiceInterim: voice.interim,
         startVoice,
         stopVoice,
-      }}
-    >
-      {children}
-    </AppContext.Provider>
-  );
+      }), [activePanel, selectPanel, aiState, setAiState, notifications, addNotification, removeNotification, appGridOpen, scanningActive, gestureOpen, settingsOpen, leftPanel, selectLeftPanel, rightPanel, conversationOpen, selectRightPanel, memories, sessionId, voice.supported, voice.listening, voice.interim, startVoice, stopVoice]);
+  const chatValue = useMemo<ChatContextType>(() => ({
+    consoleDraft,
+    setConsoleDraft,
+    messages,
+    chatError: chat.error,
+  }), [consoleDraft, messages, chat.error]);
+  const chatActionsValue = useMemo<ChatActionsContextType>(() => ({
+    addMessage,
+    sendMessage: chat.sendMessage,
+    stop: chat.stop,
+  }), [addMessage, chat.sendMessage, chat.stop]);
+
+  return <AppUiContext.Provider value={uiValue}><ChatActionsContext.Provider value={chatActionsValue}><ChatContext.Provider value={chatValue}><ChatStatusContext.Provider value={chat.isStreaming}>{children}</ChatStatusContext.Provider></ChatContext.Provider></ChatActionsContext.Provider></AppUiContext.Provider>;
 }
 
-export function useApp() {
-  const ctx = useContext(AppContext);
-  if (!ctx) throw new Error('useApp must be used within AppProvider');
+export function useAppUi() {
+  const ctx = useContext(AppUiContext);
+  if (!ctx) throw new Error('useAppUi must be used within AppProvider');
   return ctx;
+}
+
+export function useChatContext() {
+  const ctx = useContext(ChatContext);
+  if (!ctx) throw new Error('useChatContext must be used within AppProvider');
+  return ctx;
+}
+
+export function useChatStatus() {
+  return useContext(ChatStatusContext);
+}
+
+export function useChatActions() {
+  const ctx = useContext(ChatActionsContext);
+  if (!ctx) throw new Error('useChatActions must be used within AppProvider');
+  return ctx;
+}
+
+export function useApp(): AppContextType {
+  return { ...useAppUi(), ...useChatActions(), ...useChatContext(), isStreaming: useChatStatus() };
 }

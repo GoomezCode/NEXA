@@ -20,7 +20,7 @@ import { useConnectionStore } from '@/stores/connection-store';
 import { useOllamaHealth } from '@/api/ollama';
 import { useAuthStore } from '@/stores/auth-store';
 import { usePointerType } from '@/hooks/use-pointer-type';
-import { useApp } from '../ClassicContext';
+import { useAppUi } from '../ClassicContext';
 
 const orb = { fontFamily: 'Orbitron, sans-serif' };
 const mono = { fontFamily: 'Share Tech Mono, monospace' };
@@ -30,7 +30,7 @@ export function TopBar({ onExit }: { onExit: () => void }) {
   const [time, setTime] = useState(new Date());
   const pointerType = usePointerType();
   const touchOptimized = pointerType === 'coarse';
-  const { setSettingsOpen, setAppGridOpen, setGestureOpen, aiState, addNotification } = useApp();
+  const { setSettingsOpen, setAppGridOpen, setGestureOpen, aiState, addNotification } = useAppUi();
   const health = useApiHealth();
   const models = useModels();
   const usage = useUsage();
