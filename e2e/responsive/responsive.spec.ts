@@ -97,4 +97,6 @@ test('layout compacto mantém o console visível acima do dock e do cabeçalho',
   expect(panelBox!.y).toBeGreaterThanOrEqual(tabBox!.y + tabBox!.height);
   expect(inputBox!.y + inputBox!.height).toBeLessThanOrEqual(dockBox!.y);
   expect(await page.locator('.classic-topbar').evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
+  expect(await page.locator('.classic-main-area').evaluate((element) => getComputedStyle(element).zIndex)).toBe('1');
+  expect(await tabs.evaluate((element) => getComputedStyle(element).zIndex)).toBe('1');
 });

@@ -215,6 +215,14 @@
   overflow: visible;
 }
 
+/* Keep interactive panels above the fixed decorative canvas (z-index: 0). */
+.classic-main-area,
+.classic-compact-tabs,
+.classic-medium-tabs {
+  position: relative;
+  z-index: 1;
+}
+
 @media (max-width: 767px) {
   .classic-settings-overlay {
     align-items: stretch;
