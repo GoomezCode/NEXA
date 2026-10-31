@@ -2,7 +2,7 @@ import '@fontsource/share-tech-mono/400.css';
 
 import './classic.css';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Brain, Terminal, Search, Activity } from 'lucide-react';
 
@@ -374,71 +374,8 @@ function QuickActionButton({
 }
 
 export default function ClassicApp({ onExit }: { onExit: () => void }) {
-  const [narrow, setNarrow] = useState(
-    () => typeof window !== 'undefined' && window.innerWidth < 1024,
-  );
-  const [forceWide, setForceWide] = useState(false);
-
-  useEffect(() => {
-    const handleResize = () => setNarrow(window.innerWidth < 1024);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  if (narrow && !forceWide) {
-    return (
-      <div className="classic-hud flex items-center justify-center p-6">
-        <div
-          className="max-w-sm rounded-2xl p-6 text-center"
-          style={{
-            background: 'rgba(0, 10, 28, 0.8)',
-            border: '1px solid rgba(0, 245, 255, 0.22)',
-            boxShadow: '0 0 40px rgba(0,0,0,0.5)',
-          }}
-        >
-          <p
-            className="text-lg tracking-[0.14em]"
-            style={{ fontFamily: 'Orbitron, sans-serif', color: '#00f5ff' }}
-          >
-            NEXA CLASSIC
-          </p>
-          <p className="mt-3 text-sm leading-relaxed text-white/60">
-            A réplica clássica foi desenhada para telas a partir de 1024px. Em telas menores, o
-            layout pode ficar comprimido.
-          </p>
-          <div className="mt-5 flex flex-col gap-2">
-            <button
-              type="button"
-              onClick={onExit}
-              className="rounded-xl px-4 py-2.5 text-[11px] uppercase tracking-[0.12em]"
-              style={{
-                fontFamily: 'Share Tech Mono, monospace',
-                background: 'rgba(0,245,255,0.12)',
-                border: '1px solid rgba(0,245,255,0.4)',
-                color: '#00f5ff',
-              }}
-            >
-              Voltar ao NEXA HUD
-            </button>
-            <button
-              type="button"
-              onClick={() => setForceWide(true)}
-              className="rounded-xl px-4 py-2.5 text-[11px] uppercase tracking-[0.12em] text-white/50"
-              style={{
-                fontFamily: 'Share Tech Mono, monospace',
-                border: '1px solid rgba(255,255,255,0.12)',
-              }}
-            >
-              Continuar mesmo assim
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className={`classic-hud${forceWide ? ' classic-hud--scroll' : ''}`}>
+    <div className="classic-hud">
       <AppProvider>
         <MainLayout onExit={onExit} />
       </AppProvider>

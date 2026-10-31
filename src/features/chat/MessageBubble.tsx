@@ -53,7 +53,9 @@ export function MessageBubble({ message }: { message: ChatMessage }) {
             <p className="whitespace-pre-wrap text-sm leading-relaxed">{message.content}</p>
           ) : (
             <div className="nexa-markdown text-sm leading-relaxed">
-              <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSanitize]}>
+              <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSanitize]} components={{
+                table: ({ children }) => <div className="nexa-markdown-table"><table>{children}</table></div>,
+              }}>
                 {message.content}
               </ReactMarkdown>
               {isStreaming && <span className="nexa-caret" aria-hidden="true" />}

@@ -8,6 +8,7 @@ import { ConnectionNotifier } from '@/features/notifications/ConnectionNotifier'
 import { NotificationCenter } from '@/features/notifications/NotificationCenter';
 import { useSettingsStore } from '@/stores/settings-store';
 import { useUiStore } from '@/stores/ui-store';
+import { useVisualViewport } from '@/hooks/use-visual-viewport';
 
 import { BackgroundCanvas } from './BackgroundCanvas';
 import { ContextPanel } from './ContextPanel';
@@ -50,6 +51,7 @@ function ViewLoading({ label }: { label: string }) {
 }
 
 export function AppShell() {
+  useVisualViewport();
   const activeView = useUiStore((state) => state.activeView);
   const activeSessionId = useUiStore((state) => state.activeSessionId);
   const sidebarOpen = useUiStore((state) => state.sidebarOpen);

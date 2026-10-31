@@ -46,7 +46,7 @@ function Field({
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? `${id}-error` : undefined}
           className={cn(
-            'w-full rounded-xl border bg-background/60 px-3 py-2 text-sm text-foreground outline-none transition focus:border-primary/40',
+            'nexa-field w-full rounded-xl border bg-background/60 px-3 py-2 text-base sm:text-sm text-foreground outline-none transition focus:border-primary/40',
             trailing && 'pr-12',
             error ? 'border-danger/40' : 'border-white/10',
           )}
@@ -154,10 +154,10 @@ export function AuthView() {
   );
 
   return (
-    <main className="relative flex min-h-dvh items-center justify-center overflow-y-auto bg-background p-4 text-foreground">
+    <main className="fixed inset-0 flex overflow-y-auto bg-background p-4 text-foreground">
       <div className="nexa-grid pointer-events-none absolute inset-0" aria-hidden="true" />
 
-      <div className="relative z-10 w-full max-w-sm rounded-2xl border border-border bg-surface/70 p-5 backdrop-blur-xl sm:p-6">
+      <div className="relative z-10 m-auto w-full max-w-sm shrink-0 rounded-2xl border border-border bg-surface/70 p-5 backdrop-blur-xl sm:p-6">
         <div className="flex flex-col items-center text-center">
           <NexaMark size={48} />
           <h1 className="mt-3 font-display text-lg tracking-[0.3em] text-foreground">NEXA</h1>

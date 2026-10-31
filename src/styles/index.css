@@ -11,6 +11,7 @@
   html {
     height: 100%;
     background: var(--nexa-bg);
+    -webkit-text-size-adjust: 100%;
   }
 
   body {
@@ -24,6 +25,11 @@
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+  }
+
+  button,
+  a {
+    touch-action: manipulation;
   }
 
   #root {
@@ -71,6 +77,16 @@
 }
 
 @layer utilities {
+  .nexa-field {
+    min-height: 2.75rem;
+  }
+
+  @media (pointer: coarse) {
+    .nexa-field {
+      font-size: 1rem;
+    }
+  }
+
   .nexa-grid {
     background-image:
       linear-gradient(rgba(0, 229, 255, 0.055) 1px, transparent 1px),
@@ -100,6 +116,22 @@
       0 0 18px rgba(0, 229, 255, 0.45),
       0 0 48px rgba(0, 229, 255, 0.18);
   }
+}
+
+@custom-variant short (@media (max-height: 32rem));
+@custom-variant xs (@media (min-width: 30rem));
+
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --kb-inset: 0px;
+}
+
+.overflow-y-auto,
+.overflow-x-auto {
+  overscroll-behavior: contain;
 }
 
 @keyframes nexa-spin {
@@ -257,6 +289,19 @@
   width: 100%;
   border-collapse: collapse;
   font-size: 0.8rem;
+}
+
+.nexa-markdown { overflow-wrap: anywhere; }
+.nexa-markdown img { max-width: 100%; height: auto; }
+.nexa-markdown pre { max-width: 100%; overflow-x: auto; }
+.nexa-markdown-table { max-width: 100%; overflow-x: auto; }
+
+@media (min-width: 96rem) {
+  html { font-size: clamp(16px, calc(0.55vw + 8px), 20px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }
 
 .nexa-markdown th,
