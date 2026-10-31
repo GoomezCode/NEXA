@@ -94,7 +94,7 @@ function Ring({
 }
 
 export function AICore() {
-  const { aiState, memories, voiceSupported, voiceListening, startVoice, stopVoice, isStreaming } = useApp();
+  const { aiState, memories, voiceSupported, voiceListening, startVoice, stopVoice, isStreaming, setRightPanel } = useApp();
   const health = useApiHealth();
   const offlineMode = useConnectionStore((state) => state.mode === 'offline');
   const ollama = useOllamaHealth();
@@ -118,16 +118,17 @@ export function AICore() {
   const toggleVoice = () => {
     if (voiceListening) stopVoice();
     else if (voiceSupported && !isStreaming) startVoice();
+    else if (!voiceSupported) setRightPanel('console');
   };
 
   return (
     <div
       ref={coreRef}
-      className="flex flex-col items-center justify-center gap-6 select-none"
+      className="classic-ai-core flex flex-col items-center justify-center gap-6 select-none"
       style={{ perspective: '600px' }}
     >
       {/* Outer data ring indicators */}
-      <div ref={orbSize.ref} className="relative max-w-full" style={{ width: 'min(380px, 80vw, 50dvh)', aspectRatio: '1' }}>
+      <div ref={orbSize.ref} className="classic-ai-core-orb relative max-w-full" style={{ width: 'min(380px, 80vw, 50dvh)', aspectRatio: '1' }}>
         {/* Data point markers */}
         {/* Outer dashed ring */}
         <Ring size={ringSize(340)} thickness={1} color="rgba(0,245,255,0.1)" duration={40} dashed motionEnabled={motionEnabled} />
@@ -190,11 +191,11 @@ export function AICore() {
           type="button"
           onClick={toggleVoice}
           whileHover={voiceSupported && !isStreaming ? { scale: 1.05 } : undefined}
-          whileTap={voiceSupported && !isStreaming ? { scale: 0.95 } : undefined}
-          disabled={!voiceSupported || isStreaming}
-          aria-label={voiceListening ? 'Parar microfone da NEXA' : voiceSupported ? 'Ativar microfone da NEXA' : 'Reconhecimento de voz indisponível neste navegador'}
+          whileTap={!isStreaming ? { scale: 0.95 } : undefined}
+          disabled={isStreaming}
+          aria-label={voiceListening ? 'Parar microfone da NEXA' : voiceSupported ? 'Ativar microfone da NEXA' : 'Abrir console da NEXA'}
           aria-pressed={voiceListening}
-          title={voiceListening ? 'Clique para parar o microfone' : voiceSupported ? 'Clique para falar com a NEXA' : 'Reconhecimento de voz indisponível'}
+          title={voiceListening ? 'Toque para parar o microfone' : voiceSupported ? 'Toque para falar com a NEXA' : 'Toque para abrir o console'}
           className="absolute flex cursor-pointer items-center justify-center rounded-full p-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 disabled:cursor-not-allowed"
           style={{
             width: ringSize(160),

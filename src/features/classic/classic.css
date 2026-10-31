@@ -95,53 +95,56 @@
   .classic-layout .classic-topbar-actions button { display: none; width: 2.75rem; height: 2.75rem; }
   .classic-layout .classic-topbar-actions button[aria-label='Apps'],
   .classic-layout .classic-topbar-actions button[aria-label='Voltar ao NEXA HUD'] { display: flex; }
-  .classic-layout .classic-compact-tabs {
-    display: flex;
-    flex: 0 0 auto;
-    margin-top: 3rem;
-    gap: 0.25rem;
-    overflow-x: auto;
-    padding: 0.25rem 0.5rem;
-    border-bottom: 1px solid rgba(0, 245, 255, 0.12);
-    background: rgba(1, 8, 20, 0.94);
-  }
-  .classic-compact-tabs button {
-    min-width: 4.5rem;
-    min-height: 2.75rem;
-    display: flex;
-    flex: 1 0 auto;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.1rem;
-    border: 1px solid rgba(255,255,255,.08);
-    border-radius: 0.65rem;
-    color: rgba(255,255,255,.65);
-    background: rgba(255,255,255,.025);
-    font: 0.6875rem 'Share Tech Mono', monospace;
-  }
-  .classic-compact-tabs button svg { width: 1rem; height: 1rem; }
-  .classic-compact-tabs button.is-active { color: #00f5ff; border-color: rgba(0,245,255,.4); background: rgba(0,245,255,.1); }
+  .classic-layout .classic-compact-tabs { display: none !important; }
   .classic-layout > .classic-main-area {
     min-height: 0;
     flex: 1 1 0;
     display: grid;
-    grid-template-rows: minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(10rem, 0.9fr) minmax(12rem, 1.1fr);
     gap: 0;
     overflow: hidden;
     margin: 0 !important;
     padding: 0.5rem !important;
   }
-  .classic-layout--compact .classic-center { display: none; }
+  .classic-layout--compact .classic-center {
+    display: flex;
+    grid-column: 1;
+    grid-row: 1;
+    min-width: 0;
+    min-height: 0;
+    width: 100%;
+    gap: 0;
+  }
+  .classic-layout--compact .classic-center > :first-child,
+  .classic-layout--compact .classic-center > :last-child { display: none; }
+  .classic-layout--compact .classic-center > div {
+    min-width: 0;
+    min-height: 0;
+    width: 100%;
+    flex: 1 1 auto;
+  }
+  .classic-layout--compact .classic-ai-core {
+    width: 100%;
+    height: 100%;
+    gap: 0 !important;
+  }
+  .classic-layout--compact .classic-ai-core > :not(.classic-ai-core-orb) { display: none; }
+  .classic-layout--compact .classic-ai-core-orb {
+    width: min(58vw, 30dvh, 15rem) !important;
+    max-width: 100%;
+    flex: 0 0 auto;
+  }
   .classic-layout--compact .classic-panel { display: none; min-width: 0; width: 100%; max-height: none; min-height: 0; padding: 0; }
   .classic-layout--compact[data-active-panel='monitor'] .classic-panel--left,
   .classic-layout--compact[data-active-panel='memory'] .classic-panel--left,
   .classic-layout--compact[data-active-panel='console'] .classic-panel--right,
   .classic-layout--compact[data-active-panel='search'] .classic-panel--right {
     display: flex;
-    grid-row: 1;
+    grid-column: 1;
+    grid-row: 2;
     min-height: 0;
-    width: 100%;
+    width: 100% !important;
     overflow: hidden;
   }
   .classic-layout--compact .classic-panel > div:last-child { min-height: 0; flex: 1; overflow: hidden; padding: 0.75rem; }
@@ -152,7 +155,6 @@
   .classic-layout--compact .classic-app-dock > div:last-child { display: none; }
   .classic-layout--compact .classic-app-dock > div:nth-child(2) { align-items: center !important; padding: 0.1rem 0.35rem !important; }
   .classic-layout--compact .classic-app-dock > div:nth-child(2) button { width: 3.25rem; height: 2.75rem; flex-direction: column; gap: 0.05rem; }
-  .classic-layout--compact .classic-main-area { padding-bottom: calc(4rem + var(--kb-inset)) !important; }
   .classic-layout--compact .classic-console-mic {
     display: inline-flex;
     width: 2.75rem;
@@ -172,6 +174,22 @@
   .classic-layout--compact :is(p, li) { font-size: 0.75rem !important; }
   .classic-layout--compact .classic-dock-label { display: inline; }
   .classic-hud button { touch-action: manipulation; }
+}
+
+@media (max-height: 32rem) and (max-width: 767px) {
+  .classic-layout > .classic-main-area {
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    grid-template-rows: minmax(0, 1fr);
+  }
+  .classic-layout--compact .classic-center { grid-column: 1; grid-row: 1; }
+  .classic-layout--compact .classic-ai-core-orb { width: min(30vw, 28dvh, 10rem) !important; }
+  .classic-layout--compact[data-active-panel='monitor'] .classic-panel--left,
+  .classic-layout--compact[data-active-panel='memory'] .classic-panel--left,
+  .classic-layout--compact[data-active-panel='console'] .classic-panel--right,
+  .classic-layout--compact[data-active-panel='search'] .classic-panel--right {
+    grid-column: 2;
+    grid-row: 1;
+  }
 }
 
 @media (max-height: 32rem) and (min-width: 768px) {
