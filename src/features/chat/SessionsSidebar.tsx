@@ -5,6 +5,8 @@ import { useState } from 'react';
 import { formatSessionTime } from '@/lib/format';
 import { cn } from '@/lib/utils';
 import { useUiStore } from '@/stores/ui-store';
+import { useConnectionStore } from '@/stores/connection-store';
+import { useSettingsStore } from '@/stores/settings-store';
 
 import { useCreateSession, useDeleteSession, useRenameSession, useSessions } from './api';
 
@@ -21,6 +23,8 @@ export function SessionsSidebar({ onSelect, className }: SessionsSidebarProps) {
   const activeSessionId = useUiStore((state) => state.activeSessionId);
   const setActiveSessionId = useUiStore((state) => state.setActiveSessionId);
   const setActiveView = useUiStore((state) => state.setActiveView);
+  const offlineMode = useConnectionStore((state) => state.mode === 'offline');
+  const demoMode = useSettingsStore((state) => state.settings.demoMode);
 
   const [query, setQuery] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -267,7 +271,7 @@ export function SessionsSidebar({ onSelect, className }: SessionsSidebarProps) {
                     type="button"
                     onClick={() => selectSession(session.id)}
                     aria-current={active ? 'true' : undefined}
-                    className="flex w-full items-start gap-2.5 rounded-xl px-2.5 py-2 pr-28 text-left"
+                    className="flex w-full items-start gap-2.5 rounded-xl px-2.5 py-2 pr-20 text-left sm:pr-28"
                   >
                     <MessageSquare
                       className={cn(
@@ -326,7 +330,7 @@ export function SessionsSidebar({ onSelect, className }: SessionsSidebarProps) {
         <p className="font-mono text-2xs uppercase leading-relaxed tracking-[0.14em] text-muted/70">
           Histórico local
           <br />
-          modo demonstração
+          {offlineMode ? 'Ollama local · offline' : demoMode ? 'modo demonstração' : 'API conectada'}
         </p>
       </div>
     </div>

@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { appEnv } from '@/lib/env';
 
 export interface AppSettings {
   displayName: string;
@@ -13,9 +14,6 @@ export interface AppSettings {
 
 const STORAGE_KEY = 'nexa:settings:v1';
 
-const ENV_DEMO = import.meta.env.VITE_DEMO_MODE !== 'false';
-const ENV_API_URL = import.meta.env.VITE_API_URL ?? '/api/v1';
-
 export const DEFAULT_SETTINGS: AppSettings = {
   displayName: 'Operador',
   voiceInputEnabled: true,
@@ -23,8 +21,8 @@ export const DEFAULT_SETTINGS: AppSettings = {
   speechRate: 1,
   speechVoiceURI: '',
   reducedMotion: false,
-  apiUrl: ENV_API_URL,
-  demoMode: ENV_DEMO,
+  apiUrl: appEnv.apiUrl,
+  demoMode: appEnv.demoMode,
 };
 
 function sanitizeSettings(value: unknown): AppSettings {

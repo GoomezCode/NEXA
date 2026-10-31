@@ -364,9 +364,12 @@
 }
 
 @media (max-width: 47.999rem) {
-  [class*='backdrop-blur'] { backdrop-filter: none !important; }
+  [class*='backdrop-blur'] { backdrop-filter: blur(var(--glass-blur)) !important; }
   .nexa-sheet::backdrop { backdrop-filter: none; }
 }
+
+:root[data-fx='lite'] { --glass-blur: 0px; }
+:root[data-keyboard='open'] .nexa-mobile-dock { display: none; }
 
 @media (pointer: coarse) {
   button,

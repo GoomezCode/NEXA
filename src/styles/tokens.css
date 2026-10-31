@@ -35,7 +35,8 @@
   --font-ui: 'Rajdhani', 'Segoe UI', sans-serif;
   --font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', monospace;
 
-  --nexa-text-2xs: 0.6875rem;
+  --nexa-text-2xs: 0.75rem;
+  --glass-blur: 16px;
   --nexa-text-xs-plus: 0.75rem;
 }
 

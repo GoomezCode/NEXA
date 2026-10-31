@@ -16,12 +16,13 @@ import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/auth-store';
 import { useSettingsStore } from '@/stores/settings-store';
 import { useConnectionStore } from '@/stores/connection-store';
+import { appEnv } from '@/lib/env';
 
 import { fieldErrors, loginSchema, registerSchema } from './schemas';
 
 type Mode = 'login' | 'register';
 
-const REGISTRATION_ENABLED = import.meta.env.VITE_REGISTRATION_ENABLED === 'true';
+const REGISTRATION_ENABLED = appEnv.registrationEnabled;
 
 function Field({
   id,
@@ -209,8 +210,9 @@ export function AuthView() {
         >
           {mode === 'register' && !REGISTRATION_ENABLED ? (
             <p className="rounded-xl border border-white/10 bg-background/40 p-3 text-[12px] leading-relaxed text-muted">
-              O cadastro público ainda não está disponível nesta API. Peça uma conta ao
-              administrador ou continue como convidado.
+              O cadastro está desativado nesta implantação. Configure
+              {' '}VITE_REGISTRATION_ENABLED=true na Web e
+              {' '}ALLOW_SELF_REGISTRATION=true na API para habilitá-lo.
             </p>
           ) : (
             <>

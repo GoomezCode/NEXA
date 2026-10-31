@@ -45,6 +45,25 @@ export function Composer({
   maxLength,
 }: ComposerProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const shellRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const shell = shellRef.current;
+    if (!shell) return;
+    const updateHeight = () => {
+      document.documentElement.style.setProperty('--composer-height', `${shell.getBoundingClientRect().height}px`);
+    };
+    updateHeight();
+    if (typeof ResizeObserver === 'undefined') {
+      return () => document.documentElement.style.removeProperty('--composer-height');
+    }
+    const observer = new ResizeObserver(updateHeight);
+    observer.observe(shell);
+    return () => {
+      observer.disconnect();
+      document.documentElement.style.removeProperty('--composer-height');
+    };
+  }, []);
 
   useEffect(() => {
     const textarea = textareaRef.current;
@@ -72,7 +91,7 @@ export function Composer({
   };
 
   return (
-    <div className="nexa-composer-shell shrink-0 border-t border-white/5 bg-background/50 px-3 py-3 pb-[max(0.75rem,var(--safe-bottom))] sm:px-5">
+    <div ref={shellRef} className="nexa-composer-shell shrink-0 border-t border-white/5 bg-background/50 px-3 py-3 pb-[max(0.75rem,var(--safe-bottom))] sm:px-5">
       {voiceEnabled && (listening || interim || voiceError) && (
         <div
           role={voiceError ? 'alert' : 'status'}
@@ -135,22 +154,28 @@ export function Composer({
               }
 
               event.preventDefault();
+              if (event.pointerType === 'touch') {
+                if (listening) onVoiceStop();
+                else onVoiceStart();
+                return;
+              }
               onVoiceStart();
             }}
             onPointerUp={(event) => {
-              if (voiceBlocked) {
+              if (voiceBlocked || event.pointerType === 'touch') {
                 return;
               }
 
               event.preventDefault();
               onVoiceStop();
             }}
-            onPointerLeave={() => {
-              if (listening) {
+            onPointerLeave={(event) => {
+              if (event.pointerType !== 'touch' && listening) {
                 onVoiceStop();
               }
             }}
             onPointerCancel={onVoiceCancel}
+            onContextMenu={(event) => event.preventDefault()}
             onKeyDown={(event) => {
               if ((event.key === ' ' || event.key === 'Enter') && !voiceBlocked && !listening) {
                 event.preventDefault();
@@ -180,7 +205,7 @@ export function Composer({
                   : 'Segure para falar'
             }
             className={cn(
-              'flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border transition disabled:cursor-not-allowed disabled:opacity-40',
+              'flex h-11 w-11 shrink-0 touch-none select-none items-center justify-center rounded-xl border transition disabled:cursor-not-allowed disabled:opacity-40',
               listening
                 ? 'border-danger/40 bg-danger/15 text-danger'
                 : 'border-white/10 bg-white/5 text-muted hover:border-primary/35 hover:text-primary',

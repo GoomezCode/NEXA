@@ -30,7 +30,7 @@ function namespace(): string {
 /**
  * Retorna o adaptador ativo. A escolha vem das preferências persistidas
  * (`demoMode`/`apiUrl`), que herdam `VITE_DEMO_MODE` e `VITE_API_URL` na
- * primeira execução. Alterações de conexão exigem recarregar a página.
+ * primeira execução.
  */
 export function getChatAdapter(): ChatAdapter {
   if (adapter) {
@@ -81,4 +81,10 @@ useConnectionStore.subscribe(() => {
 
 export function resetChatAdapterForTests(): void {
   adapter = undefined;
+}
+
+export function resetChatAdapter(): void {
+  adapter = undefined;
+  queryClient.clear();
+  useUiStore.getState().setActiveSessionId(null);
 }

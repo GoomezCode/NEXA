@@ -1,5 +1,5 @@
 import { Menu, PanelLeft, Settings } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 
 import { logout } from '@/api/auth';
 import { NexaMark } from '@/components/brand/NexaMark';
@@ -29,8 +29,25 @@ function StatusChip({ tone, label }: { tone: 'success' | 'warning'; label: strin
   );
 }
 
-export function TopBar() {
+const Clock = memo(function Clock() {
   const [now, setNow] = useState(() => new Date());
+
+  useEffect(() => {
+    const interval = window.setInterval(() => setNow(new Date()), 1000);
+    return () => window.clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="text-right leading-tight">
+      <p className="font-mono text-sm tabular-nums text-primary">{formatClock(now)}</p>
+      <p className="hidden font-mono text-2xs uppercase tracking-[0.12em] text-muted sm:block">
+        {formatShortDate(now)}
+      </p>
+    </div>
+  );
+});
+
+export function TopBar() {
   const online = useOnlineStatus();
   const demoMode = useSettingsStore((state) => state.settings.demoMode);
   const offlineMode = useConnectionStore((state) => state.mode === 'offline');
@@ -40,11 +57,6 @@ export function TopBar() {
   const setActiveView = useUiStore((state) => state.setActiveView);
   const setSessionsSheetOpen = useUiStore((state) => state.setSessionsSheetOpen);
   const toggleSidebar = useUiStore((state) => state.toggleSidebar);
-
-  useEffect(() => {
-    const interval = window.setInterval(() => setNow(new Date()), 1000);
-    return () => window.clearInterval(interval);
-  }, []);
 
   return (
     <header className="relative z-20 flex h-14 min-h-[calc(3.5rem+var(--safe-top))] shrink-0 items-center gap-2 border-b border-white/5 bg-background/70 px-3 ps-[max(0.75rem,var(--safe-left))] pe-[max(0.75rem,var(--safe-right))] pt-[var(--safe-top)] backdrop-blur-xl sm:gap-3 sm:px-5">
@@ -118,12 +130,7 @@ export function TopBar() {
       </div>
 
       <div className="ml-auto flex items-center gap-2 sm:gap-3">
-        <div className="text-right leading-tight">
-          <p className="font-mono text-sm tabular-nums text-primary">{formatClock(now)}</p>
-          <p className="hidden font-mono text-2xs uppercase tracking-[0.12em] text-muted sm:block">
-            {formatShortDate(now)}
-          </p>
-        </div>
+        <Clock />
 
         <button
           type="button"

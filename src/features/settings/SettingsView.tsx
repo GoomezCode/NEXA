@@ -20,6 +20,7 @@ import { useAuthStore } from '@/stores/auth-store';
 import { DEFAULT_SETTINGS, useSettingsStore } from '@/stores/settings-store';
 import { useConnectionStore } from '@/stores/connection-store';
 import { ollamaVersion } from '@/api/ollama';
+import { resetChatAdapter } from '@/api';
 
 function SettingSwitch({
   label,
@@ -175,7 +176,7 @@ export function SettingsView() {
 
     setConnectionError(null);
     update({ apiUrl: normalizedApiUrl, demoMode });
-    window.location.reload();
+    resetChatAdapter();
   };
 
   const resetAll = () => {

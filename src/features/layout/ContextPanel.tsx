@@ -5,7 +5,7 @@ import { useModels } from '@/api/models';
 import { useUsage } from '@/api/usage';
 import { AI_STATE_LABEL } from '@/features/assistant/ai-state';
 import { Orb } from '@/features/assistant/Orb';
-import { useMessages, useSessions } from '@/features/chat/api';
+import { useMessageCount, useSessions } from '@/features/chat/api';
 import { useMemories } from '@/features/memory/api';
 import { formatSessionTime } from '@/lib/format';
 import { useAuthStore } from '@/stores/auth-store';
@@ -44,6 +44,38 @@ export function ContextPanel({ sessionId }: { sessionId: string | null }) {
       mobileTriggerRef.current?.focus();
     }
   }, [mobileOpen]);
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const bodyOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        closeMobilePanel();
+        return;
+      }
+      if (event.key !== 'Tab') return;
+      const panel = document.getElementById('nexa-context-panel');
+      const focusable = panel?.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      );
+      if (!focusable?.length) return;
+      const first = focusable[0]!;
+      const last = focusable[focusable.length - 1]!;
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.body.style.overflow = bodyOverflow;
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [closeMobilePanel, mobileOpen]);
   const aiState = useUiStore((state) => state.aiState);
   const demoMode = useSettingsStore((state) => state.settings.demoMode);
   const offlineMode = useConnectionStore((state) => state.mode === 'offline');
@@ -66,17 +98,17 @@ export function ContextPanel({ sessionId }: { sessionId: string | null }) {
   const averageSpeedRows = metricRows.filter((item) => item.tokensPerSecond !== undefined);
   const averageSpeed = averageSpeedRows.length ? averageSpeedRows.reduce((sum, item) => sum + (item.tokensPerSecond ?? 0), 0) / averageSpeedRows.length : undefined;
   const sessions = useSessions();
-  const messages = useMessages(sessionId);
+  const messages = useMessageCount(sessionId);
   const session = sessions.data?.find((item) => item.id === sessionId);
   const elapsedMinutes = session && now ? Math.max(0, Math.floor((now - new Date(session.createdAt).getTime()) / 60000)) : 0;
-  const messageCount = messages.data?.length ?? 0;
+  const messageCount = messages.data ?? 0;
   const sessionLabel = sessions.isError
     ? 'Indisponível'
     : (session?.title ?? (sessions.isLoading ? 'Carregando…' : 'Aguardando seleção'));
 
   return (
     <>
-    <button ref={mobileTriggerRef} type="button" aria-expanded={mobileOpen} aria-controls="nexa-context-panel" onClick={() => mobileOpen ? closeMobilePanel() : setMobileOpen(true)} className="absolute bottom-[calc(var(--safe-bottom)+5.5rem)] right-3 z-30 flex h-11 w-11 items-center justify-center rounded-full border border-primary/30 bg-surface text-primary shadow-lg xl:hidden" aria-label={mobileOpen ? 'Fechar painel do núcleo' : 'Abrir painel do núcleo'}><PanelRight className="h-4 w-4" aria-hidden="true" /></button>
+    <button ref={mobileTriggerRef} type="button" aria-expanded={mobileOpen} aria-controls="nexa-context-panel" onClick={() => mobileOpen ? closeMobilePanel() : setMobileOpen(true)} className="absolute bottom-[calc(var(--safe-bottom)+var(--composer-height,5.5rem)+0.75rem)] right-3 z-30 flex h-11 w-11 items-center justify-center rounded-full border border-primary/30 bg-surface text-primary shadow-lg xl:hidden" aria-label={mobileOpen ? 'Fechar painel do núcleo' : 'Abrir painel do núcleo'}><PanelRight className="h-4 w-4" aria-hidden="true" /></button>
     {mobileOpen && <button type="button" tabIndex={-1} aria-label="Fechar painel do núcleo" onClick={closeMobilePanel} className="fixed inset-0 z-20 bg-black/55 xl:hidden" />}
     <aside
       id="nexa-context-panel"
