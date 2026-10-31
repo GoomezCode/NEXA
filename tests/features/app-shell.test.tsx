@@ -21,12 +21,10 @@ beforeEach(async () => {
   // Estes cenários exercitam o HUD no modo demonstração, independente do .env local.
   useSettingsStore.setState({ settings: { ...DEFAULT_SETTINGS, demoMode: true } });
   resetNotificationsForTests();
+  window.history.replaceState(null, '', '/');
   useUiStore.setState({
-    activeView: 'chat',
-    activeSessionId: null,
     aiState: 'idle',
     sidebarOpen: true,
-    sessionsSheetOpen: false,
   });
 });
 
@@ -117,7 +115,6 @@ describe('AppShell', () => {
     cleanup();
     resetChatAdapterForTests();
     queryClient.clear();
-    useUiStore.setState({ activeSessionId: null });
     render(<App />);
 
     expect(await screen.findByRole('heading', { name: 'Plano de lançamento' })).toBeInTheDocument();
@@ -152,7 +149,7 @@ describe('AppShell', () => {
     await screen.findByRole('heading', { name: 'Boas-vindas' });
     await user.click(screen.getByRole('button', { name: 'Excluir Boas-vindas' }));
 
-    const dialog = screen.getByRole('alertdialog', { name: 'Excluir Boas-vindas' });
+    const dialog = screen.getByRole('alertdialog', { name: /Excluir.*Boas-vindas/ });
     expect(within(dialog).getByText(/não pode ser desfeita/i)).toBeInTheDocument();
 
     await user.click(within(dialog).getByRole('button', { name: 'Cancelar' }));
@@ -161,7 +158,7 @@ describe('AppShell', () => {
 
     await user.click(screen.getByRole('button', { name: 'Excluir Boas-vindas' }));
     await user.click(
-      within(screen.getByRole('alertdialog', { name: 'Excluir Boas-vindas' })).getByRole('button', {
+      within(screen.getByRole('alertdialog', { name: /Excluir.*Boas-vindas/ })).getByRole('button', {
         name: 'Excluir',
       }),
     );

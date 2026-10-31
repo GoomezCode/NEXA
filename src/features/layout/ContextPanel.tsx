@@ -1,5 +1,7 @@
 import { Cpu, Gauge, Radio, ShieldCheck, PanelRight } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { Drawer } from 'vaul';
+import { useSearchParams } from 'react-router-dom';
 
 import { useModels } from '@/api/models';
 import { useUsage } from '@/api/usage';
@@ -14,7 +16,6 @@ import { useSessionMetricsStore } from '@/stores/session-metrics-store';
 import { useSettingsStore } from '@/stores/settings-store';
 import { useUiStore } from '@/stores/ui-store';
 import { useConnectionStore } from '@/stores/connection-store';
-import { useOverlayHistory } from '@/hooks/use-overlay-history';
 import { IconButton } from '@/components/ui/Button';
 
 const SUBSYSTEMS = [
@@ -25,58 +26,23 @@ const EMPTY_METRICS: import('@/stores/session-metrics-store').ResponseMetric[] =
 
 export function ContextPanel({ sessionId }: { sessionId: string | null }) {
   const [now, setNow] = useState(0);
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const mobileTriggerRef = useRef<HTMLButtonElement>(null);
-  const wasMobileOpen = useRef(false);
-  const touchStartY = useRef<number | null>(null);
-  const closeMobilePanel = useOverlayHistory(mobileOpen, setMobileOpen, 'context');
+  const [activeSnapPoint, setActiveSnapPoint] = useState<number | string | null>(0.5);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const mobileOpen = searchParams.get('panel') === 'core';
+  const setMobileOpen = (open: boolean) => {
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current);
+      if (open) next.set('panel', 'core');
+      else if (next.get('panel') === 'core') next.delete('panel');
+      return next;
+    }, { replace: !open });
+  };
   useEffect(() => {
     const updateNow = () => setNow(Date.now());
     updateNow();
     const interval = window.setInterval(updateNow, 60_000);
     return () => window.clearInterval(interval);
   }, []);
-  useEffect(() => {
-    if (mobileOpen) {
-      wasMobileOpen.current = true;
-      document.getElementById('nexa-context-close')?.focus();
-    } else if (wasMobileOpen.current) {
-      wasMobileOpen.current = false;
-      mobileTriggerRef.current?.focus();
-    }
-  }, [mobileOpen]);
-  useEffect(() => {
-    if (!mobileOpen) return;
-    const bodyOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        event.preventDefault();
-        closeMobilePanel();
-        return;
-      }
-      if (event.key !== 'Tab') return;
-      const panel = document.getElementById('nexa-context-panel');
-      const focusable = panel?.querySelectorAll<HTMLElement>(
-        'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
-      );
-      if (!focusable?.length) return;
-      const first = focusable[0]!;
-      const last = focusable[focusable.length - 1]!;
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first.focus();
-      }
-    };
-    document.addEventListener('keydown', onKeyDown);
-    return () => {
-      document.body.style.overflow = bodyOverflow;
-      document.removeEventListener('keydown', onKeyDown);
-    };
-  }, [closeMobilePanel, mobileOpen]);
   const aiState = useUiStore((state) => state.aiState);
   const demoMode = useSettingsStore((state) => state.settings.demoMode);
   const offlineMode = useConnectionStore((state) => state.mode === 'offline');
@@ -109,16 +75,31 @@ export function ContextPanel({ sessionId }: { sessionId: string | null }) {
 
   return (
     <>
-    <IconButton ref={mobileTriggerRef} label={mobileOpen ? 'Fechar painel do núcleo' : 'Abrir painel do núcleo'} aria-expanded={mobileOpen} aria-controls="nexa-context-panel" onClick={() => mobileOpen ? closeMobilePanel() : setMobileOpen(true)} className="absolute bottom-[calc(var(--safe-bottom)+var(--composer-height,5.5rem)+0.75rem)] right-3 z-30 rounded-full border-primary/30 bg-surface text-primary shadow-lg xl:hidden"><PanelRight className="h-4 w-4" aria-hidden="true" /></IconButton>
-    {mobileOpen && <button type="button" tabIndex={-1} aria-label="Fechar painel do núcleo" onClick={closeMobilePanel} className="fixed inset-0 z-20 bg-black/55 xl:hidden" />}
+    <Drawer.Root open={mobileOpen} onOpenChange={setMobileOpen} modal snapPoints={[0.5, 0.9]} activeSnapPoint={activeSnapPoint} setActiveSnapPoint={setActiveSnapPoint}>
+      <Drawer.Trigger asChild>
+        <IconButton label={mobileOpen ? 'Fechar painel do núcleo' : 'Abrir painel do núcleo'} aria-expanded={mobileOpen} aria-controls="nexa-core-drawer" className="absolute bottom-[calc(var(--safe-bottom)+var(--composer-height,5.5rem)+0.75rem)] right-3 z-30 rounded-full border-primary/30 bg-surface text-primary shadow-lg xl:hidden"><PanelRight className="h-4 w-4" aria-hidden="true" /></IconButton>
+      </Drawer.Trigger>
+      <Drawer.Portal>
+        <Drawer.Overlay className="fixed inset-0 z-40 bg-black/55 backdrop-blur-sm xl:hidden" />
+        <Drawer.Content id="nexa-core-drawer" className="fixed inset-x-0 bottom-0 z-50 flex h-[90dvh] flex-col rounded-t-2xl border border-border bg-surface outline-none xl:hidden">
+          <Drawer.Handle className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-muted/50" />
+          <header className="flex items-center justify-between border-b border-border/60 px-4 py-3">
+            <div><Drawer.Title className="font-display text-xs tracking-[0.2em] text-primary">NÚCLEO NEXA</Drawer.Title><Drawer.Description className="mt-1 text-xs text-muted">Estado e contexto da conversa atual.</Drawer.Description></div>
+            <Drawer.Close asChild><IconButton label="Fechar painel do núcleo" className="text-muted"><PanelRight className="h-4 w-4" /></IconButton></Drawer.Close>
+          </header>
+          <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4 pb-[max(1rem,var(--safe-bottom))]">
+            <div className="flex items-center gap-3 rounded-xl border border-border/60 bg-background/40 p-3"><Orb state={aiState} size="sm" /><div><p role="status" aria-live="polite" className="font-mono text-xs uppercase tracking-wider text-primary">{AI_STATE_LABEL[aiState]}</p><p className="mt-1 text-sm text-foreground">{offlineMode ? 'Ollama local' : demoMode ? 'NEXA demonstração' : model?.provider ?? 'Provedor —'} · {modelId ?? (offlineMode ? 'Automático' : 'Modelo —')}</p></div></div>
+            <section className="rounded-xl border border-border/60 p-3"><h3 className="font-mono text-xs uppercase tracking-wider text-muted">Conversa</h3><p className="mt-1 truncate text-sm text-foreground">{sessionLabel}</p><p className="mt-2 text-xs text-muted">{messageCount} mensagens · {elapsedMinutes} min · {activeMemories} memórias ativas</p></section>
+            <section className="rounded-xl border border-border/60 p-3"><h3 className="font-mono text-xs uppercase tracking-wider text-muted">Uso desta sessão</h3><p className="mt-1 text-sm text-foreground">{tokenTotals.input} tokens de entrada · {tokenTotals.output} de saída</p><p className="mt-1 text-xs text-muted">Latência {averageLatency === undefined || !Number.isFinite(averageLatency) ? '—' : `${(averageLatency / 1000).toFixed(1)} s`} · {averageSpeed === undefined ? '—' : `${averageSpeed.toFixed(1)} tokens/s`}</p></section>
+          </div>
+        </Drawer.Content>
+      </Drawer.Portal>
+    </Drawer.Root>
     <aside
       id="nexa-context-panel"
       aria-label="Painel do núcleo"
-      role={mobileOpen ? 'dialog' : undefined}
-      aria-modal={mobileOpen ? true : undefined}
-      className={`${mobileOpen ? 'fixed inset-x-3 bottom-32 top-20 z-20 flex' : 'hidden'} w-auto shrink-0 flex-col border border-white/10 bg-surface/95 shadow-xl xl:static xl:inset-auto xl:z-auto xl:flex xl:w-72 xl:border-l xl:border-y-0 xl:border-r-0 xl:bg-surface/25 xl:shadow-none`}
+      className="hidden w-72 shrink-0 flex-col border-l border-border/50 bg-surface/25 xl:flex"
     >
-      {mobileOpen && <button id="nexa-context-close" type="button" aria-label="Arraste para baixo ou toque para fechar" onClick={closeMobilePanel} onTouchStart={(event) => { touchStartY.current = event.touches[0]?.clientY ?? null; }} onTouchEnd={(event) => { const startY = touchStartY.current; const endY = event.changedTouches[0]?.clientY; if (startY !== null && endY !== undefined && endY - startY > 48) closeMobilePanel(); touchStartY.current = null; }} className="flex h-11 shrink-0 items-center justify-center xl:hidden"><span className="h-1 w-10 rounded-full bg-white/30" /></button>}
       <div className="flex flex-col items-center border-b border-white/5 px-4 py-5">
         <Orb state={aiState} size="md" />
         <p className="mt-3 font-display text-2xs tracking-[0.22em] text-primary">NÚCLEO NEXA</p>

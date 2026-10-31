@@ -10,6 +10,7 @@ import { useAuthStore } from '@/stores/auth-store';
 import { useSettingsStore } from '@/stores/settings-store';
 import { useUiStore } from '@/stores/ui-store';
 import { useConnectionStore } from '@/stores/connection-store';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 function StatusChip({ tone, label }: { tone: 'success' | 'warning'; label: string }) {
   return (
@@ -48,15 +49,16 @@ export function TopBar() {
   const session = useAuthStore((state) => state.session);
   const aiState = useUiStore((state) => state.aiState);
   const busy = aiState === 'processing' || aiState === 'responding';
-  const setActiveView = useUiStore((state) => state.setActiveView);
-  const setSessionsSheetOpen = useUiStore((state) => state.setSessionsSheetOpen);
+  const navigate = useNavigate();
+  const [, setSearchParams] = useSearchParams();
   const toggleSidebar = useUiStore((state) => state.toggleSidebar);
 
   return (
     <header className="relative z-20 flex h-14 min-h-[calc(3.5rem+var(--safe-top))] shrink-0 items-center gap-2 border-b border-white/5 bg-background/70 px-3 ps-[max(0.75rem,var(--safe-left))] pe-[max(0.75rem,var(--safe-right))] pt-[var(--safe-top)] backdrop-blur-xl sm:gap-3 sm:px-5">
       <button
+        id="open-sessions-button"
         type="button"
-        onClick={() => setSessionsSheetOpen(true)}
+        onClick={() => setSearchParams((current) => { const next = new URLSearchParams(current); next.set('panel', 'sessions'); return next; })}
         className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-muted transition hover:border-primary/30 hover:text-primary md:hidden"
         aria-label="Abrir conversas"
       >
@@ -128,7 +130,7 @@ export function TopBar() {
 
         <button
           type="button"
-          onClick={() => setActiveView('settings')}
+          onClick={() => navigate('/settings')}
           className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-muted transition hover:border-primary/30 hover:text-primary"
           aria-label="Abrir ajustes"
         >

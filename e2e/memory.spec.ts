@@ -32,8 +32,8 @@ test('cria, busca, persiste, edita e esquece uma memória', async ({ page }) => 
   await page.getByRole('button', { name: 'Limpar filtros' }).click();
 
   await page.reload();
-  await expect(page.getByRole('heading', { name: 'Boas-vindas' })).toBeVisible();
-  await page.locator('button:visible', { hasText: 'Memória' }).first().click();
+  await expect(page).toHaveURL(/\/memory$/);
+  await expect(page.getByRole('heading', { name: 'Memória', exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Preferência de voz' })).toBeVisible();
 
   await page.getByRole('button', { name: 'Editar Preferência de voz' }).click();
@@ -43,7 +43,7 @@ test('cria, busca, persiste, edita e esquece uma memória', async ({ page }) => 
 
   await page.getByRole('button', { name: 'Esquecer Preferência de voz atualizada' }).click();
   const dialog = page.getByRole('alertdialog', {
-    name: 'Esquecer Preferência de voz atualizada',
+    name: /Esquecer.*Preferência de voz atualizada/,
   });
   await dialog.getByRole('button', { name: 'Esquecer' }).click();
 

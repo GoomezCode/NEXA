@@ -2,7 +2,9 @@ import { Activity, Brain, MessageSquare, Settings } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/Button';
-import { useUiStore, type AppView } from '@/stores/ui-store';
+import { useLocation, useNavigate } from 'react-router-dom';
+
+type AppView = 'chat' | 'memory' | 'monitor' | 'settings';
 
 const NAV_ITEMS: { id: AppView; label: string; icon: typeof MessageSquare }[] = [
   { id: 'chat', label: 'Chat', icon: MessageSquare },
@@ -53,8 +55,12 @@ function NavButton({
 }
 
 export function Dock() {
-  const activeView = useUiStore((state) => state.activeView);
-  const setActiveView = useUiStore((state) => state.setActiveView);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const activeView: AppView = location.pathname === '/settings' ? 'settings'
+    : location.pathname === '/memory' ? 'memory'
+      : location.pathname === '/monitor' ? 'monitor' : 'chat';
+  const setActiveView = (view: AppView) => navigate(view === 'chat' ? '/' : `/${view}`);
 
   return (
     <>

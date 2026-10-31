@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { ArrowUpRight, Check, Copy, ExternalLink, Mail, X } from 'lucide-react';
-import { AnimatePresence, motion } from 'motion/react';
+import { motion } from 'motion/react';
+import * as Dialog from '@radix-ui/react-dialog';
 
 import { apiOrigin } from '@/api/config';
 import { useApiHealth } from '@/api/health';
@@ -32,13 +33,6 @@ export function ApiLetter() {
   const apiUrl = useSettingsStore((state) => state.settings.apiUrl);
   const origin = apiOrigin(apiUrl) || (typeof window === 'undefined' ? '' : window.location.origin);
 
-  useEffect(() => {
-    if (!open) return;
-    const onKeyDown = (event: KeyboardEvent) => { if (event.key === 'Escape') setOpen(false); };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, [open]);
-
   const copy = async (id: string, body: string) => {
     try {
       await navigator.clipboard.writeText(body.replaceAll('{{origin}}', origin));
@@ -51,8 +45,8 @@ export function ApiLetter() {
   };
 
   return (
-    <>
-      <motion.button type="button" onClick={() => setOpen(true)} whileHover={{ y: -2 }} whileTap={{ scale: .985 }} className="group relative flex w-full items-center gap-4 overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/[.1] via-surface/70 to-surface/40 p-4 text-left shadow-[0_12px_40px_rgba(0,0,0,.15)] transition hover:border-primary/35 sm:p-5">
+    <Dialog.Root open={open} onOpenChange={setOpen}>
+      <Dialog.Trigger asChild><motion.button type="button" whileHover={{ y: -2 }} whileTap={{ scale: .985 }} className="group relative flex w-full items-center gap-4 overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/[.1] via-surface/70 to-surface/40 p-4 text-left shadow-[0_12px_40px_rgba(0,0,0,.15)] transition hover:border-primary/35 sm:p-5">
         <span className="absolute -right-5 -top-8 h-28 w-28 rounded-full bg-primary/8 blur-2xl transition group-hover:bg-primary/15" aria-hidden="true" />
         <span className="relative flex h-14 w-16 shrink-0 items-center justify-center rounded-xl border border-primary/20 bg-background/70 text-primary shadow-inner">
           <Mail className="h-7 w-7" strokeWidth={1.35} aria-hidden="true" />
@@ -64,14 +58,14 @@ export function ApiLetter() {
           <span className="mt-1 block text-xs leading-relaxed text-muted">Endereços úteis e exemplos para conectar seus clientes à API NEXA.</span>
         </span>
         <span className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-primary/20 bg-primary/8 text-primary transition group-hover:translate-x-0.5 group-hover:bg-primary/15"><ArrowUpRight className="h-4 w-4" aria-hidden="true" /></span>
-      </motion.button>
+      </motion.button></Dialog.Trigger>
 
-      <AnimatePresence>
-        {open && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[180] flex items-center justify-center overflow-y-auto bg-[#020610]/80 p-3 backdrop-blur-md sm:p-6" onMouseDown={(event) => { if (event.target === event.currentTarget) setOpen(false); }}>
-            <motion.article role="dialog" aria-modal="true" aria-labelledby="api-letter-title" initial={{ opacity: 0, y: 24, scale: .96, rotateX: 3 }} animate={{ opacity: 1, y: 0, scale: 1, rotateX: 0 }} exit={{ opacity: 0, y: 12, scale: .98 }} transition={{ type: 'spring', stiffness: 230, damping: 23 }} className="relative my-auto w-full max-w-2xl overflow-hidden rounded-[22px] border border-[#ddceaa] bg-[#f5f0e6] text-[#243342] shadow-[0_30px_100px_rgba(0,0,0,.55)]">
+      <Dialog.Portal>
+        <Dialog.Overlay asChild><motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[180] flex items-center justify-center overflow-y-auto bg-[#020610]/80 p-3 backdrop-blur-md sm:p-6" /></Dialog.Overlay>
+        <Dialog.Content asChild>
+            <motion.article initial={{ opacity: 0, y: 24, scale: .96, rotateX: 3 }} animate={{ opacity: 1, y: 0, scale: 1, rotateX: 0 }} transition={{ type: 'spring', stiffness: 230, damping: 23 }} className="fixed left-1/2 top-1/2 z-[181] my-auto w-[calc(100%-1.5rem)] max-w-2xl -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[22px] border border-[#ddceaa] bg-[#f5f0e6] text-[#243342] shadow-[0_30px_100px_rgba(0,0,0,.55)]">
               <div className="relative max-h-[92vh] overflow-y-auto p-5 sm:p-8">
-                <motion.button type="button" whileHover={{ rotate: 90, scale: 1.05 }} whileTap={{ scale: .92 }} aria-label="Fechar carta" onClick={() => setOpen(false)} className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full border border-[#243342]/10 text-[#526171] transition hover:bg-[#243342]/5"><X className="h-4 w-4" /></motion.button>
+                <Dialog.Close asChild><motion.button type="button" whileHover={{ rotate: 90, scale: 1.05 }} whileTap={{ scale: .92 }} aria-label="Fechar carta" className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full border border-[#243342]/10 text-[#526171] transition hover:bg-[#243342]/5"><X className="h-4 w-4" /></motion.button></Dialog.Close>
                 <div className="flex items-start justify-between gap-4 border-b border-[#243342]/12 pb-5 pr-10">
                   <div><p className="font-mono text-2xs uppercase tracking-[.22em] text-[#477b83]">Correspondência · NEXA API</p><h2 id="api-letter-title" className="mt-2 font-display text-2xl tracking-wide text-[#1e3040]">Olá, operador.</h2><p className="mt-1 text-sm text-[#64717a]">Sua carta de integração chegou.</p></div>
                   <span className="flex h-14 w-14 shrink-0 rotate-3 items-center justify-center border border-dashed border-[#477b83]/55 bg-[#477b83]/8 font-display text-xs tracking-widest text-[#477b83]">NEXA<br />API</span>
@@ -96,9 +90,8 @@ export function ApiLetter() {
                 <div className="mt-6 flex items-center justify-between border-t border-[#243342]/12 pt-4 font-mono text-2xs uppercase tracking-[.15em] text-[#78909a]"><span>Com carinho,</span><span>Equipe NEXA</span></div>
               </div>
             </motion.article>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
   );
 }

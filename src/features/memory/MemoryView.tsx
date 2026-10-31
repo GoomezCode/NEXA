@@ -1,3 +1,4 @@
+import * as AlertDialog from '@radix-ui/react-alert-dialog';
 import { Brain, Database, Pencil, Plus, Search, Trash2, X } from 'lucide-react';
 import { useMemo, useState, type FormEvent } from 'react';
 
@@ -477,40 +478,19 @@ export function MemoryView() {
                 </label>
 
                 {confirmingId === entry.id ? (
-                  <div
-                    role="alertdialog"
-                    aria-label={`Esquecer ${entry.title}`}
-                    className="mt-3 rounded-xl border border-danger/30 bg-danger/5 p-3"
-                  >
-                    <p className="text-[12px] text-foreground">Esquecer “{entry.title}”?</p>
-                    <p className="mt-0.5 font-mono text-2xs uppercase tracking-[0.08em] text-muted">
-                      Esta ação não pode ser desfeita
-                    </p>
-                    <div className="mt-3 flex gap-2">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          deleteMemory.mutate(entry.id, {
-                            onSuccess: () => {
-                              setConfirmingId(null);
-                              setActiveTag(null);
-                            },
-                          })
-                        }
-                        disabled={deleteMemory.isPending}
-                        className="inline-flex min-h-11 items-center rounded-lg border border-danger/35 bg-danger/15 px-3 py-2 font-mono text-2xs uppercase tracking-[0.12em] text-danger transition hover:bg-danger/25 disabled:opacity-50"
-                      >
-                        Esquecer
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setConfirmingId(null)}
-                        className="inline-flex min-h-11 items-center rounded-lg border border-white/10 px-3 py-2 font-mono text-2xs uppercase tracking-[0.12em] text-muted transition hover:text-foreground"
-                      >
-                        Cancelar
-                      </button>
-                    </div>
-                  </div>
+                  <AlertDialog.Root open onOpenChange={(open) => { if (!open) setConfirmingId(null); }}>
+                    <AlertDialog.Portal>
+                      <AlertDialog.Overlay className="fixed inset-0 z-[89] bg-black/60 backdrop-blur-sm" />
+                      <AlertDialog.Content aria-describedby="delete-memory-description" className="fixed left-1/2 top-1/2 z-[90] w-[min(26rem,calc(100vw-2rem))] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-border bg-surface p-5 shadow-2xl">
+                        <AlertDialog.Title className="font-display text-sm tracking-wide text-foreground">Esquecer “{entry.title}”?</AlertDialog.Title>
+                        <AlertDialog.Description id="delete-memory-description" className="mt-2 text-sm text-muted">Esta ação não pode ser desfeita.</AlertDialog.Description>
+                        <div className="mt-5 flex justify-end gap-2">
+                          <AlertDialog.Cancel asChild><button type="button" className="min-h-11 rounded-xl border border-border px-3 text-sm text-muted">Cancelar</button></AlertDialog.Cancel>
+                          <button type="button" onClick={() => deleteMemory.mutate(entry.id, { onSuccess: () => { setConfirmingId(null); setActiveTag(null); } })} disabled={deleteMemory.isPending} className="min-h-11 rounded-xl border border-danger/40 bg-danger/10 px-3 text-sm text-danger disabled:opacity-50">{deleteMemory.isPending ? 'Esquecendo…' : 'Esquecer'}</button>
+                        </div>
+                      </AlertDialog.Content>
+                    </AlertDialog.Portal>
+                  </AlertDialog.Root>
                 ) : (
                   <div className="mt-3 flex flex-wrap gap-2">
                     <button

@@ -11,6 +11,24 @@ test('o shell carrega a conversa inicial', async ({ page }) => {
   await expect(page.getByRole('complementary', { name: 'Painel do núcleo' })).toBeVisible();
 });
 
+test('a URL identifica a conversa e a navegação por view respeita Voltar', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByRole('heading', { name: 'Boas-vindas' })).toBeVisible();
+  await expect(page).toHaveURL(/\/c\//);
+  const conversationUrl = page.url();
+
+  await page.getByRole('button', { name: 'Memória' }).click();
+  await expect(page).toHaveURL(/\/memory$/);
+  await expect(page.getByRole('heading', { name: 'Memória', exact: true })).toBeVisible();
+  await page.goBack();
+  await expect(page).toHaveURL(conversationUrl);
+  await expect(page.getByRole('heading', { name: 'Boas-vindas' })).toBeVisible();
+
+  await page.reload();
+  await expect(page).toHaveURL(conversationUrl);
+  await expect(page.getByRole('heading', { name: 'Boas-vindas' })).toBeVisible();
+});
+
 test('envia uma mensagem e recebe a resposta do mock', async ({ page }) => {
   await page.goto('/');
 
@@ -96,7 +114,7 @@ test('busca, renomeia e exclui conversas', async ({ page }) => {
   await expect(sidebar.getByRole('button', { name: /^Boas-vindas/ })).toBeVisible();
 
   await sidebar.getByRole('button', { name: 'Excluir Boas-vindas' }).click();
-  const dialog = page.getByRole('alertdialog', { name: 'Excluir Boas-vindas' });
+  const dialog = page.getByRole('alertdialog', { name: /Excluir.*Boas-vindas/ });
   await expect(dialog).toBeVisible();
 
   await dialog.getByRole('button', { name: 'Cancelar' }).click();
@@ -105,7 +123,7 @@ test('busca, renomeia e exclui conversas', async ({ page }) => {
 
   await sidebar.getByRole('button', { name: 'Excluir Boas-vindas' }).click();
   await page
-    .getByRole('alertdialog', { name: 'Excluir Boas-vindas' })
+    .getByRole('alertdialog', { name: /Excluir.*Boas-vindas/ })
     .getByRole('button', { name: 'Excluir' })
     .click();
 
@@ -169,10 +187,10 @@ test.describe('em viewport móvel', () => {
     await page.goto('/');
     const trigger = page.getByRole('button', { name: 'Abrir painel do núcleo' });
     await trigger.click();
-    await expect(page.getByRole('dialog', { name: 'Painel do núcleo' })).toBeVisible();
+    await expect(page.getByRole('dialog', { name: 'NÚCLEO NEXA' })).toBeVisible();
 
     await page.goBack();
-    await expect(page.getByRole('dialog', { name: 'Painel do núcleo' })).toBeHidden();
+    await expect(page.getByRole('dialog', { name: 'NÚCLEO NEXA' })).toBeHidden();
     await expect(trigger).toBeFocused();
   });
 

@@ -12,7 +12,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/auth-store';
 import { useSettingsStore } from '@/stores/settings-store';
-import { useUiStore } from '@/stores/ui-store';
+import { useNavigate } from 'react-router-dom';
 
 const PROVIDER_ORDER: ProviderName[] = ['openai', 'anthropic', 'google', 'ollama_cloud', 'nvidia', 'openai_compatible'];
 const PROVIDER_HELP: Record<ProviderName, string> = {
@@ -27,7 +27,7 @@ const PROVIDER_HELP: Record<ProviderName, string> = {
 export function ProviderKeysPanel({ compact = false }: { compact?: boolean }) {
   const session = useAuthStore((state) => state.session);
   const demoMode = useSettingsStore((state) => state.settings.demoMode);
-  const setActiveView = useUiStore((state) => state.setActiveView);
+  const navigate = useNavigate();
   const canManage = Boolean(session && session.role !== 'guest');
   const keys = useProviderKeys(canManage && !demoMode);
   const save = useSaveProviderKey();
@@ -79,7 +79,7 @@ export function ProviderKeysPanel({ compact = false }: { compact?: boolean }) {
       {!canManage || demoMode ? (
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/8 bg-background/35 p-3">
           <p className="text-xs leading-relaxed text-muted">{demoMode ? 'Desative o modo demonstração para configurar chaves de provedores.' : 'Entre ou crie uma conta para configurar chaves próprias. Convidados podem usar os provedores habilitados pelo servidor.'}</p>
-          <button type="button" onClick={() => setActiveView('settings')} className="min-h-10 rounded-lg border border-primary/25 bg-primary/8 px-3 font-mono text-2xs uppercase tracking-wider text-primary transition hover:bg-primary/15">{demoMode ? 'Abrir Ajustes' : 'Entrar ou criar conta'}</button>
+<button type="button" onClick={() => navigate('/settings')} className="min-h-10 rounded-lg border border-primary/25 bg-primary/8 px-3 font-mono text-2xs uppercase tracking-wider text-primary transition hover:bg-primary/15">{demoMode ? 'Abrir Ajustes' : 'Entrar ou criar conta'}</button>
         </div>
       ) : (
         <>

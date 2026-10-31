@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { BrowserRouter } from 'react-router-dom';
 
 import { AppProviders } from './providers';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -20,12 +21,14 @@ export function App() {
   }, [reducedMotion, theme]);
 
   return (
-    <AppProviders>
-      <ErrorBoundary>
-        <AuthGate>
-          <AppShell />
-        </AuthGate>
-      </ErrorBoundary>
-    </AppProviders>
+    <BrowserRouter>
+      <AppProviders>
+        <ErrorBoundary>
+          <AuthGate>
+            <AppShell />
+          </AuthGate>
+        </ErrorBoundary>
+      </AppProviders>
+    </BrowserRouter>
   );
 }

@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { toast } from 'sonner';
 
 export type NotificationTone = 'info' | 'success' | 'warning' | 'error';
 
@@ -52,7 +53,13 @@ export const useNotificationStore = create<NotificationStore>((set) => ({
 }));
 
 export function notify(input: NotificationInput): string {
-  return useNotificationStore.getState().add(input);
+  const id = useNotificationStore.getState().add(input);
+  const options = { description: input.message, duration: input.duration ?? 6000, id };
+  if (input.tone === 'success') toast.success(input.title, options);
+  else if (input.tone === 'warning') toast.warning(input.title, options);
+  else if (input.tone === 'error') toast.error(input.title, options);
+  else toast.info(input.title, options);
+  return id;
 }
 
 export function resetNotificationsForTests(): void {
