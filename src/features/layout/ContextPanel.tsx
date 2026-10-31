@@ -23,11 +23,18 @@ const SUBSYSTEMS = [
 const EMPTY_METRICS: import('@/stores/session-metrics-store').ResponseMetric[] = [];
 
 export function ContextPanel({ sessionId }: { sessionId: string | null }) {
+  const [now, setNow] = useState(0);
   const [mobileOpen, setMobileOpen] = useState(false);
   const mobileTriggerRef = useRef<HTMLButtonElement>(null);
   const wasMobileOpen = useRef(false);
   const touchStartY = useRef<number | null>(null);
   const closeMobilePanel = useOverlayHistory(mobileOpen, setMobileOpen, 'context');
+  useEffect(() => {
+    const updateNow = () => setNow(Date.now());
+    updateNow();
+    const interval = window.setInterval(updateNow, 60_000);
+    return () => window.clearInterval(interval);
+  }, []);
   useEffect(() => {
     if (mobileOpen) {
       wasMobileOpen.current = true;
@@ -61,7 +68,7 @@ export function ContextPanel({ sessionId }: { sessionId: string | null }) {
   const sessions = useSessions();
   const messages = useMessages(sessionId);
   const session = sessions.data?.find((item) => item.id === sessionId);
-  const elapsedMinutes = session ? Math.max(0, Math.floor((Date.now() - new Date(session.createdAt).getTime()) / 60000)) : 0;
+  const elapsedMinutes = session && now ? Math.max(0, Math.floor((now - new Date(session.createdAt).getTime()) / 60000)) : 0;
   const messageCount = messages.data?.length ?? 0;
   const sessionLabel = sessions.isError
     ? 'Indisponível'

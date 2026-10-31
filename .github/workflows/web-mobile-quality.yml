@@ -17,6 +17,8 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
+      - run: npm run lint
+      - run: npm run api:types:check
       - run: npx playwright install --with-deps chromium firefox webkit
       - run: npm run test:responsive
       - run: npm run test:e2e -- --project=chromium e2e/a11y.spec.ts
