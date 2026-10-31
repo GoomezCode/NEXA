@@ -53,3 +53,22 @@ test('aba ativa e rascunho do console sobrevivem à rotação', async ({ page })
   await panelTabs.getByRole('button', { name: 'CONSOLE', exact: true }).click();
   await expect(input).toHaveValue('rascunho preservado');
 });
+
+test('campos e ações principais mantêm tamanho legível e alvos de toque', async ({ page }) => {
+  await useDemoMode(page);
+  await page.goto('/');
+  const composer = page.getByRole('textbox', { name: 'Mensagem para a NEXA' });
+  await expect(composer).toBeVisible();
+  const fontSize = await composer.evaluate((element) => getComputedStyle(element).fontSize);
+  expect(Number.parseFloat(fontSize)).toBeGreaterThanOrEqual(16);
+
+  for (const button of [
+    page.getByRole('button', { name: 'Abrir conversas' }),
+    page.getByRole('button', { name: 'Abrir ajustes' }),
+    page.getByRole('button', { name: 'Enviar mensagem' }),
+  ]) {
+    const box = await button.boundingBox();
+    expect(box?.width).toBeGreaterThanOrEqual(44);
+    expect(box?.height).toBeGreaterThanOrEqual(44);
+  }
+});

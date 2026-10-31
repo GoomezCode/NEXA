@@ -46,7 +46,7 @@ Use `nexa-field` nos campos de formulário. Ele estabelece altura mínima de 44 
 
 ## Verificação
 
-Execute `npm run test:responsive` para a matriz responsiva Playwright em Chromium, Firefox e WebKit. O Playwright e os navegadores precisam estar instalados (`npx playwright install --with-deps chromium firefox webkit`). O teste cobre larguras de 320 a 3840 px, paisagem baixa, rolagem horizontal e preservação do rascunho/aba durante rotação.
+Execute `npm run test:responsive` para a matriz responsiva Playwright em Chromium, Chromium com toque (Pixel 7), Firefox e WebKit. O Playwright e os navegadores precisam estar instalados (`npx playwright install --with-deps chromium firefox webkit`). O teste cobre larguras de 320 a 3840 px, paisagem baixa, rolagem horizontal, alvos de toque, campos com fonte legível e preservação do rascunho/aba durante rotação.
 
 ### Checklist para PR
 
