@@ -115,7 +115,9 @@ export function BackgroundCanvas() {
     };
 
     const start = () => {
-      if (running || reducedMotion.matches || document.documentElement.dataset.reducedMotion === 'true') {
+      // A static gradient behind the canvas is sufficient on touch devices.
+      // Avoid waking the main thread 30 times per second for invisible ambience.
+      if (running || compact || reducedMotion.matches || document.documentElement.dataset.reducedMotion === 'true') {
         return;
       }
 
@@ -151,7 +153,11 @@ export function BackgroundCanvas() {
 
     const scheduleResize = () => {
       window.clearTimeout(resizeTimer);
-      resizeTimer = window.setTimeout(resize, 120);
+      resizeTimer = window.setTimeout(() => {
+        resize();
+        if (compact) stop();
+        else start();
+      }, 120);
     };
     const resizeObserver = new ResizeObserver(scheduleResize);
     resizeObserver.observe(canvas);

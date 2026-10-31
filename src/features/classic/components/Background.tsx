@@ -99,7 +99,9 @@ export function Background() {
     };
 
     const start = () => {
-      if (running || document.hidden || reducedMotion.matches || document.documentElement.dataset.reducedMotion === 'true') return;
+      // Keep the mobile scene static: the gradient and grid remain visible,
+      // while avoiding a perpetual canvas animation on touch devices.
+      if (running || compact || document.hidden || reducedMotion.matches || document.documentElement.dataset.reducedMotion === 'true') return;
       running = true;
       lastFrameAt = 0;
       animId = requestAnimationFrame(tick);
@@ -115,7 +117,11 @@ export function Background() {
     start();
     const scheduleResize = () => {
       window.clearTimeout(resizeTimer);
-      resizeTimer = window.setTimeout(resize, 120);
+      resizeTimer = window.setTimeout(() => {
+        resize();
+        if (compact) stop();
+        else start();
+      }, 120);
     };
     const resizeObserver = new ResizeObserver(scheduleResize);
     resizeObserver.observe(canvas);
