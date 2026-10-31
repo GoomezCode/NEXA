@@ -171,15 +171,57 @@
 }
 
 .classic-compact-tabs { display: none; }
+.classic-medium-tabs { display: none; }
 .classic-console-mic { display: none; }
 .classic-dock-label { display: none; }
 
 @media (min-width: 768px) and (max-width: 1279px) {
-  :root { --c-main-top: 3.5rem; --c-main-bottom: 8rem; }
+  :root { --c-main-top: 0px; --c-main-bottom: 8rem; }
+  .classic-layout .classic-medium-tabs {
+    display: flex;
+    flex: 0 0 auto;
+    gap: 0.35rem;
+    margin-top: 3.5rem;
+    padding: 0.35rem 0.75rem;
+    border-bottom: 1px solid rgba(0,245,255,.12);
+    background: rgba(1,8,20,.9);
+  }
+  .classic-medium-tabs button {
+    min-height: 2.75rem;
+    min-width: 2.75rem;
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 0.65rem;
+    color: rgba(255,255,255,.65);
+    background: rgba(255,255,255,.025);
+    font: 0.6875rem 'Share Tech Mono', monospace;
+  }
+  .classic-medium-tabs button svg { width: 1rem; height: 1rem; }
+  .classic-medium-tabs button.is-active { color: #00f5ff; border-color: rgba(0,245,255,.4); background: rgba(0,245,255,.1); }
+  .classic-layout--medium .classic-main-area { min-width: 0; }
+  .classic-layout--medium .classic-center { order: 1; min-width: 0; }
+  .classic-layout--medium .classic-panel { display: none; }
+  .classic-layout--medium[data-active-panel='monitor'] .classic-panel--left,
+  .classic-layout--medium[data-active-panel='memory'] .classic-panel--left,
+  .classic-layout--medium[data-active-panel='console'] .classic-panel--right,
+  .classic-layout--medium[data-active-panel='search'] .classic-panel--right {
+    display: flex;
+    order: 2;
+    width: clamp(16rem, 34vw, 22rem);
+  }
+  .classic-layout--medium .classic-panel > div:first-child { display: none; }
+  .classic-layout--medium .classic-panel > div:last-child { min-width: 0; flex: 1; overflow: auto; padding: 0.75rem; }
 }
 
 @media (max-height: 32rem) and (min-width: 768px) {
-  :root { --c-main-top: 2.75rem; --c-main-bottom: 7rem; }
+  :root { --c-main-top: 0px; --c-main-bottom: 7rem; }
+  .classic-layout .classic-topbar { height: 2.75rem !important; }
+  .classic-layout .classic-medium-tabs { margin-top: 2.75rem; padding-block: 0.15rem; }
+  .classic-layout .classic-medium-tabs button { min-height: 2.5rem; }
   .classic-layout--short .classic-panel--left { display: none; }
   .classic-layout--short .classic-center { flex: 1 1 60%; }
   .classic-layout--short .classic-panel--right { width: min(38vw, 26rem); }

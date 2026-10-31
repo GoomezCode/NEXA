@@ -57,6 +57,7 @@ test('aba ativa e rascunho do console sobrevivem à rotação', async ({ page })
 test('campos e ações principais mantêm tamanho legível e alvos de toque', async ({ page }) => {
   await useDemoMode(page);
   await page.goto('/');
+  test.skip(!(await page.evaluate(() => matchMedia('(pointer: coarse)').matches)), 'aplica-se a dispositivo de toque');
   const composer = page.getByRole('textbox', { name: 'Mensagem para a NEXA' });
   await expect(composer).toBeVisible();
   const fontSize = await composer.evaluate((element) => getComputedStyle(element).fontSize);

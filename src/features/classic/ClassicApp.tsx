@@ -166,6 +166,25 @@ function MainLayout({ onExit }: { onExit: () => void }) {
           </button>
         ))}
       </nav>
+      <nav className="classic-medium-tabs" aria-label="Painéis do modo clássico">
+        {([
+          ['console', 'CONSOLE', Terminal],
+          ['monitor', 'MONITOR', Activity],
+          ['memory', 'MEMORY', Brain],
+          ['search', 'SEARCH', Search],
+        ] as const).map(([panel, label, Icon]) => (
+          <button
+            key={panel}
+            type="button"
+            aria-pressed={activePanel === panel}
+            onClick={() => setActivePanel(panel)}
+            className={activePanel === panel ? 'is-active' : ''}
+          >
+            <Icon aria-hidden="true" />
+            <span>{label}</span>
+          </button>
+        ))}
+      </nav>
 
       {/* Main 3-column layout */}
       <div
