@@ -86,6 +86,25 @@ test('abre e fecha os overlays clássicos, inclusive com Esc', async ({ page }) 
   await expect(page.getByText('ATALHOS DISPONÍVEIS')).toBeHidden();
 });
 
+test('o chat desktop fica acima da barra de voz', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 766 });
+  await page.goto('/?ui=classic');
+  await page.getByRole('button', { name: 'Abrir Chat' }).click();
+  const chat = page.getByRole('dialog', { name: 'Conversa com a NEXA' });
+  const input = page.getByPlaceholder('Enter command or speak...');
+  const voiceBar = page.locator('.classic-voice-bar');
+  await expect(chat).toBeVisible();
+  await expect(input).toBeVisible();
+  const [windowBox, inputBox, voiceBox] = await Promise.all([
+    page.locator('.classic-mobile-chat-window').boundingBox(),
+    input.boundingBox(),
+    voiceBar.boundingBox(),
+  ]);
+  expect(windowBox && inputBox && voiceBox).toBeTruthy();
+  expect(inputBox!.y + inputBox!.height).toBeLessThanOrEqual(windowBox!.y + windowBox!.height);
+  expect(windowBox!.y + windowBox!.height).toBeLessThanOrEqual(voiceBox!.y);
+});
+
 test.describe('em viewport móvel', () => {
   test.use({ viewport: { width: 390, height: 844 } });
 

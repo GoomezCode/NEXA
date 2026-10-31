@@ -219,7 +219,7 @@
   display: flex;
   align-items: stretch;
   justify-content: center;
-  padding: calc(3rem + max(0.75rem, env(safe-area-inset-top))) max(0.75rem, env(safe-area-inset-right)) calc(4.25rem + env(safe-area-inset-bottom)) max(0.75rem, env(safe-area-inset-left));
+  padding: calc(3rem + max(0.75rem, env(safe-area-inset-top))) max(0.75rem, env(safe-area-inset-right)) calc(9rem + env(safe-area-inset-bottom)) max(0.75rem, env(safe-area-inset-left));
   background: rgba(0, 4, 14, 0.88);
   backdrop-filter: blur(16px);
 }
@@ -247,6 +247,9 @@
 }
 
 @media (max-width: 767px) {
+  .classic-mobile-chat-overlay {
+    padding-bottom: calc(4.25rem + env(safe-area-inset-bottom));
+  }
   .classic-hud [style*="backdrop-filter"] { backdrop-filter: none !important; }
 }
 

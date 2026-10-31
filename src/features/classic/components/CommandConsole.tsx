@@ -51,7 +51,7 @@ export function CommandConsole({ conversationMode = false }: { conversationMode?
   };
 
   return (
-    <div className="flex flex-col h-full gap-3 overflow-hidden">
+    <div className="flex flex-col h-full min-h-0 gap-3 overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between flex-shrink-0">
         <div className="flex items-center gap-2">
@@ -64,7 +64,7 @@ export function CommandConsole({ conversationMode = false }: { conversationMode?
 
       {/* Messages */}
       <div
-        className="flex-1 overflow-y-auto flex flex-col gap-3 pr-1"
+        className="flex-1 min-h-0 overflow-y-auto flex flex-col gap-3 pr-1"
         style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(0,245,255,0.2) transparent' }}
       >
         <AnimatePresence initial={false}>
