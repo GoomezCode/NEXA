@@ -8,6 +8,7 @@ Interface conversacional da NEXA, construída com React, TypeScript e Vite. Pode
 - [Requisitos](#requisitos)
 - [Início rápido](#início-rápido)
 - [Modo offline com Ollama](#modo-offline-com-ollama)
+- [Compatibilidade](#compatibilidade)
 - [Configuração](#configuração)
 - [Comandos](#comandos)
 - [Estrutura do projeto](#estrutura-do-projeto)
@@ -78,6 +79,19 @@ Para sair, use **Sair do offline** no cabeçalho ou em Ajustes. Conversas e mem�
 | A Web não abre por outro dispositivo | Use `npm run dev -- --host` e verifique o firewall e a porta 5173.                       |
 | A conexão direta apresenta CORS      | Use `/ollama`; não configure `http://localhost:11434` no navegador de outro dispositivo. |
 
+## Compatibilidade
+
+A interface adapta o HUD e o modo Clássico para celulares, tablets, notebooks, desktops e telas grandes. A base de navegadores do projeto segue os requisitos do Tailwind 4: Safari 16.4+, Chrome/Edge 111+ e Firefox 128+. O layout compacto inclui navegação por abas, suporte a toque, safe areas e teclado virtual; use zoom do navegador sem restrição.
+
+Para validar tamanhos de tela e rotação nos três motores, instale os navegadores Playwright e execute:
+
+```bash
+npx playwright install --with-deps chromium firefox webkit
+npm run test:responsive
+```
+
+O checklist de breakpoints, controles, zoom e teclado virtual está em [Guia de responsividade](docs/GUIA_RESPONSIVIDADE.md). A verificação automatizada não substitui a checagem de Safari iOS, Android e dispositivos com notch/teclado real.
+
 ## Configuração
 
 As variáveis do frontend são lidas pelo Vite no início do processo. Reinicie o Vite depois de alterá-las.
@@ -108,6 +122,7 @@ Para conectar à API real, configure `VITE_DEMO_MODE=false` e aponte `VITE_API_U
 | `npm run typecheck`     | Verifica os tipos TypeScript.                                          |
 | `npm test`              | Executa os testes unitários com Vitest.                                |
 | `npm run test:e2e`      | Executa os testes end-to-end com Playwright.                           |
+| `npm run test:responsive` | Executa a matriz responsiva Chromium, Firefox e WebKit.                 |
 | `npm run check`         | Executa lint, tipos, testes e build.                                   |
 
 ## Estrutura do projeto
@@ -132,6 +147,7 @@ tests/            Testes unitários e de componentes
 - [Modo offline com Ollama](docs/PLANO_MODO_OFFLINE_OLLAMA.md)
 - [Integração com a API NEXA](docs/PLANO_INTEGRACAO_NEXA_API.md)
 - [Autenticação](docs/PLANO_CORRECAO_AUTENTICACAO.md)
+- [Guia de responsividade](docs/GUIA_RESPONSIVIDADE.md)
 - [Plano geral API + Web](<docs/NEXA%20%E2%80%94%20Plano%20de%20implementa%C3%A7%C3%A3o%20(API%20%2B%20Web).md>)
 
 `WEB_PARA_COPIAR/` contém a referência visual histórica e não faz parte do build da aplicação.

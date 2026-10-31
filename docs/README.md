@@ -10,6 +10,7 @@ Este diretório reúne planos técnicos e registros de implementação. O README
 | Modo OFFLINE e acesso pela rede local | Implementado com proxy same-origin do Vite para evitar CORS; testes dedicados e validação manual com Ollama real ainda são pendentes | [Plano do Ollama](PLANO_MODO_OFFLINE_OLLAMA.md) |
 | Integração com a API | Chat, autenticação, modelos, cotas e integrações documentados; fechamento de release permanece separado | [Plano de integração](PLANO_INTEGRACAO_NEXA_API.md) |
 | Autenticação | Login, convidado, cadastro por configuração e ciclo de sessão implementados | [Plano de autenticação](PLANO_CORRECAO_AUTENTICACAO.md) |
+| Responsividade | Layouts compactos no HUD e Clássico, navegação adaptável e matriz Playwright; WebKit depende das bibliotecas do sistema no ambiente local | [Guia de responsividade](GUIA_RESPONSIVIDADE.md) · [Plano](PLANO_RESPONSIVIDADE.md) |
 | Planejamento API + Web | Análise inicial e decisões de implementação; parte do diagnóstico é histórica | [Plano geral](NEXA%20%E2%80%94%20Plano%20de%20implementa%C3%A7%C3%A3o%20(API%20%2B%20Web).md) |
 
 ## Como interpretar os planos
