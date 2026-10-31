@@ -145,6 +145,28 @@
     text-align: center;
   }
   .classic-layout--compact .classic-panel { display: none !important; }
+  .classic-layout--compact[data-active-panel='monitor'] .classic-center,
+  .classic-layout--compact[data-active-panel='memory'] .classic-center { display: none; }
+  .classic-layout--compact[data-active-panel='monitor'] .classic-panel--left,
+  .classic-layout--compact[data-active-panel='memory'] .classic-panel--left {
+    display: flex !important;
+    grid-column: 1;
+    grid-row: 1;
+    width: 100% !important;
+    min-width: 0;
+    min-height: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+  .classic-layout--compact .classic-panel--left > div:first-child { display: none; }
+  .classic-layout--compact .classic-panel--left > div:last-child {
+    min-width: 0;
+    min-height: 0;
+    flex: 1;
+    padding: 0.75rem !important;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
   .classic-layout--compact .classic-voice-bar { display: none; }
   .classic-layout--compact .classic-app-dock { height: 3.5rem !important; bottom: var(--kb-inset) !important; }
   .classic-layout--compact .classic-app-dock > div:first-child,

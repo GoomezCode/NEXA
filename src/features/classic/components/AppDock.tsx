@@ -30,7 +30,10 @@ export function AppDock() {
     if (app.id === 'settings') {
       setSettingsOpen(true);
     } else if (app.id === 'console') setConversationOpen(true);
-    else setLeftPanel(app.id as 'monitor' | 'memory');
+    else {
+      setConversationOpen(false);
+      setLeftPanel(app.id as 'monitor' | 'memory');
+    }
   };
 
   const getScale = (id: string) => {
