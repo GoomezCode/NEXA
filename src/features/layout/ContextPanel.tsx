@@ -16,6 +16,7 @@ import { useSessionMetricsStore } from '@/stores/session-metrics-store';
 import { useSettingsStore } from '@/stores/settings-store';
 import { useUiStore } from '@/stores/ui-store';
 import { useConnectionStore } from '@/stores/connection-store';
+import { useSpeechStore } from '@/stores/speech-store';
 import { IconButton } from '@/components/ui/Button';
 
 const SUBSYSTEMS = [
@@ -48,6 +49,7 @@ export function ContextPanel({ sessionId }: { sessionId: string | null }) {
   const offlineMode = useConnectionStore((state) => state.mode === 'offline');
   const displayName = useSettingsStore((state) => state.settings.displayName);
   const ttsEnabled = useSettingsStore((state) => state.settings.ttsEnabled);
+  const isSpeaking = useSpeechStore((state) => state.isSpeaking);
   const auth = useAuthStore((state) => state.session);
   const selectedModel = useModelStore((state) => state.selectedModelId);
   const usage = useUsage();
@@ -88,7 +90,7 @@ export function ContextPanel({ sessionId }: { sessionId: string | null }) {
             <Drawer.Close asChild><IconButton label="Fechar painel do núcleo" className="text-muted"><PanelRight className="h-4 w-4" /></IconButton></Drawer.Close>
           </header>
           <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4 pb-[max(1rem,var(--safe-bottom))]">
-            <div className="flex items-center gap-3 rounded-xl border border-border/60 bg-background/40 p-3"><Orb state={aiState} size="sm" /><div><p role="status" aria-live="polite" className="font-mono text-xs uppercase tracking-wider text-primary">{AI_STATE_LABEL[aiState]}</p><p className="mt-1 text-sm text-foreground">{offlineMode ? 'Ollama local' : demoMode ? 'NEXA demonstração' : model?.provider ?? 'Provedor —'} · {modelId ?? (offlineMode ? 'Automático' : 'Modelo —')}</p></div></div>
+            <div className="flex items-center gap-3 rounded-xl border border-border/60 bg-background/40 p-3"><Orb state={aiState} size="sm" /><div><p role="status" aria-live="polite" className="font-mono text-xs uppercase tracking-wider text-primary">{isSpeaking ? 'Lendo resposta' : AI_STATE_LABEL[aiState]}</p><p className="mt-1 text-sm text-foreground">{offlineMode ? 'Ollama local' : demoMode ? 'NEXA demonstração' : model?.provider ?? 'Provedor —'} · {modelId ?? (offlineMode ? 'Automático' : 'Modelo —')}</p></div></div>
             <section className="rounded-xl border border-border/60 p-3"><h3 className="font-mono text-xs uppercase tracking-wider text-muted">Conversa</h3><p className="mt-1 truncate text-sm text-foreground">{sessionLabel}</p><p className="mt-2 text-xs text-muted">{messageCount} mensagens · {elapsedMinutes} min · {activeMemories} memórias ativas</p></section>
             <section className="rounded-xl border border-border/60 p-3"><h3 className="font-mono text-xs uppercase tracking-wider text-muted">Uso desta sessão</h3><p className="mt-1 text-sm text-foreground">{tokenTotals.input} tokens de entrada · {tokenTotals.output} de saída</p><p className="mt-1 text-xs text-muted">Latência {averageLatency === undefined || !Number.isFinite(averageLatency) ? '—' : `${(averageLatency / 1000).toFixed(1)} s`} · {averageSpeed === undefined ? '—' : `${averageSpeed.toFixed(1)} tokens/s`}</p></section>
           </div>
@@ -108,7 +110,7 @@ export function ContextPanel({ sessionId }: { sessionId: string | null }) {
           aria-live="polite"
           className="mt-1 font-mono text-2xs uppercase tracking-[0.2em] text-muted"
         >
-          {AI_STATE_LABEL[aiState]}
+          {isSpeaking ? 'Lendo resposta' : AI_STATE_LABEL[aiState]}
         </p>
       </div>
 

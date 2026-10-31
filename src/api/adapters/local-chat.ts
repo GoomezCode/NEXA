@@ -14,7 +14,7 @@ export interface LocalChatRepository {
   finishAssistant(
     sessionId: string,
     assistantId: string,
-    patch: { content: string; status: MessageStatus },
+    patch: { content: string; status: MessageStatus; memoriesUsed?: number },
   ): Promise<void>;
 }
 
@@ -153,7 +153,7 @@ export class IndexedDbChatRepository implements LocalChatRepository {
   finishAssistant(
     sessionId: string,
     assistantId: string,
-    patch: { content: string; status: MessageStatus },
+    patch: { content: string; status: MessageStatus; memoriesUsed?: number },
   ): Promise<void> {
     return this.withReady(async () => {
       const history = this.messages.get(sessionId) ?? [];
@@ -162,7 +162,7 @@ export class IndexedDbChatRepository implements LocalChatRepository {
         sessionId,
         history.map((message) =>
           message.id === assistantId
-            ? { ...message, content: patch.content, status: patch.status }
+            ? { ...message, content: patch.content, status: patch.status, ...(patch.memoriesUsed !== undefined ? { memoriesUsed: patch.memoriesUsed } : {}) }
             : message,
         ),
       );

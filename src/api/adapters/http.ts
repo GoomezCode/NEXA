@@ -41,11 +41,12 @@ export class HttpChatAdapter implements ChatAdapter {
     content,
     signal,
     modelId,
+    personalization: suppliedPersonalization,
   }: ChatStreamInput): AsyncIterable<ChatStreamEvent> {
     const { assistantId } = await this.repo.beginExchange(sessionId, content);
     const role = useAuthStore.getState().session?.role ?? 'guest';
     const messages = fitContext(await this.repo.listMessages(sessionId), limitsFor(role));
-    const personalization = await buildPersonalization(content);
+    const personalization = suppliedPersonalization ?? await buildPersonalization(content);
     let text = '';
 
     try {
@@ -60,7 +61,7 @@ export class HttpChatAdapter implements ChatAdapter {
         }
       }
 
-      await this.repo.finishAssistant(sessionId, assistantId, { content: text, status: 'done' });
+      await this.repo.finishAssistant(sessionId, assistantId, { content: text, status: 'done', memoriesUsed: personalization.memories.length });
     } catch (error) {
       await this.repo.finishAssistant(sessionId, assistantId, {
         content: text,

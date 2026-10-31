@@ -31,18 +31,28 @@ export function MessageList({
   onSuggestion,
 }: MessageListProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const anchorRef = useRef<HTMLDivElement>(null);
+  const scrollFrameRef = useRef<number | null>(null);
   const stickToBottom = useRef(true);
   const [showJumpButton, setShowJumpButton] = useState(false);
 
   useEffect(() => {
-    const container = containerRef.current;
-
-    if (!container || !stickToBottom.current) {
-      return;
-    }
-
-    container.scrollTop = container.scrollHeight;
-    setShowJumpButton(false);
+    const content = contentRef.current;
+    if (!content || typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver(() => {
+      if (!stickToBottom.current) return;
+      if (scrollFrameRef.current !== null) cancelAnimationFrame(scrollFrameRef.current);
+      scrollFrameRef.current = requestAnimationFrame(() => {
+        anchorRef.current?.scrollIntoView({ block: 'end', behavior: 'auto' });
+        setShowJumpButton(false);
+      });
+    });
+    observer.observe(content);
+    return () => {
+      observer.disconnect();
+      if (scrollFrameRef.current !== null) cancelAnimationFrame(scrollFrameRef.current);
+    };
   }, [messages]);
 
   if (isLoading) {
@@ -138,7 +148,7 @@ export function MessageList({
         }}
         className="h-full overflow-y-auto"
       >
-        <div className="mx-auto flex w-full max-w-3xl flex-col gap-5 px-4 py-5 sm:px-6">
+        <div ref={contentRef} className="mx-auto flex w-full max-w-3xl flex-col gap-5 px-4 py-5 sm:px-6">
           {messages.map((message) => (
             <div key={message.id} className="nexa-message-row">
               <MessageBubble message={message} />
@@ -163,6 +173,7 @@ export function MessageList({
               </button>
             </div>
           )}
+          <div ref={anchorRef} aria-hidden="true" />
         </div>
       </div>
       {showJumpButton && (
