@@ -110,4 +110,15 @@ test.describe('em viewport móvel', () => {
     await expect(conversation).toBeHidden();
     await expect(page.locator('.classic-ai-core-orb')).toBeVisible();
   });
+
+  test('voltar fecha os Ajustes clássicos no celular', async ({ page }) => {
+    await page.goto('/?ui=classic');
+    await page.getByRole('button', { name: 'Abrir Ajustes' }).click();
+    const settings = page.locator('.classic-settings-overlay');
+    await expect(settings).toBeVisible();
+
+    await page.goBack();
+    await expect(settings).toBeHidden();
+    await expect(page.locator('.classic-ai-core-orb')).toBeVisible();
+  });
 });

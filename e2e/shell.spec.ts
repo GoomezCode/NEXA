@@ -164,6 +164,18 @@ test.describe('em viewport móvel', () => {
     await expect(page.getByRole('heading', { name: 'Boas-vindas' })).toBeVisible();
   });
 
+  test('botão voltar fecha o painel do núcleo e devolve o foco', async ({ page }) => {
+    await useDemoMode(page);
+    await page.goto('/');
+    const trigger = page.getByRole('button', { name: 'Abrir painel do núcleo' });
+    await trigger.click();
+    await expect(page.getByRole('dialog', { name: 'Painel do núcleo' })).toBeVisible();
+
+    await page.goBack();
+    await expect(page.getByRole('dialog', { name: 'Painel do núcleo' })).toBeHidden();
+    await expect(trigger).toBeFocused();
+  });
+
   test('navega pelo dock móvel', async ({ page }) => {
     await page.goto('/');
 

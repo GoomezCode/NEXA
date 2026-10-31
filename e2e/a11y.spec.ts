@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from '@playwright/test';
+import { useDemoMode } from './responsive/helpers';
 
 type ViewName = 'chat' | 'ajustes' | 'memória';
 
@@ -32,6 +33,7 @@ async function expectNoA11yViolations(page: Page) {
 
 for (const view of VIEWS) {
   test(`sem violações de acessibilidade em ${view.name}`, async ({ page }) => {
+    await useDemoMode(page);
     await page.goto('/');
     await expect(page.getByRole('heading', { name: 'Boas-vindas' })).toBeVisible();
 
@@ -40,16 +42,23 @@ for (const view of VIEWS) {
   });
 }
 
-test.describe('em viewport móvel', () => {
-  test.use({ viewport: { width: 390, height: 844 } });
+for (const viewport of [
+  { width: 320, height: 568 },
+  { width: 768, height: 1024 },
+  { width: 1280, height: 800 },
+]) {
+  test.describe(`viewport ${viewport.width}px`, () => {
+    test.use({ viewport });
 
-  for (const view of VIEWS) {
-    test(`sem violações de acessibilidade em ${view.name}`, async ({ page }) => {
-      await page.goto('/');
-      await expect(page.getByRole('heading', { name: 'Boas-vindas' })).toBeVisible();
+    for (const view of VIEWS) {
+      test(`sem violações de acessibilidade em ${view.name}`, async ({ page }) => {
+        await useDemoMode(page);
+        await page.goto('/');
+        await expect(page.getByRole('heading', { name: 'Boas-vindas' })).toBeVisible();
 
-      await view.open(page);
-      await expectNoA11yViolations(page);
-    });
-  }
-});
+        await view.open(page);
+        await expectNoA11yViolations(page);
+      });
+    }
+  });
+}

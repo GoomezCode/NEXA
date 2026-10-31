@@ -44,9 +44,21 @@ Use `nexa-field` nos campos de formulário. Ele estabelece altura mínima de 44 
 - Diálogos e folhas devem limitar a altura a `100dvh` e rolar o conteúdo dentro da própria superfície.
 - Elementos decorativos, como canvas e glows, devem usar `pointer-events: none`.
 
+## Desempenho e navegação em camadas
+
+- Em telas touch, o fundo do HUD e do Clássico mantém o gradiente estático e pausa o canvas. A animação só roda em ponteiro fino e para ao ocultar a aba ou ativar movimento reduzido.
+- A resposta em streaming agrega tokens antes de atualizar a lista. As mensagens usam `React.memo`, conteúdo Markdown separado em chunk lazy, `useDeferredValue` e `content-visibility: auto` nas linhas antigas.
+- Ajustes, Monitor, Memória, Clássico e Markdown são carregados sob demanda; falha de download de um chunk mostra uma ação para tentar de novo.
+- O drawer de conversas e o painel móvel do núcleo fecham com Escape ou Voltar do navegador. O chat e os diálogos do Clássico também refletem a camada ativa no histórico.
+- Mensagens antigas deixam de acompanhar automaticamente o streaming quando a pessoa rola para cima; o botão **Ir para o fim** retorna à resposta recente.
+
+O chunk principal medido antes destas otimizações foi 187,95 KB gzip; após separar Markdown, o conjunto de JavaScript inicial (entrada mais modulepreloads) ficou em 148,44 KB gzip, abaixo do limite de 200 KB. Consulte o [baseline detalhado](BASELINE_WEB_MOBILE.md). Esses valores são do build local, não substituem Web Vitals em aparelhos reais.
+
 ## Verificação
 
 Execute `npm run test:responsive` para a matriz responsiva Playwright em Chromium, Chromium com toque (Pixel 7), Firefox e WebKit. O Playwright e os navegadores precisam estar instalados (`npx playwright install --with-deps chromium firefox webkit`). O teste cobre larguras de 320 a 3840 px, paisagem baixa, rolagem horizontal, alvos de toque, campos com fonte legível e preservação do rascunho/aba durante rotação.
+
+Os testes axe executam em Chromium nas larguras de 320, 768 e 1280 px. O workflow `Web mobile quality` roda a matriz responsiva, axe e Lighthouse CI com limites para performance, acessibilidade, LCP, CLS e JavaScript inicial.
 
 ### Checklist para PR
 
@@ -57,3 +69,4 @@ Execute `npm run test:responsive` para a matriz responsiva Playwright em Chromiu
 - [ ] Mudança de breakpoint/rotação preserva conversa, rascunho e aba ativa.
 - [ ] Efeitos respeitam `prefers-reduced-motion` e não continuam em abas ocultas.
 - [ ] Rodei `npm run test:responsive` ou registrei o motivo da impossibilidade.
+- [ ] Conferi o relatório Lighthouse CI e não ultrapassei os orçamentos de Web Vitals e JavaScript.

@@ -189,7 +189,7 @@ describe('MonitorView', () => {
     renderMonitor();
 
     expect(await screen.findByText('NEXA Local')).toBeInTheDocument();
-    expect(screen.getByText('OpenAI')).toBeInTheDocument();
+    expect(screen.getAllByText('OpenAI').length).toBeGreaterThan(0);
     expect(screen.getByRole('list', { name: 'Provedores' })).toHaveTextContent(
       /openai.*indisponível/i,
     );

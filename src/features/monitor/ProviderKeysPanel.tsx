@@ -11,6 +11,7 @@ import {
 } from '@/api/provider-keys';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/auth-store';
+import { useSettingsStore } from '@/stores/settings-store';
 import { useUiStore } from '@/stores/ui-store';
 
 const PROVIDER_ORDER: ProviderName[] = ['openai', 'anthropic', 'google', 'ollama_cloud', 'nvidia', 'openai_compatible'];
@@ -25,9 +26,10 @@ const PROVIDER_HELP: Record<ProviderName, string> = {
 
 export function ProviderKeysPanel({ compact = false }: { compact?: boolean }) {
   const session = useAuthStore((state) => state.session);
+  const demoMode = useSettingsStore((state) => state.settings.demoMode);
   const setActiveView = useUiStore((state) => state.setActiveView);
   const canManage = Boolean(session && session.role !== 'guest');
-  const keys = useProviderKeys(canManage);
+  const keys = useProviderKeys(canManage && !demoMode);
   const save = useSaveProviderKey();
   const remove = useDeleteProviderKey();
   const test = useTestProviderKey();
@@ -36,7 +38,7 @@ export function ProviderKeysPanel({ compact = false }: { compact?: boolean }) {
   const [baseUrls, setBaseUrls] = useState<Partial<Record<ProviderName, string>>>({});
   const [models, setModels] = useState<Partial<Record<ProviderName, string>>>({});
   const [feedback, setFeedback] = useState<{ provider: ProviderName; text: string; error?: boolean } | null>(null);
-  const saved = new Map((keys.data ?? []).map((item) => [item.provider, item]));
+  const saved = new Map((Array.isArray(keys.data) ? keys.data : []).map((item) => [item.provider, item]));
 
   const saveKey = async (provider: ProviderName) => {
     setFeedback(null);
@@ -74,10 +76,10 @@ export function ProviderKeysPanel({ compact = false }: { compact?: boolean }) {
         <span className="inline-flex items-center gap-1.5 rounded-full border border-success/20 bg-success/5 px-2.5 py-1 font-mono text-2xs uppercase tracking-wider text-success"><LockKeyhole className="h-3 w-3" aria-hidden="true" />Cifradas no servidor</span>
       </header>
 
-      {!canManage ? (
+      {!canManage || demoMode ? (
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/8 bg-background/35 p-3">
-          <p className="text-xs leading-relaxed text-muted">Entre ou crie uma conta para configurar chaves próprias. Convidados podem usar os provedores habilitados pelo servidor.</p>
-          <button type="button" onClick={() => setActiveView('settings')} className="min-h-10 rounded-lg border border-primary/25 bg-primary/8 px-3 font-mono text-2xs uppercase tracking-wider text-primary transition hover:bg-primary/15">Entrar ou criar conta</button>
+          <p className="text-xs leading-relaxed text-muted">{demoMode ? 'Desative o modo demonstração para configurar chaves de provedores.' : 'Entre ou crie uma conta para configurar chaves próprias. Convidados podem usar os provedores habilitados pelo servidor.'}</p>
+          <button type="button" onClick={() => setActiveView('settings')} className="min-h-10 rounded-lg border border-primary/25 bg-primary/8 px-3 font-mono text-2xs uppercase tracking-wider text-primary transition hover:bg-primary/15">{demoMode ? 'Abrir Ajustes' : 'Entrar ou criar conta'}</button>
         </div>
       ) : (
         <>

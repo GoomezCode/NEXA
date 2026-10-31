@@ -92,6 +92,8 @@ npm run test:responsive
 
 O checklist de breakpoints, controles, zoom e teclado virtual está em [Guia de responsividade](docs/GUIA_RESPONSIVIDADE.md). A verificação automatizada não substitui a checagem de Safari iOS, Android e dispositivos com notch/teclado real.
 
+Em pull requests, o workflow **Web mobile quality** executa a matriz responsiva, axe-core em 320/768/1280 px e Lighthouse CI com limites de performance, acessibilidade, LCP, CLS e JavaScript inicial. O [baseline mobile](docs/BASELINE_WEB_MOBILE.md) documenta a medição atual e o que ainda requer aparelhos reais.
+
 ## Configuração
 
 As variáveis do frontend são lidas pelo Vite no início do processo. Reinicie o Vite depois de alterá-las.
@@ -117,6 +119,7 @@ Para conectar à API real, configure `VITE_DEMO_MODE=false` e aponte `VITE_API_U
 | `npm run dev`           | Inicia o servidor de desenvolvimento.                                  |
 | `npm run dev -- --host` | Inicia o servidor acessível pela rede local.                           |
 | `npm run build`         | Verifica tipos e cria o build em `dist/`.                              |
+| `npm run check:bundle`  | Verifica se o JavaScript inicial gzip permanece abaixo de 200 kB.     |
 | `npm run preview`       | Serve localmente o build, incluindo o proxy local configurado no Vite. |
 | `npm run lint`          | Executa o ESLint.                                                      |
 | `npm run typecheck`     | Verifica os tipos TypeScript.                                          |

@@ -1,0 +1,31 @@
+name: Web mobile quality
+
+on:
+  pull_request:
+  push:
+    branches: [main, develop]
+
+jobs:
+  responsive-and-a11y:
+    runs-on: ubuntu-latest
+    env:
+      VITE_DEMO_MODE: 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium firefox webkit
+      - run: npm run test:responsive
+      - run: npm run test:e2e -- --project=chromium e2e/a11y.spec.ts
+      - run: npm run build
+      - run: npm run check:bundle
+      - run: npx --yes @lhci/cli@0.14.x autorun
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: web-mobile-quality-reports
+          path: .lighthouseci/reports
+          if-no-files-found: ignore
