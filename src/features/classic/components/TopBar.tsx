@@ -168,7 +168,7 @@ export function TopBar({ onExit }: { onExit: () => void }) {
       <div className="w-px h-8 flex-shrink-0" style={{ background: 'rgba(0,245,255,0.12)' }} />
 
       {/* Quick actions */}
-      <div className="flex items-center gap-2 flex-shrink-0">
+      <div className="classic-topbar-actions flex items-center gap-2 flex-shrink-0">
         {[
           {
             icon: Bell,

@@ -73,3 +73,28 @@ test('campos e ações principais mantêm tamanho legível e alvos de toque', as
     expect(box?.height).toBeGreaterThanOrEqual(44);
   }
 });
+
+test('layout compacto mantém o console visível acima do dock e do cabeçalho', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await useDemoMode(page);
+  await page.goto('/?ui=classic');
+
+  const tabs = page.getByRole('navigation', { name: 'Painéis do modo clássico' });
+  const consolePanel = page.locator('.classic-panel--right');
+  const consoleInput = page.getByPlaceholder('Enter command or speak...');
+  await expect(tabs).toBeVisible();
+  await expect(consoleInput).toBeVisible();
+
+  const [tabBox, panelBox, inputBox, dockBox, headerBox] = await Promise.all([
+    tabs.boundingBox(),
+    consolePanel.boundingBox(),
+    consoleInput.boundingBox(),
+    page.locator('.classic-app-dock').boundingBox(),
+    page.locator('.classic-topbar').boundingBox(),
+  ]);
+  expect(tabBox && panelBox && inputBox && dockBox && headerBox).toBeTruthy();
+  expect(tabBox!.y).toBeGreaterThanOrEqual(headerBox!.y + headerBox!.height);
+  expect(panelBox!.y).toBeGreaterThanOrEqual(tabBox!.y + tabBox!.height);
+  expect(inputBox!.y + inputBox!.height).toBeLessThanOrEqual(dockBox!.y);
+  expect(await page.locator('.classic-topbar').evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
+});
