@@ -1,4 +1,5 @@
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
+import { useEffect, useRef, useState } from 'react';
 import { useApiHealth } from '@/api/health';
 import { useOllamaHealth } from '@/api/ollama';
 import { useConnectionStore } from '@/stores/connection-store';
@@ -59,6 +60,7 @@ function Ring({
   direction = 1,
   dashed = false,
   tilt = 0,
+  motionEnabled = true,
 }: {
   size: number;
   thickness: number;
@@ -67,11 +69,12 @@ function Ring({
   direction?: number;
   dashed?: boolean;
   tilt?: number;
+  motionEnabled?: boolean;
 }) {
   return (
     <motion.div
-      animate={{ rotate: direction * 360 }}
-      transition={{ duration, repeat: Infinity, ease: 'linear' }}
+      animate={motionEnabled ? { rotate: direction * 360 } : { rotate: 0 }}
+      transition={{ duration, repeat: motionEnabled ? Infinity : 0, ease: 'linear' }}
       className="absolute rounded-full"
       style={{
         width: size,
@@ -95,6 +98,18 @@ export function AICore() {
   const offlineMode = useConnectionStore((state) => state.mode === 'offline');
   const ollama = useOllamaHealth();
   const cfg = stateConfig[aiState];
+  const reducedMotion = useReducedMotion() ?? false;
+  const coreRef = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(true);
+  const motionEnabled = !reducedMotion && visible;
+
+  useEffect(() => {
+    const element = coreRef.current;
+    if (!element || !('IntersectionObserver' in window)) return;
+    const observer = new IntersectionObserver(([entry]) => setVisible(entry.isIntersecting));
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
 
   const toggleVoice = () => {
     if (voiceListening) stopVoice();
@@ -103,6 +118,7 @@ export function AICore() {
 
   return (
     <div
+      ref={coreRef}
       className="flex flex-col items-center justify-center gap-6 select-none"
       style={{ perspective: '600px' }}
     >
@@ -110,7 +126,7 @@ export function AICore() {
       <div className="relative" style={{ width: 380, height: 380 }}>
         {/* Data point markers */}
         {/* Outer dashed ring */}
-        <Ring size={340} thickness={1} color="rgba(0,245,255,0.1)" duration={40} dashed />
+        <Ring size={340} thickness={1} color="rgba(0,245,255,0.1)" duration={40} dashed motionEnabled={motionEnabled} />
 
         {/* Ring 1 — large slow */}
         <Ring
@@ -120,6 +136,7 @@ export function AICore() {
           duration={20}
           direction={1}
           tilt={20}
+          motionEnabled={motionEnabled}
         />
         {/* Ring 2 — medium counter */}
         <Ring
@@ -129,14 +146,15 @@ export function AICore() {
           duration={14}
           direction={-1}
           tilt={-15}
+          motionEnabled={motionEnabled}
         />
         {/* Ring 3 — fast accent */}
-        <Ring size={210} thickness={1} color={cfg.ringColor} duration={8} direction={1} />
+        <Ring size={210} thickness={1} color={cfg.ringColor} duration={8} direction={1} motionEnabled={motionEnabled} />
 
         {/* Pulse wave rings */}
         <motion.div
-          animate={{ scale: [1, 1.4, 1], opacity: [0.3, 0, 0.3] }}
-          transition={{ duration: cfg.pulseSpeed * 2, repeat: Infinity }}
+          animate={motionEnabled ? { scale: [1, 1.4, 1], opacity: [0.3, 0, 0.3] } : { scale: 1, opacity: 0.15 }}
+          transition={{ duration: cfg.pulseSpeed * 2, repeat: motionEnabled ? Infinity : 0 }}
           className="absolute rounded-full"
           style={{
             width: 180,
@@ -149,8 +167,8 @@ export function AICore() {
           }}
         />
         <motion.div
-          animate={{ scale: [1, 1.6, 1], opacity: [0.2, 0, 0.2] }}
-          transition={{ duration: cfg.pulseSpeed * 2, repeat: Infinity, delay: 0.4 }}
+          animate={motionEnabled ? { scale: [1, 1.6, 1], opacity: [0.2, 0, 0.2] } : { scale: 1, opacity: 0.1 }}
+          transition={{ duration: cfg.pulseSpeed * 2, repeat: motionEnabled ? Infinity : 0, delay: 0.4 }}
           className="absolute rounded-full"
           style={{
             width: 180,
@@ -189,8 +207,8 @@ export function AICore() {
         >
           {/* Inner glow core */}
           <motion.div
-            animate={{ scale: [1, 1.15, 1], opacity: [0.8, 1, 0.8] }}
-            transition={{ duration: cfg.pulseSpeed, repeat: Infinity }}
+            animate={motionEnabled ? { scale: [1, 1.15, 1], opacity: [0.8, 1, 0.8] } : { scale: 1, opacity: 0.9 }}
+            transition={{ duration: cfg.pulseSpeed, repeat: motionEnabled ? Infinity : 0 }}
             className="rounded-full flex items-center justify-center flex-col gap-1"
             style={{
               width: 120,
@@ -200,10 +218,10 @@ export function AICore() {
           >
             {/* Core logo */}
             <motion.div
-              animate={{ rotate: aiState === 'processing' ? 360 : 0 }}
+              animate={motionEnabled && aiState === 'processing' ? { rotate: 360 } : { rotate: 0 }}
               transition={{
                 duration: 1.5,
-                repeat: aiState === 'processing' ? Infinity : 0,
+                repeat: motionEnabled && aiState === 'processing' ? Infinity : 0,
                 ease: 'linear',
               }}
             >
@@ -290,15 +308,15 @@ export function AICore() {
         </div>
 
         <motion.p
-          animate={{ opacity: [0.3, 0.6, 0.3] }}
-          transition={{ duration: 3, repeat: Infinity }}
+          animate={motionEnabled ? { opacity: [0.3, 0.6, 0.3] } : { opacity: 0.5 }}
+          transition={{ duration: 3, repeat: motionEnabled ? Infinity : 0 }}
           style={{ ...raj, color: 'rgba(0,245,255,0.4)', fontSize: '11px', marginTop: 4 }}
         >
           {offlineMode ? ollama.isError ? 'OLLAMA LOCAL INDISPONÍVEL' : ollama.data ? `OLLAMA ${ollama.data} CONECTADO` : 'VERIFICANDO OLLAMA' : health.data?.status === 'ok' ? 'API CONNECTADA' : 'STATUS DA API INDISPONÍVEL'}
         </motion.p>
         <motion.p
-          animate={{ opacity: [0.35, 0.65, 0.35] }}
-          transition={{ duration: 2.4, repeat: Infinity }}
+          animate={motionEnabled ? { opacity: [0.35, 0.65, 0.35] } : { opacity: 0.5 }}
+          transition={{ duration: 2.4, repeat: motionEnabled ? Infinity : 0 }}
           style={{ ...mono, color: 'rgba(0,245,255,0.32)', fontSize: '8px', letterSpacing: '0.08em' }}
         >
           {voiceListening ? 'TOQUE PARA ENCERRAR A ESCUTA' : voiceSupported ? 'TOQUE NO NÚCLEO PARA FALAR' : 'MICROFONE INDISPONÍVEL'}

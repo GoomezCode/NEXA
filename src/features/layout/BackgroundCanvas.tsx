@@ -38,9 +38,10 @@ export function BackgroundCanvas() {
           const neighbor = particles[other];
           const dx = particle.x - neighbor.x;
           const dy = particle.y - neighbor.y;
-          const distance = Math.hypot(dx, dy);
+          const distanceSquared = dx * dx + dy * dy;
 
-          if (distance < 120) {
+          if (distanceSquared < 14400) {
+            const distance = Math.sqrt(distanceSquared);
             context.beginPath();
             context.moveTo(particle.x, particle.y);
             context.lineTo(neighbor.x, neighbor.y);
@@ -60,7 +61,9 @@ export function BackgroundCanvas() {
     };
 
     const createParticles = () => {
-      const count = Math.min(54, Math.max(18, Math.floor(width / 26)));
+      const compact = window.matchMedia('(max-width: 47.999rem)').matches;
+      const areaCount = Math.floor((width * height) / 18000);
+      const count = Math.max(12, Math.min(54, Math.floor(areaCount * (compact ? 0.65 : 1))));
 
       particles = Array.from({ length: count }, () => ({
         x: Math.random() * width,

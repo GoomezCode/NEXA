@@ -307,6 +307,11 @@
   html { font-size: clamp(16px, calc(0.55vw + 8px), 20px); }
 }
 
+@media (max-width: 47.999rem) {
+  [class*='backdrop-blur'] { backdrop-filter: none !important; }
+  .nexa-sheet::backdrop { backdrop-filter: none; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }
