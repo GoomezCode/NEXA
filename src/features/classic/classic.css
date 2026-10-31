@@ -132,12 +132,13 @@
   .classic-layout--compact[data-active-panel='console'] .classic-panel--right,
   .classic-layout--compact[data-active-panel='search'] .classic-panel--right { display: flex; flex: 1; }
   .classic-layout--compact .classic-panel > div:last-child { min-height: 0; flex: 1; overflow: auto; padding: 0.75rem; }
+  .classic-layout--compact .classic-panel > div:first-child { display: none; }
   .classic-layout--compact .classic-voice-bar { display: none; }
   .classic-layout--compact .classic-app-dock { height: 3.5rem !important; bottom: var(--kb-inset) !important; }
   .classic-layout--compact .classic-app-dock > div:first-child,
   .classic-layout--compact .classic-app-dock > div:last-child { display: none; }
-  .classic-layout--compact .classic-app-dock > div:nth-child(2) { padding: 0.15rem 0.35rem !important; }
-  .classic-layout--compact .classic-app-dock > div:nth-child(2) button { width: 2.75rem; height: 2.75rem; }
+  .classic-layout--compact .classic-app-dock > div:nth-child(2) { align-items: center !important; padding: 0.1rem 0.35rem !important; }
+  .classic-layout--compact .classic-app-dock > div:nth-child(2) button { width: 3.25rem; height: 2.75rem; flex-direction: column; gap: 0.05rem; }
   .classic-layout--compact .classic-main-area { padding-bottom: calc(4rem + var(--kb-inset)) !important; }
   .classic-layout--compact .classic-console-mic {
     display: inline-flex;
@@ -153,6 +154,10 @@
   }
   .classic-layout--compact .classic-console-mic svg { width: 1rem; height: 1rem; }
   .classic-layout--compact .classic-panel input { min-height: 2.75rem; font-size: 1rem !important; }
+  .classic-layout--compact button { min-height: 2.75rem; }
+  .classic-layout--compact :is(p, span, label, button, li, dt, dd) { font-size: 0.6875rem !important; }
+  .classic-layout--compact :is(p, li) { font-size: 0.75rem !important; }
+  .classic-layout--compact .classic-dock-label { display: inline; }
   .classic-hud button { touch-action: manipulation; }
 }
 
@@ -167,6 +172,7 @@
 
 .classic-compact-tabs { display: none; }
 .classic-console-mic { display: none; }
+.classic-dock-label { display: none; }
 
 @media (min-width: 768px) and (max-width: 1279px) {
   :root { --c-main-top: 3.5rem; --c-main-bottom: 8rem; }
@@ -179,4 +185,9 @@
   .classic-layout--short .classic-panel--right { width: min(38vw, 26rem); }
   .classic-layout--short .classic-voice-bar { height: 3rem !important; }
   .classic-layout--short .classic-app-dock { height: 2.75rem !important; }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .classic-hud [title] { -webkit-tap-highlight-color: transparent; }
+  .classic-hud .classic-app-dock { backdrop-filter: none !important; }
 }

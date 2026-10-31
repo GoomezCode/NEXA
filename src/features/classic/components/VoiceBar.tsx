@@ -91,7 +91,7 @@ export function VoiceBar() {
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
         onClick={() => setTextMode(!textMode)}
-        className="w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer flex-shrink-0"
+        className="w-11 h-11 rounded-xl flex items-center justify-center cursor-pointer flex-shrink-0"
         style={{
           background: textMode ? 'rgba(168,85,247,0.15)' : 'rgba(0,245,255,0.05)',
           border: `1px solid ${textMode ? 'rgba(168,85,247,0.4)' : 'rgba(0,245,255,0.15)'}`,
@@ -117,7 +117,7 @@ export function VoiceBar() {
           updateSettings({ ttsEnabled: !ttsEnabled });
           if (!ttsEnabled && !isStreaming && latestAnswer) speakText(latestAnswer.text);
         }}
-        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
+        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
         style={{
           background: ttsEnabled ? 'rgba(34,197,94,.14)' : 'rgba(255,255,255,.035)',
           border: `1px solid ${ttsEnabled ? 'rgba(34,197,94,.45)' : 'rgba(255,255,255,.1)'}`,

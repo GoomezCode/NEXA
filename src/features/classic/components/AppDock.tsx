@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   MessageSquare,
@@ -24,6 +24,7 @@ export function AppDock() {
   const { setAppGridOpen, setSettingsOpen, setLeftPanel, setRightPanel, leftPanel, rightPanel, settingsOpen } = useApp();
   const [hovered, setHovered] = useState<string | null>(null);
   const [tooltip, setTooltip] = useState<string | null>(null);
+  const touchStartY = useRef<number | null>(null);
 
   const handleClick = (app: (typeof DOCK_APPS)[0]) => {
     if (app.id === 'settings') {
@@ -51,6 +52,14 @@ export function AppDock() {
         backdropFilter: 'blur(20px)',
         borderTop: '1px solid rgba(0, 245, 255, 0.1)',
       }}
+      onPointerDown={(event) => {
+        if (event.pointerType === 'touch' || event.pointerType === 'pen') touchStartY.current = event.clientY;
+      }}
+      onPointerUp={(event) => {
+        if (touchStartY.current !== null && touchStartY.current - event.clientY > 48) setAppGridOpen(true);
+        touchStartY.current = null;
+      }}
+      onPointerCancel={() => { touchStartY.current = null; }}
     >
       {/* Left label */}
       <div className="absolute left-6 flex flex-col">
@@ -123,6 +132,7 @@ export function AppDock() {
               }}
             >
               <app.icon className="w-5 h-5" style={{ color: app.color }} />
+              <span className="classic-dock-label">{app.name}</span>
 
               <AnimatePresence>{active && <motion.span initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0 }} className="absolute -bottom-1.5 h-1.5 w-1.5 rounded-full" style={{ background: app.color, boxShadow: `0 0 7px ${app.color}` }} />}</AnimatePresence>
             </motion.button>
@@ -167,6 +177,7 @@ export function AppDock() {
             }}
           >
             <Grid className="w-5 h-5" style={{ color: '#00f5ff' }} />
+            <span className="classic-dock-label">Apps</span>
           </motion.button>
         </div>
       </div>
