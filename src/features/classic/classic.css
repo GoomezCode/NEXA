@@ -15,6 +15,18 @@
   text-rendering: optimizeLegibility;
 }
 
+/* Keep the classic scene opaque on mobile Safari as well as desktop. The HUD is
+   a fixed viewport layer; without its own painted surface WebKit can expose
+   the page canvas through the flex layout during viewport updates. */
+.classic-layout {
+  isolation: isolate;
+  background-color: #010812;
+}
+
+.classic-layout > .classic-background {
+  z-index: -1 !important;
+}
+
 .classic-hud * {
   scrollbar-width: thin;
   scrollbar-color: rgba(0, 245, 255, 0.2) transparent;
