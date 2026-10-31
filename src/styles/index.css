@@ -262,6 +262,11 @@
   outline-offset: 2px;
 }
 
+.nexa-app-root button:not(:disabled):active,
+.classic-hud button:not(:disabled):active {
+  filter: brightness(1.2);
+}
+
 .nexa-markdown > * + * {
   margin-top: 0.65rem;
 }

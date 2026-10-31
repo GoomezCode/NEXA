@@ -1,5 +1,5 @@
 import { AlertTriangle, CheckCircle2, Info, X, XCircle } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { cn } from '@/lib/utils';
 import type { AppNotification, NotificationTone } from '@/stores/notification-store';
@@ -34,6 +34,7 @@ const TONE: Record<
 function NotificationToast({ item }: { item: AppNotification }) {
   const remove = useNotificationStore((state) => state.remove);
   const [paused, setPaused] = useState(false);
+  const touchStartX = useRef<number | null>(null);
   const tone = TONE[item.tone];
   const Icon = tone.icon;
 
@@ -53,6 +54,9 @@ function NotificationToast({ item }: { item: AppNotification }) {
       onMouseLeave={() => setPaused(false)}
       onFocusCapture={() => setPaused(true)}
       onBlurCapture={() => setPaused(false)}
+      onPointerDown={(event) => { if (event.pointerType === 'touch') touchStartX.current = event.clientX; }}
+      onPointerUp={(event) => { const startX = touchStartX.current; if (startX !== null && startX - event.clientX > 56) remove(item.id); touchStartX.current = null; }}
+      onPointerCancel={() => { touchStartX.current = null; }}
       className={cn(
         'pointer-events-auto flex w-full items-start gap-2.5 rounded-xl border p-3 shadow-[0_10px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl',
         tone.className,
@@ -71,7 +75,7 @@ function NotificationToast({ item }: { item: AppNotification }) {
         type="button"
         onClick={() => remove(item.id)}
         aria-label={`Dispensar notificação: ${item.title}`}
-        className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-muted transition hover:bg-white/10 hover:text-foreground"
+        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-muted transition hover:bg-white/10 hover:text-foreground active:scale-95"
       >
         <X className="h-3.5 w-3.5" aria-hidden="true" />
       </button>
