@@ -1,12 +1,5 @@
 import { Eye, EyeOff, LogIn, UserPlus } from 'lucide-react';
-import {
-  useEffect,
-  useState,
-  type ChangeEvent,
-  type FormEvent,
-  type InputHTMLAttributes,
-  type ReactNode,
-} from 'react';
+import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
 
 import { ensureGuest, loginWithPassword, registerAccount } from '@/api/auth';
 import { ApiError } from '@/api/client/problem';
@@ -17,52 +10,13 @@ import { useAuthStore } from '@/stores/auth-store';
 import { useSettingsStore } from '@/stores/settings-store';
 import { useConnectionStore } from '@/stores/connection-store';
 import { appEnv } from '@/lib/env';
+import { Field } from '@/components/ui/Field';
 
 import { fieldErrors, loginSchema, registerSchema } from './schemas';
 
 type Mode = 'login' | 'register';
 
 const REGISTRATION_ENABLED = appEnv.registrationEnabled;
-
-function Field({
-  id,
-  label,
-  error,
-  trailing,
-  ...input
-}: {
-  id: string;
-  label: string;
-  error?: string;
-  trailing?: ReactNode;
-} & InputHTMLAttributes<HTMLInputElement>) {
-  return (
-    <div>
-      <label htmlFor={id} className="block text-2xs text-muted">
-        {label}
-      </label>
-      <div className="relative mt-1">
-        <input
-          id={id}
-          aria-invalid={error ? true : undefined}
-          aria-describedby={error ? `${id}-error` : undefined}
-          className={cn(
-            'nexa-field w-full rounded-xl border bg-background/60 px-3 py-2 text-base sm:text-sm text-foreground outline-none transition focus:border-primary/40',
-            trailing && 'pr-12',
-            error ? 'border-danger/40' : 'border-white/10',
-          )}
-          {...input}
-        />
-        {trailing && <div className="absolute right-0 top-1/2 -translate-y-1/2">{trailing}</div>}
-      </div>
-      {error && (
-        <p id={`${id}-error`} className="mt-1 text-2xs text-danger">
-          {error}
-        </p>
-      )}
-    </div>
-  );
-}
 
 export function AuthView() {
   const expired = useAuthStore((state) => state.status === 'expired');

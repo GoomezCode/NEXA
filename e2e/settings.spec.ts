@@ -43,6 +43,18 @@ test('mantém a entrada por voz desligada após recarregar', async ({ page }) =>
   );
 });
 
+test('persiste a aparência selecionada e aplica o tema ao documento', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Abrir ajustes' }).click();
+  await page.getByLabel('Tema da interface').selectOption('light');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+  await page.getByRole('button', { name: 'Abrir ajustes' }).click();
+  await expect(page.getByLabel('Tema da interface')).toHaveValue('light');
+});
+
 test('restaura os padrões dos ajustes', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: 'Abrir ajustes' }).click();

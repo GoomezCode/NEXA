@@ -1,3 +1,5 @@
+import type { CSSProperties } from 'react';
+
 import type { AiState } from '@/api/types';
 import { NexaMark } from '@/components/brand/NexaMark';
 import { cn } from '@/lib/utils';
@@ -5,11 +7,11 @@ import { cn } from '@/lib/utils';
 import { AI_STATE_LABEL } from './ai-state';
 
 const ORB_COLOR: Record<AiState, string> = {
-  idle: '#00e5ff',
-  listening: '#34d399',
-  processing: '#fbbf24',
-  responding: '#a78bfa',
-  error: '#fb7185',
+  idle: 'var(--nexa-orb-idle)',
+  listening: 'var(--nexa-orb-listening)',
+  processing: 'var(--nexa-orb-processing)',
+  responding: 'var(--nexa-orb-responding)',
+  error: 'var(--nexa-orb-error)',
 };
 
 const ORB_SIZE = {
@@ -31,19 +33,19 @@ export function Orb({ state, size = 'md', className }: OrbProps) {
   return (
     <div
       className={cn('relative flex items-center justify-center', className)}
-      style={{ width: pixels, height: pixels }}
+      style={{ width: pixels, height: pixels, '--orb-color': color } as CSSProperties}
       role="img"
       aria-label={`NEXA: ${AI_STATE_LABEL[state].toLowerCase()}`}
     >
       <div
         className="nexa-spin-slow absolute inset-0 rounded-full border border-dashed"
-        style={{ borderColor: `${color}33` }}
+        style={{ borderColor: 'color-mix(in oklab, var(--orb-color) 20%, transparent)' }}
         aria-hidden="true"
       />
       <div
         className="nexa-spin-reverse absolute inset-[10%] rounded-full border"
         style={{
-          borderColor: `${color}55`,
+          borderColor: 'color-mix(in oklab, var(--orb-color) 34%, transparent)',
           animationDuration: state === 'processing' ? '5s' : undefined,
         }}
         aria-hidden="true"
@@ -51,17 +53,17 @@ export function Orb({ state, size = 'md', className }: OrbProps) {
       <div
         className="nexa-pulse absolute inset-[22%] rounded-full"
         style={{
-          border: `1px solid ${color}66`,
-          boxShadow: `0 0 24px ${color}33`,
+          border: '1px solid color-mix(in oklab, var(--orb-color) 40%, transparent)',
+          boxShadow: '0 0 24px color-mix(in oklab, var(--orb-color) 20%, transparent)',
         }}
         aria-hidden="true"
       />
       <div
         className="absolute inset-[30%] rounded-full"
         style={{
-          background: `radial-gradient(circle at 38% 32%, ${color}40, rgba(4, 7, 15, 0.92) 68%)`,
-          border: `1.5px solid ${color}`,
-          boxShadow: `0 0 28px ${color}55, inset 0 0 18px ${color}22`,
+          background: 'radial-gradient(circle at 38% 32%, color-mix(in oklab, var(--orb-color) 25%, transparent), var(--nexa-bg) 68%)',
+          border: '1.5px solid var(--orb-color)',
+          boxShadow: '0 0 28px color-mix(in oklab, var(--orb-color) 34%, transparent), inset 0 0 18px color-mix(in oklab, var(--orb-color) 14%, transparent)',
         }}
         aria-hidden="true"
       />

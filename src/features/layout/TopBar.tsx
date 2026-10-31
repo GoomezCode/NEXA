@@ -3,6 +3,7 @@ import { memo, useEffect, useState } from 'react';
 
 import { logout } from '@/api/auth';
 import { NexaMark } from '@/components/brand/NexaMark';
+import { Badge } from '@/components/ui/Badge';
 import { useOnlineStatus } from '@/hooks/use-online-status';
 import { formatClock, formatShortDate } from '@/lib/format';
 import { useAuthStore } from '@/stores/auth-store';
@@ -11,21 +12,14 @@ import { useUiStore } from '@/stores/ui-store';
 import { useConnectionStore } from '@/stores/connection-store';
 
 function StatusChip({ tone, label }: { tone: 'success' | 'warning'; label: string }) {
-  const styles =
-    tone === 'success'
-      ? 'border-success/25 bg-success/5 text-success'
-      : 'border-warning/25 bg-warning/5 text-warning';
-
   return (
-    <span
-      className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 font-mono text-2xs uppercase tracking-[0.14em] ${styles}`}
-    >
+    <Badge tone={tone}>
       <span
         className={`h-1.5 w-1.5 rounded-full ${tone === 'success' ? 'bg-success' : 'bg-warning'}`}
         aria-hidden="true"
       />
       {label}
-    </span>
+    </Badge>
   );
 }
 

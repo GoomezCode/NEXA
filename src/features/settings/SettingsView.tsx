@@ -10,92 +10,18 @@ import {
   User,
   Volume2,
 } from 'lucide-react';
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useState } from 'react';
 
 import { logout } from '@/api/auth';
 import { isSpeechRecognitionSupported } from '@/features/voice/use-speech-recognition';
 import { cancelSpeech, isSpeechSynthesisSupported, speakText } from '@/lib/speech';
-import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/auth-store';
 import { DEFAULT_SETTINGS, useSettingsStore } from '@/stores/settings-store';
 import { useConnectionStore } from '@/stores/connection-store';
 import { ollamaVersion } from '@/api/ollama';
 import { resetChatAdapter } from '@/api';
-
-function SettingSwitch({
-  label,
-  description,
-  checked,
-  onChange,
-  disabled = false,
-}: {
-  label: string;
-  description?: string;
-  checked: boolean;
-  onChange: (checked: boolean) => void;
-  disabled?: boolean;
-}) {
-  return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={checked}
-      aria-label={label}
-      onClick={() => onChange(!checked)}
-      disabled={disabled}
-      className="flex w-full items-center justify-between gap-4 rounded-xl border border-white/5 bg-background/40 p-3 text-left transition hover:border-white/10 disabled:cursor-not-allowed disabled:opacity-50"
-    >
-      <span className="min-w-0">
-        <span className="block text-[13px] text-foreground">{label}</span>
-        {description && (
-          <span className="mt-0.5 block text-2xs leading-relaxed text-muted">{description}</span>
-        )}
-      </span>
-      <span
-        aria-hidden="true"
-        className={cn(
-          'flex h-5 w-9 shrink-0 items-center rounded-full border p-0.5 transition',
-          checked ? 'border-primary/40 bg-primary/20' : 'border-white/10 bg-white/5',
-        )}
-      >
-        <span
-          className={cn(
-            'h-3.5 w-3.5 rounded-full transition',
-            checked ? 'translate-x-4 bg-primary' : 'translate-x-0 bg-muted/60',
-          )}
-        />
-      </span>
-    </button>
-  );
-}
-
-function SectionCard({
-  id,
-  title,
-  icon: Icon,
-  children,
-}: {
-  id: string;
-  title: string;
-  icon: typeof User;
-  children: ReactNode;
-}) {
-  return (
-    <section
-      aria-labelledby={id}
-      className="rounded-2xl border border-border bg-surface/50 p-4 sm:p-5"
-    >
-      <h3
-        id={id}
-        className="flex items-center gap-2 font-display text-2xs tracking-[0.2em] text-primary"
-      >
-        <Icon className="h-3.5 w-3.5" aria-hidden="true" />
-        {title}
-      </h3>
-      <div className="mt-3 space-y-2.5">{children}</div>
-    </section>
-  );
-}
+import { SectionCard } from '@/components/ui/Panel';
+import { Switch as SettingSwitch } from '@/components/ui/Switch';
 
 function AccountSettings() {
   const session = useAuthStore((state) => state.session);
@@ -291,6 +217,21 @@ export function SettingsView() {
         </SectionCard>
 
         <SectionCard id="settings-appearance" title="APARÊNCIA" icon={Palette}>
+          <div>
+            <label htmlFor="settings-theme" className="block text-2xs text-muted">Tema da interface</label>
+            <select
+              id="settings-theme"
+              value={settings.theme}
+              onChange={(event) => update({ theme: event.target.value as typeof settings.theme })}
+              className="mt-1 min-h-11 w-full rounded-xl border border-white/10 bg-background/60 px-3 text-sm text-foreground outline-none focus:border-primary/40"
+            >
+              <option value="hud">NEXA HUD</option>
+              <option value="violet">Violeta</option>
+              <option value="classic">Clássico</option>
+              <option value="light">Claro</option>
+              <option value="contrast">Alto contraste</option>
+            </select>
+          </div>
           <SettingSwitch
             label="Reduzir animações"
             description="Desliga pulsos, giros e transições do HUD."

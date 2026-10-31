@@ -8,13 +8,16 @@ import { useSettingsStore } from '@/stores/settings-store';
 
 export function App() {
   const reducedMotion = useSettingsStore((state) => state.settings.reducedMotion);
+  const theme = useSettingsStore((state) => state.settings.theme);
 
   useEffect(() => {
     document.documentElement.dataset.reducedMotion = reducedMotion ? 'true' : 'false';
+    document.documentElement.dataset.theme = theme;
     return () => {
       delete document.documentElement.dataset.reducedMotion;
+      delete document.documentElement.dataset.theme;
     };
-  }, [reducedMotion]);
+  }, [reducedMotion, theme]);
 
   return (
     <AppProviders>

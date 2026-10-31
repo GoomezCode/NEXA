@@ -15,6 +15,7 @@ import { useSettingsStore } from '@/stores/settings-store';
 import { useUiStore } from '@/stores/ui-store';
 import { useConnectionStore } from '@/stores/connection-store';
 import { useOverlayHistory } from '@/hooks/use-overlay-history';
+import { IconButton } from '@/components/ui/Button';
 
 const SUBSYSTEMS = [
   { icon: Radio, label: 'Streaming', value: 'SSE ativo' },
@@ -108,7 +109,7 @@ export function ContextPanel({ sessionId }: { sessionId: string | null }) {
 
   return (
     <>
-    <button ref={mobileTriggerRef} type="button" aria-expanded={mobileOpen} aria-controls="nexa-context-panel" onClick={() => mobileOpen ? closeMobilePanel() : setMobileOpen(true)} className="absolute bottom-[calc(var(--safe-bottom)+var(--composer-height,5.5rem)+0.75rem)] right-3 z-30 flex h-11 w-11 items-center justify-center rounded-full border border-primary/30 bg-surface text-primary shadow-lg xl:hidden" aria-label={mobileOpen ? 'Fechar painel do núcleo' : 'Abrir painel do núcleo'}><PanelRight className="h-4 w-4" aria-hidden="true" /></button>
+    <IconButton ref={mobileTriggerRef} label={mobileOpen ? 'Fechar painel do núcleo' : 'Abrir painel do núcleo'} aria-expanded={mobileOpen} aria-controls="nexa-context-panel" onClick={() => mobileOpen ? closeMobilePanel() : setMobileOpen(true)} className="absolute bottom-[calc(var(--safe-bottom)+var(--composer-height,5.5rem)+0.75rem)] right-3 z-30 rounded-full border-primary/30 bg-surface text-primary shadow-lg xl:hidden"><PanelRight className="h-4 w-4" aria-hidden="true" /></IconButton>
     {mobileOpen && <button type="button" tabIndex={-1} aria-label="Fechar painel do núcleo" onClick={closeMobilePanel} className="fixed inset-0 z-20 bg-black/55 xl:hidden" />}
     <aside
       id="nexa-context-panel"

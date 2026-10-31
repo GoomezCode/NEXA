@@ -1,6 +1,7 @@
 import { Activity, Brain, MessageSquare, Settings } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/Button';
 import { useUiStore, type AppView } from '@/stores/ui-store';
 
 const NAV_ITEMS: { id: AppView; label: string; icon: typeof MessageSquare }[] = [
@@ -24,12 +25,14 @@ function NavButton({
   const Icon = item.icon;
 
   return (
-    <button
+    <Button
       type="button"
+      variant={active ? 'primary' : 'ghost'}
+      size="sm"
       onClick={onClick}
       aria-current={active ? 'page' : undefined}
       className={cn(
-        'flex items-center justify-center gap-2 rounded-xl border transition',
+        'flex items-center justify-center gap-2 rounded-xl',
         compact ? 'h-12 flex-1 flex-col gap-0.5' : 'min-h-11 px-4 py-2',
         active
           ? 'border-primary/35 bg-primary/10 text-primary'
@@ -45,7 +48,7 @@ function NavButton({
       >
         {item.label}
       </span>
-    </button>
+    </Button>
   );
 }
 
