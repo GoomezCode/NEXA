@@ -122,7 +122,7 @@ export function ContextPanel({ sessionId }: { sessionId: string | null }) {
       >
         <section>
           <h2 className="font-display text-2xs tracking-[0.22em] text-primary/80">PERFIL</h2>
-          <p className="mt-2 truncate text-sm text-foreground">{displayName && displayName !== 'Operador' ? displayName : auth?.username ?? 'Visitante'}</p>
+          <p className="mt-2 truncate text-sm text-foreground">{displayName || auth?.username || 'Visitante'}</p>
           <p className="font-mono text-2xs uppercase text-muted">{offlineMode ? 'modo offline' : `${auth?.username ?? 'sem conta'} · ${auth?.role ?? 'demo'}`}</p>
         </section>
 

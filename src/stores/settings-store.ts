@@ -16,7 +16,7 @@ export interface AppSettings {
 const STORAGE_KEY = 'nexa:settings:v1';
 
 export const DEFAULT_SETTINGS: AppSettings = {
-  displayName: 'Operador',
+  displayName: '',
   theme: 'hud',
   voiceInputEnabled: true,
   ttsEnabled: false,
@@ -37,9 +37,11 @@ function sanitizeSettings(value: unknown): AppSettings {
 
   return {
     displayName:
-      typeof candidate.displayName === 'string'
-        ? candidate.displayName.slice(0, 60)
-        : DEFAULT_SETTINGS.displayName,
+      candidate.displayName === 'Operador'
+        ? ''
+        : typeof candidate.displayName === 'string'
+          ? candidate.displayName.slice(0, 60)
+          : DEFAULT_SETTINGS.displayName,
     theme: ['hud', 'violet', 'classic', 'light', 'contrast'].includes(String(candidate.theme))
       ? (candidate.theme as AppSettings['theme'])
       : DEFAULT_SETTINGS.theme,

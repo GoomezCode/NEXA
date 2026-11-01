@@ -125,9 +125,9 @@ export function AppShell() {
           </div>
         )}
 
-        <div className="relative flex min-h-0 flex-1">
+        <div className="relative flex min-h-0 flex-1 min-[640px]:max-lg:pl-16">
           {sidebarOpen && (
-            <aside className="hidden w-56 shrink-0 border-r border-white/5 bg-surface/25 md:flex md:flex-col lg:w-64">
+            <aside className="hidden w-56 shrink-0 border-r border-white/5 bg-surface/25 lg:flex lg:flex-col lg:w-64">
               <SessionsSidebar className="min-h-0 flex-1" />
             </aside>
           )}

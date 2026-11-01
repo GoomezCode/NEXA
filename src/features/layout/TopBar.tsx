@@ -59,7 +59,7 @@ export function TopBar() {
         id="open-sessions-button"
         type="button"
         onClick={() => setSearchParams((current) => { const next = new URLSearchParams(current); next.set('panel', 'sessions'); return next; })}
-        className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-muted transition hover:border-primary/30 hover:text-primary md:hidden"
+        className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-muted transition hover:border-primary/30 hover:text-primary lg:hidden"
         aria-label="Abrir conversas"
       >
         <Menu className="h-4 w-4" aria-hidden="true" />
@@ -68,7 +68,7 @@ export function TopBar() {
       <button
         type="button"
         onClick={toggleSidebar}
-        className="hidden h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-muted transition hover:border-primary/30 hover:text-primary md:flex"
+        className="hidden h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-muted transition hover:border-primary/30 hover:text-primary lg:flex"
         aria-label="Alternar barra lateral"
       >
         <PanelLeft className="h-4 w-4" aria-hidden="true" />
@@ -84,7 +84,7 @@ export function TopBar() {
         </div>
       </div>
 
-      <div className="ml-2 hidden items-center gap-2 md:flex">
+      <div className="ml-2 hidden items-center gap-2 lg:flex">
         {offlineMode ? (
           <>
             <StatusChip tone="warning" label="modo offline · ollama local" />
@@ -125,8 +125,11 @@ export function TopBar() {
         </>}
       </div>
 
-      <div className="ml-auto flex items-center gap-2 sm:gap-3">
-        <Clock />
+      <div className="ml-auto flex min-w-0 items-center gap-2 sm:gap-3">
+        <div className="lg:hidden">
+          <StatusChip tone={offlineMode || !online || demoMode ? 'warning' : 'success'} label={offlineMode ? 'offline' : !online ? 'sem rede' : demoMode ? 'demo' : 'online'} />
+        </div>
+        <div className="hidden sm:block"><Clock /></div>
 
         <button
           type="button"

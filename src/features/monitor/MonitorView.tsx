@@ -25,7 +25,7 @@ import { useSettingsStore } from '@/stores/settings-store';
 import { useConnectionStore } from '@/stores/connection-store';
 import { ollamaBase, useOllamaHealth, useOllamaProcesses } from '@/api/ollama';
 import { ApiLetter } from './ApiLetter';
-import { ProviderKeysPanel } from './ProviderKeysPanel';
+import { useNavigate } from 'react-router-dom';
 
 type Tone = 'success' | 'warning' | 'danger' | 'muted';
 
@@ -102,6 +102,7 @@ function QuotaMeter({
 }
 
 export function MonitorView() {
+  const navigate = useNavigate();
   const offlineMode = useConnectionStore((state) => state.mode === 'offline');
   const health = useApiHealth();
   const usage = useUsage();
@@ -439,7 +440,10 @@ export function MonitorView() {
           </div>
         </div>
 
-        <ProviderKeysPanel />
+        <Panel title="CHAVES DE PROVEDORES" icon={ShieldCheck}>
+          <p className="text-xs leading-relaxed text-muted">As chaves próprias agora ficam em Ajustes, junto das outras opções de conexão.</p>
+          <button type="button" onClick={() => navigate('/settings#settings-providers')} className="min-h-11 rounded-xl border border-primary/30 bg-primary/10 px-3 font-mono text-2xs uppercase tracking-wider text-primary hover:bg-primary/15">Abrir provedores em Ajustes</button>
+        </Panel>
 
         <ApiLetter />
 

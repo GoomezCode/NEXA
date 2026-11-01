@@ -63,7 +63,8 @@ test('restaura os padrões dos ajustes', async ({ page }) => {
   await name.fill('Marina');
   await page.getByRole('button', { name: 'Restaurar padrões' }).click();
 
-  await expect(name).toHaveValue('Operador');
+  await expect(name).toHaveValue('');
+  await expect(name).toHaveAttribute('placeholder', 'Seu nome');
 });
 
 test('o aviso de demonstração leva aos ajustes', async ({ page }) => {

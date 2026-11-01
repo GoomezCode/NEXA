@@ -24,7 +24,7 @@ export function SessionsSheet() {
         <Dialog.Overlay className="fixed inset-0 z-[79] bg-black/60 backdrop-blur-sm" />
         <Dialog.Content
           aria-describedby={undefined}
-          className="nexa-sheet fixed inset-0 z-[80] flex flex-col bg-background/95 pb-[var(--safe-bottom)] pt-[var(--safe-top)] shadow-2xl backdrop-blur-2xl"
+          className="nexa-sheet fixed inset-0 z-[80] flex flex-col bg-background/95 pb-[var(--safe-bottom)] pt-[var(--safe-top)] shadow-2xl backdrop-blur-2xl min-[640px]:max-lg:inset-y-0 min-[640px]:max-lg:left-16 min-[640px]:max-lg:right-auto min-[640px]:max-lg:w-[min(24rem,calc(100vw-4rem))]"
           onCloseAutoFocus={(event) => {
             if (!document.getElementById('open-sessions-button')) return;
             event.preventDefault();

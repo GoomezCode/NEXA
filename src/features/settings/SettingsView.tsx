@@ -7,6 +7,7 @@ import {
   Plug,
   RotateCcw,
   ShieldCheck,
+  Settings2,
   User,
   Volume2,
 } from 'lucide-react';
@@ -21,7 +22,10 @@ import { useConnectionStore } from '@/stores/connection-store';
 import { ollamaVersion } from '@/api/ollama';
 import { resetChatAdapter } from '@/api';
 import { SectionCard } from '@/components/ui/Panel';
+import { Button } from '@/components/ui/Button';
+import { Field } from '@/components/ui/Field';
 import { Switch as SettingSwitch } from '@/components/ui/Switch';
+import { ProviderKeysPanel } from '@/features/monitor/ProviderKeysPanel';
 
 function AccountSettings() {
   const session = useAuthStore((state) => state.session);
@@ -69,6 +73,7 @@ export function SettingsView() {
   const setConnectionMode = useConnectionStore((state) => state.setMode);
   const setOllamaConfig = useConnectionStore((state) => state.setOllamaConfig);
   const settings = useSettingsStore((state) => state.settings);
+  const accountName = useAuthStore((state) => state.session?.username ?? '');
   const update = useSettingsStore((state) => state.update);
   const reset = useSettingsStore((state) => state.reset);
 
@@ -125,6 +130,13 @@ export function SettingsView() {
           </p>
         </header>
 
+        <nav aria-label="Seções dos ajustes" className="sticky top-0 z-10 flex gap-1 overflow-x-auto rounded-xl border border-border/70 bg-background/95 p-1 backdrop-blur-xl">
+          {[
+            ['settings-profile', 'Perfil'], ['settings-voice', 'Voz'], ['settings-appearance', 'Aparência'],
+            ['settings-account', 'Conta'], ['settings-providers', 'Provedores'], ['settings-connection', 'Conexão'], ['settings-offline', 'Offline'],
+          ].map(([id, label]) => <a key={id} href={`#${id}`} className="inline-flex min-h-10 shrink-0 items-center rounded-lg px-3 font-mono text-2xs uppercase tracking-wider text-muted hover:bg-primary/10 hover:text-primary">{label}</a>)}
+        </nav>
+
         <SectionCard id="settings-profile" title="PERFIL" icon={User}>
           <label htmlFor="settings-display-name" className="block text-2xs text-muted">
             Como a NEXA deve chamar você
@@ -132,6 +144,7 @@ export function SettingsView() {
           <input
             id="settings-display-name"
             value={settings.displayName}
+            placeholder={accountName || 'Seu nome'}
             maxLength={60}
             onChange={(event) => update({ displayName: event.target.value })}
             className="w-full rounded-xl border border-white/10 bg-background/60 px-3 py-2 text-sm text-foreground outline-none transition focus:border-primary/40"
@@ -244,17 +257,19 @@ export function SettingsView() {
           <AccountSettings />
         </SectionCard>
 
+        <SectionCard id="settings-providers" title="PROVEDORES DE IA" icon={Settings2}>
+          <p className="text-xs leading-relaxed text-muted">Configure chaves próprias para usar provedores de IA.</p>
+          <ProviderKeysPanel />
+        </SectionCard>
+
         <SectionCard id="settings-connection" title="CONEXÃO" icon={Plug}>
           <div>
-            <label htmlFor="settings-api-url" className="block text-2xs text-muted">
-              URL base da API
-            </label>
-            <input
+            <Field
               id="settings-api-url"
+              label="URL base da API"
               value={apiUrl}
               onChange={(event) => setApiUrl(event.target.value)}
               placeholder="/api/v1"
-              className="mt-1 w-full rounded-xl border border-white/10 bg-background/60 px-3 py-2 font-mono text-xs text-foreground outline-none transition focus:border-primary/40"
             />
             <p className="mt-1 text-2xs leading-relaxed text-muted/70">
               Use <code>/api/v1</code> para o proxy local ou a URL completa do backend. Nenhuma
@@ -276,15 +291,16 @@ export function SettingsView() {
           )}
 
           <div className="flex flex-wrap items-center gap-2">
-            <button
+            <Button
               type="button"
+              variant="primary"
               onClick={applyConnection}
               disabled={!connectionDirty}
-              className="inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-primary/35 bg-primary/10 px-3 py-2 font-mono text-2xs uppercase tracking-[0.12em] text-primary transition hover:bg-primary/15 disabled:cursor-not-allowed disabled:opacity-40"
+              className="font-mono text-2xs uppercase tracking-[0.12em]"
             >
               <Gauge className="h-3.5 w-3.5" aria-hidden="true" />
-              Aplicar e recarregar
-            </button>
+              Aplicar conexão
+            </Button>
             <span className="font-mono text-2xs uppercase tracking-[0.1em] text-muted/60">
               {connectionDirty ? 'alterações pendentes' : 'sem alterações'}
             </span>
@@ -292,10 +308,17 @@ export function SettingsView() {
         </SectionCard>
 
         <SectionCard id="settings-offline" title="MODO OFFLINE (OLLAMA)" icon={Plug}>
-          <div><label htmlFor="settings-ollama-url" className="block text-2xs text-muted">URL local</label><input id="settings-ollama-url" value={ollamaUrl} onChange={(event) => setOllamaConfig(event.target.value, numCtx)} className="mt-1 w-full rounded-xl border border-white/10 bg-background/60 px-3 py-2 font-mono text-xs text-foreground" /><p className="mt-1 text-2xs text-muted/70">Use /ollama para acessar pelo proxy same-origin, inclusive quando a Web é aberta pelo IP da rede. URLs diretas aceitam somente localhost ou loopback.</p></div>
-          <div><label htmlFor="settings-ollama-context" className="block text-2xs text-muted">Contexto (num_ctx)</label><input id="settings-ollama-context" type="number" min={512} max={131072} step={512} value={numCtx} onChange={(event) => setOllamaConfig(ollamaUrl, Math.max(512, Number(event.target.value) || 4096))} className="mt-1 w-full rounded-xl border border-white/10 bg-background/60 px-3 py-2 font-mono text-xs text-foreground" /></div>
-          <div className="flex flex-wrap gap-2"><button type="button" onClick={() => { setOllamaError(null); setOllamaStatus(null); void ollamaVersion().then((version) => setOllamaStatus(`Ollama ${version} conectado`)).catch((error: unknown) => setOllamaError(error instanceof Error ? error.message : 'Falha ao conectar.')); }} className="min-h-11 rounded-xl border border-white/10 px-3 font-mono text-2xs uppercase text-muted hover:text-primary">Testar conexão</button><button type="button" onClick={() => { if (connectionMode === 'offline') { setConnectionMode('api'); useAuthStore.getState().clear(); } else setConnectionMode('offline'); }} className="min-h-11 rounded-xl border border-primary/35 bg-primary/10 px-3 font-mono text-2xs uppercase text-primary">{connectionMode === 'offline' ? 'Sair do offline' : 'Entrar no offline'}</button></div>
-          {ollamaStatus && <p role="status" className="text-2xs text-success">{ollamaStatus}</p>}{ollamaError && <p role="alert" className="text-2xs text-danger">{ollamaError}</p>}
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Field id="settings-ollama-url" label="URL local" value={ollamaUrl} onChange={(event) => setOllamaConfig(event.target.value, numCtx)} />
+            <Field id="settings-ollama-context" label="Contexto (num_ctx)" type="number" min={512} max={131072} step={512} value={numCtx} onChange={(event) => setOllamaConfig(ollamaUrl, Math.max(512, Number(event.target.value) || 4096))} />
+          </div>
+          <p className="text-xs leading-relaxed text-muted">Use <code>/ollama</code> pelo proxy same-origin. URLs diretas aceitam somente localhost ou loopback.</p>
+          <div className="flex flex-wrap gap-2">
+            <Button onClick={() => { setOllamaError(null); setOllamaStatus(null); void ollamaVersion().then((version) => setOllamaStatus(`Ollama ${version} conectado`)).catch((error: unknown) => setOllamaError(error instanceof Error ? error.message : 'Falha ao conectar.')); }}>Testar conexão</Button>
+            <Button variant="primary" onClick={() => { if (connectionMode === 'offline') { setConnectionMode('api'); useAuthStore.getState().clear(); } else setConnectionMode('offline'); }}>{connectionMode === 'offline' ? 'Sair do offline' : 'Entrar no offline'}</Button>
+          </div>
+          {ollamaStatus && <p role="status" className="text-xs text-success">{ollamaStatus}</p>}
+          {ollamaError && <p role="alert" className="text-xs text-danger">{ollamaError}</p>}
         </SectionCard>
 
         <div className="flex flex-wrap items-center justify-between gap-2 pb-2">

@@ -61,6 +61,13 @@ describe('settings-store', () => {
     });
   });
 
+  it('migra o valor sentinela antigo do perfil para o campo vazio', async () => {
+    window.localStorage.setItem('nexa:settings:v1', JSON.stringify({ displayName: 'Operador' }));
+    vi.resetModules();
+    const fresh = await import('@/stores/settings-store');
+    expect(fresh.getSettingsSnapshot().displayName).toBe('');
+  });
+
   it('ignora valores inválidos e restaura os padrões', () => {
     window.localStorage.setItem('nexa:settings:v1', '{ não é json');
     resetSettingsForTests();
