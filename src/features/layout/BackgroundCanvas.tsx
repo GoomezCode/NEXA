@@ -117,7 +117,7 @@ export function BackgroundCanvas() {
     const start = () => {
       // A static gradient behind the canvas is sufficient on touch devices.
       // Avoid waking the main thread 30 times per second for invisible ambience.
-      if (running || compact || reducedMotion.matches || document.documentElement.dataset.reducedMotion === 'true') {
+      if (running || compact || reducedMotion.matches || document.documentElement.dataset.reducedMotion === 'true' || document.documentElement.dataset.fx === 'lite') {
         return;
       }
 
@@ -140,7 +140,7 @@ export function BackgroundCanvas() {
     };
 
     const handleMotionPreference = () => {
-      if (reducedMotion.matches || document.documentElement.dataset.reducedMotion === 'true') {
+      if (reducedMotion.matches || document.documentElement.dataset.reducedMotion === 'true' || document.documentElement.dataset.fx === 'lite') {
         stop();
         draw();
       } else {
@@ -165,7 +165,7 @@ export function BackgroundCanvas() {
     document.addEventListener('visibilitychange', handleVisibility);
     reducedMotion.addEventListener('change', handleMotionPreference);
     const motionObserver = new MutationObserver(handleMotionPreference);
-    motionObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-reduced-motion'] });
+    motionObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-reduced-motion', 'data-fx'] });
 
     return () => {
       stop();

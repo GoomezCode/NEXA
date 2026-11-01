@@ -9,6 +9,7 @@ export interface AppSettings {
   speechRate: number;
   speechVoiceURI: string;
   reducedMotion: boolean;
+  effectsMode: 'auto' | 'full' | 'balanced' | 'lite';
   apiUrl: string;
   demoMode: boolean;
 }
@@ -23,6 +24,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   speechRate: 1,
   speechVoiceURI: '',
   reducedMotion: false,
+  effectsMode: 'auto',
   apiUrl: appEnv.apiUrl,
   demoMode: appEnv.demoMode,
 };
@@ -61,6 +63,9 @@ function sanitizeSettings(value: unknown): AppSettings {
       typeof candidate.reducedMotion === 'boolean'
         ? candidate.reducedMotion
         : DEFAULT_SETTINGS.reducedMotion,
+    effectsMode: ['auto', 'full', 'balanced', 'lite'].includes(String(candidate.effectsMode))
+      ? (candidate.effectsMode as AppSettings['effectsMode'])
+      : DEFAULT_SETTINGS.effectsMode,
     apiUrl:
       typeof candidate.apiUrl === 'string' && candidate.apiUrl.trim()
         ? candidate.apiUrl.trim()

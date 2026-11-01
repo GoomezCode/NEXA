@@ -1,4 +1,5 @@
 import * as AlertDialog from '@radix-ui/react-alert-dialog';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { Brain, Database, Pencil, Plus, Search, Trash2, X } from 'lucide-react';
 import { useMemo, useState, type FormEvent } from 'react';
 
@@ -359,10 +360,8 @@ export function MemoryView() {
         </div>
 
         {memories.isLoading && (
-          <div role="status" className="rounded-2xl border border-border bg-surface/40 p-6">
-            <p className="font-mono text-2xs uppercase tracking-[0.12em] text-muted">
-              Carregando memórias…
-            </p>
+          <div role="status" aria-label="Carregando memórias" className="space-y-3 rounded-2xl border border-border bg-surface/40 p-6">
+            {[0, 1, 2].map((row) => <Skeleton key={row} className="h-20" />)}
           </div>
         )}
 

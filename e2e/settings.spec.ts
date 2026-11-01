@@ -55,6 +55,16 @@ test('persiste a aparência selecionada e aplica o tema ao documento', async ({ 
   await expect(page.getByLabel('Tema da interface')).toHaveValue('light');
 });
 
+test('aplica o modo econômico de efeitos e mantém a escolha', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Abrir ajustes' }).click();
+  const effects = page.getByLabel('Efeitos visuais');
+  await effects.selectOption('lite');
+  await expect(page.locator('html')).toHaveAttribute('data-fx', 'lite');
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('data-fx', 'lite');
+});
+
 test('restaura os padrões dos ajustes', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: 'Abrir ajustes' }).click();

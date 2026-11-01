@@ -19,6 +19,7 @@ import { useUsage } from '@/api/usage';
 import { cn } from '@/lib/utils';
 import { Badge as SharedBadge } from '@/components/ui/Badge';
 import { Panel } from '@/components/ui/Panel';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { useAuthStore } from '@/stores/auth-store';
 import { useModelStore } from '@/stores/model-store';
 import { useSettingsStore } from '@/stores/settings-store';
@@ -278,9 +279,9 @@ export function MonitorView() {
                   {modelsError}
                 </p>
               ) : models.isLoading ? (
-                <p role="status" className="font-mono text-2xs uppercase tracking-[0.12em] text-muted">
-                  Carregando catálogo…
-                </p>
+                <div role="status" aria-label="Carregando catálogo" className="space-y-2">
+                  {[0, 1, 2].map((row) => <Skeleton key={row} className="h-12" />)}
+                </div>
               ) : (
                 <>
                   <div className="flex flex-wrap items-center justify-between gap-2">

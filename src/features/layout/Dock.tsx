@@ -18,12 +18,14 @@ function NavButton({
   active,
   compact = false,
   rail = false,
+  group,
   onClick,
 }: {
   item: (typeof NAV_ITEMS)[number];
   active: boolean;
   compact?: boolean;
   rail?: boolean;
+  group: string;
   onClick: () => void;
 }) {
   const Icon = item.icon;
@@ -31,7 +33,7 @@ function NavButton({
   return (
     <Button
       type="button"
-      variant={active ? 'primary' : 'ghost'}
+      variant="ghost"
       size="sm"
       onClick={onClick}
       aria-current={active ? 'page' : undefined}
@@ -41,14 +43,15 @@ function NavButton({
         'flex items-center justify-center gap-2 rounded-xl',
         rail ? 'h-12 w-12 px-0' : compact ? 'h-12 flex-1 flex-col gap-0.5' : 'min-h-11 px-4 py-2',
         active
-          ? 'border-primary/35 bg-primary/10 text-primary'
+          ? 'relative border-primary/35 text-primary'
           : 'border-transparent text-muted hover:border-white/10 hover:bg-white/5 hover:text-foreground',
       )}
     >
-      <Icon className={compact ? 'h-4 w-4' : 'h-4 w-4'} aria-hidden="true" />
+      {active && <span className="nexa-nav-indicator absolute inset-0 rounded-xl bg-primary/10 transition-colors" aria-hidden="true" data-navigation-group={group} />}
+      <Icon className="relative z-10 h-4 w-4" aria-hidden="true" />
       <span
         className={cn(
-          'font-mono uppercase tracking-[0.1em]',
+          'relative z-10 font-mono uppercase tracking-[0.1em]',
           rail ? 'sr-only' : 'text-2xs',
         )}
       >
@@ -78,6 +81,7 @@ export function Dock() {
               key={item.id}
               item={item}
               active={activeView === item.id}
+              group="desktop"
               onClick={() => setActiveView(item.id)}
             />
           ))}
@@ -95,6 +99,7 @@ export function Dock() {
             item={item}
             active={activeView === item.id}
             compact
+            group="mobile"
             onClick={() => setActiveView(item.id)}
           />
         ))}
@@ -105,7 +110,7 @@ export function Dock() {
         className="fixed bottom-0 left-0 top-[calc(3.5rem+var(--safe-top))] z-30 hidden w-16 flex-col items-center gap-1 border-r border-border/50 bg-background/90 py-2 backdrop-blur-xl min-[640px]:max-lg:flex"
       >
         {NAV_ITEMS.map((item) => (
-          <NavButton key={item.id} item={item} active={activeView === item.id} rail onClick={() => setActiveView(item.id)} />
+          <NavButton key={item.id} item={item} active={activeView === item.id} rail group="tablet" onClick={() => setActiveView(item.id)} />
         ))}
       </nav>
     </>

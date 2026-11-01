@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import type { ChatMessage } from '@/api/types';
 import { NexaMark } from '@/components/brand/NexaMark';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 import { MessageBubble } from './MessageBubble';
 
@@ -65,9 +66,9 @@ export function MessageList({
           Carregando mensagens
         </span>
         {[0, 1, 2].map((row) => (
-          <div
+            <Skeleton
             key={row}
-            className="h-16 animate-pulse rounded-2xl border border-white/5 bg-surface/40"
+              className="h-16 rounded-2xl border border-white/5"
             style={{ width: row === 1 ? '68%' : '82%', marginLeft: row === 1 ? 'auto' : undefined }}
           />
         ))}
@@ -150,7 +151,7 @@ export function MessageList({
       >
         <div ref={contentRef} className="mx-auto flex w-full max-w-3xl flex-col gap-5 px-4 py-5 sm:px-6">
           {messages.map((message) => (
-            <div key={message.id} className="nexa-message-row">
+            <div key={message.id} className="nexa-message-row nexa-message-enter">
               <MessageBubble message={message} />
             </div>
           ))}

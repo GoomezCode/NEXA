@@ -32,7 +32,8 @@ export function Orb({ state, size = 'md', className }: OrbProps) {
 
   return (
     <div
-      className={cn('relative flex items-center justify-center', className)}
+      className={cn('nexa-orb relative flex items-center justify-center', className)}
+      data-state={state}
       style={{ width: pixels, height: pixels, '--orb-color': color } as CSSProperties}
       role="img"
       aria-label={`NEXA: ${AI_STATE_LABEL[state].toLowerCase()}`}

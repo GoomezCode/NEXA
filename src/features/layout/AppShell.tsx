@@ -96,6 +96,7 @@ export function AppShell() {
 
       <div className="nexa-grid pointer-events-none absolute inset-0" aria-hidden="true" />
       <BackgroundCanvas />
+      <div className="nexa-aurora pointer-events-none absolute" aria-hidden="true" />
 
       <div
         className="pointer-events-none absolute -top-40 left-1/2 h-[30rem] w-[30rem] -translate-x-1/2 rounded-full bg-primary/8 blur-3xl"
@@ -133,6 +134,7 @@ export function AppShell() {
           )}
 
           <ChunkLoadBoundary key={activeView}>
+            <div key={activeView} className="nexa-view-enter flex min-h-0 min-w-0 flex-1 flex-col">
             <main id="nexa-main" tabIndex={-1} className="nexa-content-container relative flex min-w-0 flex-1 flex-col">
               {activeView === 'chat' ? (
                 <ChatView sessionId={activeSessionId} />
@@ -150,6 +152,7 @@ export function AppShell() {
                 </Suspense>
               )}
             </main>
+            </div>
           </ChunkLoadBoundary>
 
           {activeView === 'chat' && <ContextPanel sessionId={activeSessionId} />}

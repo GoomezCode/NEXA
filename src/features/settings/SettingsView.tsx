@@ -245,6 +245,16 @@ export function SettingsView() {
               <option value="contrast">Alto contraste</option>
             </select>
           </div>
+          <div>
+            <label htmlFor="settings-effects" className="block text-xs text-muted">Efeitos visuais</label>
+            <select id="settings-effects" value={settings.effectsMode} onChange={(event) => update({ effectsMode: event.target.value as typeof settings.effectsMode })} className="mt-1 min-h-11 w-full rounded-xl border border-border bg-background/60 px-3 text-base text-foreground outline-none focus:border-primary/40 sm:text-sm">
+              <option value="auto">Automático</option>
+              <option value="full">Completo</option>
+              <option value="balanced">Equilibrado</option>
+              <option value="lite">Econômico</option>
+            </select>
+            <p className="mt-1 text-xs text-muted">Automático reduz blur e animações em aparelhos limitados ou com economia de dados.</p>
+          </div>
           <SettingSwitch
             label="Reduzir animações"
             description="Desliga pulsos, giros e transições do HUD."
