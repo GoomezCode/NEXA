@@ -21,7 +21,9 @@ Interface conversacional da NEXA, construída com React, TypeScript e Vite. Pode
 - Modo demonstração local para explorar a interface sem a API.
 - Modo OFFLINE com Ollama local, catálogo de modelos instalados e streaming NDJSON.
 - Memórias locais, personalização, entrada por voz e leitura opcional das respostas.
-- Interface NEXA HUD, monitoramento e ajustes.
+- Interface NEXA HUD responsiva, com rotas de chat, memória, monitoramento e ajustes.
+- Cinco temas de interface, modos de efeitos visuais e formulários com validação acessível.
+- Destaque de blocos de código carregado sob demanda e visualizações de carregamento compartilhadas.
 
 ## Requisitos
 
@@ -81,7 +83,7 @@ Para sair, use **Sair do offline** no cabeçalho ou em Ajustes. Conversas e mem�
 
 ## Compatibilidade
 
-A interface NEXA HUD adapta-se a celulares, tablets, notebooks, desktops e telas grandes. A base de navegadores do projeto segue os requisitos do Tailwind 4: Safari 16.4+, Chrome/Edge 111+ e Firefox 128+. O layout compacto inclui navegação por abas, suporte a toque, safe areas e teclado virtual; use zoom do navegador sem restrição.
+A interface NEXA HUD adapta-se a celulares, tablets, notebooks, desktops e telas grandes. Chat, memória, monitoramento e ajustes têm URLs próprias e acompanham o histórico do navegador. A base de navegadores do projeto segue os requisitos do Tailwind 4: Safari 16.4+, Chrome/Edge 111+ e Firefox 128+. O layout compacto inclui navegação por abas, suporte a toque, safe areas e teclado virtual; use zoom do navegador sem restrição.
 
 Para validar tamanhos de tela e rotação nos três motores, instale os navegadores Playwright e execute:
 
@@ -90,9 +92,7 @@ npx playwright install --with-deps chromium firefox webkit
 npm run test:responsive
 ```
 
-O checklist de breakpoints, controles, zoom e teclado virtual está em [Guia de responsividade](docs/GUIA_RESPONSIVIDADE.md). A verificação automatizada não substitui a checagem de Safari iOS, Android e dispositivos com notch/teclado real.
-
-Em pull requests, o workflow **Web mobile quality** executa a matriz responsiva, axe-core em 320/768/1280 px e Lighthouse CI com limites de performance, acessibilidade, LCP, CLS e JavaScript inicial. O [baseline mobile](docs/BASELINE_WEB_MOBILE.md) documenta a medição atual e o que ainda requer aparelhos reais.
+Execute `npm run test:responsive` para validar os breakpoints responsivos nos motores instalados. Essa verificação automatizada não substitui a checagem de Safari iOS, Android e dispositivos com notch e teclado real.
 
 ## Configuração
 
@@ -103,7 +103,7 @@ As variáveis do frontend são lidas pelo Vite no início do processo. Reinicie 
 | `VITE_API_URL`              | `/api/v1`                | Base da API NEXA.                                                  |
 | `VITE_API_PROXY`            | `http://localhost:8000`  | Destino local do proxy da API durante desenvolvimento.             |
 | `VITE_DEMO_MODE`            | `false`                  | Usa respostas locais simuladas quando ativado.                     |
-| `VITE_REGISTRATION_ENABLED` | `true`                   | Exibe a opção de cadastro; a API também precisa permitir cadastro. |
+| `VITE_REGISTRATION_ENABLED` | `false`                  | Exibe a opção de cadastro; a API também precisa permitir cadastro. |
 | `VITE_OLLAMA_URL`           | `/ollama`                | URL usada pelo cliente Ollama. Prefira o proxy same-origin.        |
 | `VITE_OLLAMA_PROXY`         | `http://127.0.0.1:11434` | Destino do proxy Vite para o Ollama.                               |
 | `VITE_OLLAMA_NUM_CTX`       | `4096`                   | Janela de contexto enviada ao Ollama.                              |
@@ -135,7 +135,7 @@ src/
 ├── api/          Clientes HTTP/Ollama, adaptadores e persistência
 ├── app/          Composição da aplicação e providers
 ├── components/   Componentes compartilhados
-├── features/     Autenticação, chat, monitor, memória e interfaces
+├── features/     Autenticação, chat, monitor, memória e ajustes
 ├── hooks/        Hooks compartilhados
 ├── stores/       Estado persistido e estado de interface
 └── styles/       Tokens e estilos globais
@@ -146,9 +146,5 @@ tests/            Testes unitários e de componentes
 
 ## Documentação
 
-- [Índice e estado dos planos](docs/README.md)
-- [Modo offline com Ollama](docs/PLANO_MODO_OFFLINE_OLLAMA.md)
-- [Integração com a API NEXA](docs/PLANO_INTEGRACAO_NEXA_API.md)
-- [Autenticação](docs/PLANO_CORRECAO_AUTENTICACAO.md)
-- [Guia de responsividade](docs/GUIA_RESPONSIVIDADE.md)
-- [Plano geral API + Web](<docs/NEXA%20%E2%80%94%20Plano%20de%20implementa%C3%A7%C3%A3o%20(API%20%2B%20Web).md>)
+- [Design system do front-end](docs/FRONTEND_DESIGN_SYSTEM.md)
+- [Guia de efeitos visuais](docs/GUIA_EFEITOS_VISUAIS.md)
