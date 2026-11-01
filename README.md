@@ -13,6 +13,7 @@ Interface conversacional da NEXA, construída com React, TypeScript e Vite. Pode
 - [Comandos](#comandos)
 - [Estrutura do projeto](#estrutura-do-projeto)
 - [Documentação](#documentação)
+- [Guia de arquitetura e manutenção](docs/GUIA_ARQUITETURA_FRONTEND.md)
 
 ## Recursos
 
@@ -92,7 +93,7 @@ npx playwright install --with-deps chromium firefox webkit
 npm run test:responsive
 ```
 
-Execute `npm run test:responsive` para validar os breakpoints responsivos nos motores instalados. Essa verificação automatizada não substitui a checagem de Safari iOS, Android e dispositivos com notch e teclado real.
+Essa verificação automatizada não substitui a checagem de Safari iOS, Android e dispositivos com notch e teclado real.
 
 ## Configuração
 
@@ -114,19 +115,19 @@ Para conectar à API real, configure `VITE_DEMO_MODE=false` e aponte `VITE_API_U
 
 ## Comandos
 
-| Comando                 | Descrição                                                              |
-| ----------------------- | ---------------------------------------------------------------------- |
-| `npm run dev`           | Inicia o servidor de desenvolvimento.                                  |
-| `npm run dev -- --host` | Inicia o servidor acessível pela rede local.                           |
-| `npm run build`         | Verifica tipos e cria o build em `dist/`.                              |
-| `npm run check:bundle`  | Verifica se o JavaScript inicial gzip permanece abaixo de 200 kB.     |
-| `npm run preview`       | Serve localmente o build, incluindo o proxy local configurado no Vite. |
-| `npm run lint`          | Executa o ESLint.                                                      |
-| `npm run typecheck`     | Verifica os tipos TypeScript.                                          |
-| `npm test`              | Executa os testes unitários com Vitest.                                |
-| `npm run test:e2e`      | Executa os testes end-to-end com Playwright.                           |
-| `npm run test:responsive` | Executa a matriz responsiva Chromium, Firefox e WebKit.                 |
-| `npm run check`         | Executa lint, tipos, testes e build.                                   |
+| Comando                   | Descrição                                                              |
+| ------------------------- | ---------------------------------------------------------------------- |
+| `npm run dev`             | Inicia o servidor de desenvolvimento.                                  |
+| `npm run dev -- --host`   | Inicia o servidor acessível pela rede local.                           |
+| `npm run build`           | Verifica tipos e cria o build em `dist/`.                              |
+| `npm run check:bundle`    | Verifica se o JavaScript inicial gzip permanece abaixo de 200 kB.      |
+| `npm run preview`         | Serve localmente o build, incluindo o proxy local configurado no Vite. |
+| `npm run lint`            | Executa o ESLint.                                                      |
+| `npm run typecheck`       | Verifica os tipos TypeScript.                                          |
+| `npm test`                | Executa os testes unitários com Vitest.                                |
+| `npm run test:e2e`        | Executa os testes end-to-end com Playwright.                           |
+| `npm run test:responsive` | Executa a matriz responsiva Chromium, Firefox e WebKit.                |
+| `npm run check`           | Executa lint, tipos, testes e build.                                   |
 
 ## Estrutura do projeto
 
@@ -146,5 +147,6 @@ tests/            Testes unitários e de componentes
 
 ## Documentação
 
+- [Guia de arquitetura e manutenção do front-end](docs/GUIA_ARQUITETURA_FRONTEND.md)
 - [Design system do front-end](docs/FRONTEND_DESIGN_SYSTEM.md)
 - [Guia de efeitos visuais](docs/GUIA_EFEITOS_VISUAIS.md)
