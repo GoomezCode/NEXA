@@ -1,179 +1,36 @@
 import {
   AudioLines,
-  Check,
   Gauge,
   LogOut,
-  MessageSquare,
   Mic,
-  MonitorPlay,
   Palette,
   Plug,
   RotateCcw,
   ShieldCheck,
+  Settings2,
   User,
   Volume2,
 } from 'lucide-react';
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 
 import { logout } from '@/api/auth';
 import { isSpeechRecognitionSupported } from '@/features/voice/use-speech-recognition';
 import { cancelSpeech, isSpeechSynthesisSupported, speakText } from '@/lib/speech';
-import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/auth-store';
-import { useInterfaceModeStore } from '@/stores/interface-mode-store';
-import { DEFAULT_SETTINGS, useSettingsStore } from '@/stores/settings-store';
-import { useUiStore } from '@/stores/ui-store';
 import { useConnectionStore } from '@/stores/connection-store';
-import { ollamaVersion } from '@/api/ollama';
+import { DEFAULT_SETTINGS, useSettingsStore } from '@/stores/settings-store';
+import { resetChatAdapter } from '@/api';
+import { SectionCard } from '@/components/ui/Panel';
+import { Button } from '@/components/ui/Button';
+import { Field } from '@/components/ui/Field';
+import { Switch as SettingSwitch } from '@/components/ui/Switch';
+import { ProviderKeysPanel } from '@/features/monitor/ProviderKeysPanel';
+import { OllamaSettings } from './OllamaSettings';
 
-function SettingSwitch({
-  label,
-  description,
-  checked,
-  onChange,
-  disabled = false,
-}: {
-  label: string;
-  description?: string;
-  checked: boolean;
-  onChange: (checked: boolean) => void;
-  disabled?: boolean;
-}) {
-  return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={checked}
-      aria-label={label}
-      onClick={() => onChange(!checked)}
-      disabled={disabled}
-      className="flex w-full items-center justify-between gap-4 rounded-xl border border-white/5 bg-background/40 p-3 text-left transition hover:border-white/10 disabled:cursor-not-allowed disabled:opacity-50"
-    >
-      <span className="min-w-0">
-        <span className="block text-[13px] text-foreground">{label}</span>
-        {description && (
-          <span className="mt-0.5 block text-2xs leading-relaxed text-muted">{description}</span>
-        )}
-      </span>
-      <span
-        aria-hidden="true"
-        className={cn(
-          'flex h-5 w-9 shrink-0 items-center rounded-full border p-0.5 transition',
-          checked ? 'border-primary/40 bg-primary/20' : 'border-white/10 bg-white/5',
-        )}
-      >
-        <span
-          className={cn(
-            'h-3.5 w-3.5 rounded-full transition',
-            checked ? 'translate-x-4 bg-primary' : 'translate-x-0 bg-muted/60',
-          )}
-        />
-      </span>
-    </button>
-  );
-}
-
-function SectionCard({
-  id,
-  title,
-  icon: Icon,
-  children,
-}: {
-  id: string;
-  title: string;
-  icon: typeof User;
-  children: ReactNode;
-}) {
-  return (
-    <section
-      aria-labelledby={id}
-      className="rounded-2xl border border-border bg-surface/50 p-4 sm:p-5"
-    >
-      <h3
-        id={id}
-        className="flex items-center gap-2 font-display text-2xs tracking-[0.2em] text-primary"
-      >
-        <Icon className="h-3.5 w-3.5" aria-hidden="true" />
-        {title}
-      </h3>
-      <div className="mt-3 space-y-2.5">{children}</div>
-    </section>
-  );
-}
-
-function InterfaceModeSettings() {
-  const mode = useInterfaceModeStore((state) => state.mode);
-  const setMode = useInterfaceModeStore((state) => state.setMode);
-  const aiState = useUiStore((state) => state.aiState);
-  const busy = aiState === 'processing' || aiState === 'responding';
-
-  const options = [
-    {
-      id: 'nexa' as const,
-      name: 'NEXA HUD',
-      description: 'Chat-first, responsivo e conectado ao histórico.',
-      icon: MessageSquare,
-    },
-    {
-      id: 'classic' as const,
-      name: 'Clássico',
-      description: 'Réplica fiel da interface original, com a marca NEXA.',
-      icon: MonitorPlay,
-    },
-  ];
-
-  return (
-    <div>
-      <div className="grid gap-2 sm:grid-cols-2">
-        {options.map((option) => {
-          const OptionIcon = option.icon;
-          const active = mode === option.id;
-
-          return (
-            <button
-              key={option.id}
-              type="button"
-              onClick={() => setMode(option.id)}
-              disabled={busy}
-              aria-pressed={active}
-              aria-label={`Usar ${option.name} ${option.description}`}
-              title={busy ? 'Aguarde a resposta terminar' : undefined}
-              className={`rounded-xl border p-3 text-left transition disabled:cursor-not-allowed disabled:opacity-50 ${
-                active
-                  ? 'border-primary/40 bg-primary/10'
-                  : 'border-white/10 bg-background/40 hover:border-primary/25'
-              }`}
-            >
-              <span className="flex items-center gap-2">
-                <OptionIcon
-                  className={`h-3.5 w-3.5 ${active ? 'text-primary' : 'text-muted'}`}
-                  aria-hidden="true"
-                />
-                <span
-                  className={`text-[12px] font-semibold ${
-                    active ? 'text-primary' : 'text-foreground'
-                  }`}
-                >
-                  {option.name}
-                </span>
-                {active && (
-                  <Check className="ml-auto h-3.5 w-3.5 text-primary" aria-hidden="true" />
-                )}
-              </span>{' '}
-              <span className="mt-1 block text-2xs leading-relaxed text-muted">
-                {option.description}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-
-      <p className="mt-2 font-mono text-2xs uppercase tracking-[0.12em] text-muted/70">
-        {busy ? 'Aguarde a resposta terminar' : 'Atalho: Alt+M'}
-      </p>
-    </div>
-  );
-}
+const profileSchema = z.object({ displayName: z.string().trim().max(60, 'Use até 60 caracteres.') });
 
 function AccountSettings() {
   const session = useAuthStore((state) => state.session);
@@ -215,12 +72,8 @@ function AccountSettings() {
 }
 
 export function SettingsView() {
-  const connectionMode = useConnectionStore((state) => state.mode);
-  const ollamaUrl = useConnectionStore((state) => state.ollamaUrl);
-  const numCtx = useConnectionStore((state) => state.numCtx);
-  const setConnectionMode = useConnectionStore((state) => state.setMode);
-  const setOllamaConfig = useConnectionStore((state) => state.setOllamaConfig);
   const settings = useSettingsStore((state) => state.settings);
+  const accountName = useAuthStore((state) => state.session?.username ?? '');
   const update = useSettingsStore((state) => state.update);
   const reset = useSettingsStore((state) => state.reset);
 
@@ -228,11 +81,18 @@ export function SettingsView() {
   const [demoMode, setDemoMode] = useState(settings.demoMode);
   const [connectionError, setConnectionError] = useState<string | null>(null);
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
-  const [ollamaError, setOllamaError] = useState<string | null>(null);
-  const [ollamaStatus, setOllamaStatus] = useState<string | null>(null);
+  const profileForm = useForm({
+    resolver: zodResolver(profileSchema),
+    defaultValues: { displayName: settings.displayName },
+  });
+  const resetProfile = profileForm.reset;
 
   const voiceInputSupported = isSpeechRecognitionSupported();
   const speechSupported = isSpeechSynthesisSupported();
+  useEffect(() => {
+    resetProfile({ displayName: settings.displayName });
+  }, [resetProfile, settings.displayName]);
+
   useEffect(() => {
     if (!speechSupported) return;
     const synth = window.speechSynthesis;
@@ -254,7 +114,7 @@ export function SettingsView() {
 
     setConnectionError(null);
     update({ apiUrl: normalizedApiUrl, demoMode });
-    window.location.reload();
+    resetChatAdapter();
   };
 
   const resetAll = () => {
@@ -262,10 +122,11 @@ export function SettingsView() {
     setApiUrl(DEFAULT_SETTINGS.apiUrl);
     setDemoMode(DEFAULT_SETTINGS.demoMode);
     setConnectionError(null);
+    resetProfile({ displayName: DEFAULT_SETTINGS.displayName });
   };
 
   return (
-    <section aria-label="Ajustes" className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
+    <section aria-label="Ajustes" className="min-h-0 flex-1 overflow-y-auto p-4 pb-24 sm:p-6 sm:pb-24">
       <div className="mx-auto w-full max-w-2xl space-y-3">
         <header className="rounded-2xl border border-border bg-surface/60 p-5">
           <p className="font-mono text-2xs uppercase tracking-[0.28em] text-primary/70">
@@ -277,17 +138,19 @@ export function SettingsView() {
           </p>
         </header>
 
+        <nav aria-label="Seções dos ajustes" className="sticky top-0 z-10 flex gap-1 overflow-x-auto rounded-xl border border-border/70 bg-background/95 p-1 backdrop-blur-xl">
+          {[
+            ['settings-profile', 'Perfil'], ['settings-voice', 'Voz'], ['settings-appearance', 'Aparência'],
+            ['settings-account', 'Conta'], ['settings-providers', 'Provedores'], ['settings-connection', 'Conexão'], ['settings-offline', 'Offline'],
+          ].map(([id, label]) => <a key={id} href={`#${id}`} className="inline-flex min-h-10 shrink-0 items-center rounded-lg px-3 font-mono text-2xs uppercase tracking-wider text-muted hover:bg-primary/10 hover:text-primary">{label}</a>)}
+        </nav>
+
         <SectionCard id="settings-profile" title="PERFIL" icon={User}>
-          <label htmlFor="settings-display-name" className="block text-2xs text-muted">
-            Como a NEXA deve chamar você
-          </label>
-          <input
-            id="settings-display-name"
-            value={settings.displayName}
-            maxLength={60}
-            onChange={(event) => update({ displayName: event.target.value })}
-            className="w-full rounded-xl border border-white/10 bg-background/60 px-3 py-2 text-sm text-foreground outline-none transition focus:border-primary/40"
-          />
+          <form onSubmit={profileForm.handleSubmit(({ displayName }) => update({ displayName }))} className="space-y-2">
+            <Field id="settings-display-name" label="Como a NEXA deve chamar você" placeholder={accountName || 'Seu nome'} maxLength={60} aria-invalid={Boolean(profileForm.formState.errors.displayName)} {...profileForm.register('displayName')} />
+            {profileForm.formState.errors.displayName && <p role="alert" className="text-xs text-danger">{profileForm.formState.errors.displayName.message}</p>}
+            <Button type="submit" variant="primary" disabled={!profileForm.formState.isDirty}>Salvar perfil</Button>
+          </form>
         </SectionCard>
 
         <SectionCard id="settings-voice" title="VOZ" icon={Mic}>
@@ -370,12 +233,31 @@ export function SettingsView() {
 
         <SectionCard id="settings-appearance" title="APARÊNCIA" icon={Palette}>
           <div>
-            <p className="text-2xs text-muted">Modo de interface</p>
-            <div className="mt-2">
-              <InterfaceModeSettings />
-            </div>
+            <label htmlFor="settings-theme" className="block text-2xs text-muted">Tema da interface</label>
+            <select
+              id="settings-theme"
+              value={settings.theme}
+              onChange={(event) => update({ theme: event.target.value as typeof settings.theme })}
+              className="mt-1 min-h-11 w-full rounded-xl border border-white/10 bg-background/60 px-3 text-sm text-foreground outline-none focus:border-primary/40"
+            >
+              <option value="hud">NEXA HUD</option>
+              <option value="violet">Violeta</option>
+              <option value="rose">Rosa</option>
+              <option value="classic">Clássico</option>
+              <option value="light">Claro</option>
+              <option value="contrast">Alto contraste</option>
+            </select>
           </div>
-
+          <div>
+            <label htmlFor="settings-effects" className="block text-xs text-muted">Efeitos visuais</label>
+            <select id="settings-effects" value={settings.effectsMode} onChange={(event) => update({ effectsMode: event.target.value as typeof settings.effectsMode })} className="mt-1 min-h-11 w-full rounded-xl border border-border bg-background/60 px-3 text-base text-foreground outline-none focus:border-primary/40 sm:text-sm">
+              <option value="auto">Automático</option>
+              <option value="full">Completo</option>
+              <option value="balanced">Equilibrado</option>
+              <option value="lite">Econômico</option>
+            </select>
+            <p className="mt-1 text-xs text-muted">Automático reduz blur e animações em aparelhos limitados ou com economia de dados.</p>
+          </div>
           <SettingSwitch
             label="Reduzir animações"
             description="Desliga pulsos, giros e transições do HUD."
@@ -388,17 +270,19 @@ export function SettingsView() {
           <AccountSettings />
         </SectionCard>
 
+        <SectionCard id="settings-providers" title="PROVEDORES DE IA" icon={Settings2}>
+          <p className="text-xs leading-relaxed text-muted">Configure chaves próprias para usar provedores de IA.</p>
+          <ProviderKeysPanel />
+        </SectionCard>
+
         <SectionCard id="settings-connection" title="CONEXÃO" icon={Plug}>
           <div>
-            <label htmlFor="settings-api-url" className="block text-2xs text-muted">
-              URL base da API
-            </label>
-            <input
+            <Field
               id="settings-api-url"
+              label="URL base da API"
               value={apiUrl}
               onChange={(event) => setApiUrl(event.target.value)}
               placeholder="/api/v1"
-              className="mt-1 w-full rounded-xl border border-white/10 bg-background/60 px-3 py-2 font-mono text-xs text-foreground outline-none transition focus:border-primary/40"
             />
             <p className="mt-1 text-2xs leading-relaxed text-muted/70">
               Use <code>/api/v1</code> para o proxy local ou a URL completa do backend. Nenhuma
@@ -420,27 +304,23 @@ export function SettingsView() {
           )}
 
           <div className="flex flex-wrap items-center gap-2">
-            <button
+            <Button
               type="button"
+              variant="primary"
               onClick={applyConnection}
               disabled={!connectionDirty}
-              className="inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-primary/35 bg-primary/10 px-3 py-2 font-mono text-2xs uppercase tracking-[0.12em] text-primary transition hover:bg-primary/15 disabled:cursor-not-allowed disabled:opacity-40"
+              className="font-mono text-2xs uppercase tracking-[0.12em]"
             >
               <Gauge className="h-3.5 w-3.5" aria-hidden="true" />
-              Aplicar e recarregar
-            </button>
+              Aplicar conexão
+            </Button>
             <span className="font-mono text-2xs uppercase tracking-[0.1em] text-muted/60">
               {connectionDirty ? 'alterações pendentes' : 'sem alterações'}
             </span>
           </div>
         </SectionCard>
 
-        <SectionCard id="settings-offline" title="MODO OFFLINE (OLLAMA)" icon={Plug}>
-          <div><label htmlFor="settings-ollama-url" className="block text-2xs text-muted">URL local</label><input id="settings-ollama-url" value={ollamaUrl} onChange={(event) => setOllamaConfig(event.target.value, numCtx)} className="mt-1 w-full rounded-xl border border-white/10 bg-background/60 px-3 py-2 font-mono text-xs text-foreground" /><p className="mt-1 text-2xs text-muted/70">Use /ollama para acessar pelo proxy same-origin, inclusive quando a Web é aberta pelo IP da rede. URLs diretas aceitam somente localhost ou loopback.</p></div>
-          <div><label htmlFor="settings-ollama-context" className="block text-2xs text-muted">Contexto (num_ctx)</label><input id="settings-ollama-context" type="number" min={512} max={131072} step={512} value={numCtx} onChange={(event) => setOllamaConfig(ollamaUrl, Math.max(512, Number(event.target.value) || 4096))} className="mt-1 w-full rounded-xl border border-white/10 bg-background/60 px-3 py-2 font-mono text-xs text-foreground" /></div>
-          <div className="flex flex-wrap gap-2"><button type="button" onClick={() => { setOllamaError(null); setOllamaStatus(null); void ollamaVersion().then((version) => setOllamaStatus(`Ollama ${version} conectado`)).catch((error: unknown) => setOllamaError(error instanceof Error ? error.message : 'Falha ao conectar.')); }} className="min-h-11 rounded-xl border border-white/10 px-3 font-mono text-2xs uppercase text-muted hover:text-primary">Testar conexão</button><button type="button" onClick={() => { if (connectionMode === 'offline') { setConnectionMode('api'); useAuthStore.getState().clear(); } else setConnectionMode('offline'); }} className="min-h-11 rounded-xl border border-primary/35 bg-primary/10 px-3 font-mono text-2xs uppercase text-primary">{connectionMode === 'offline' ? 'Sair do offline' : 'Entrar no offline'}</button></div>
-          {ollamaStatus && <p role="status" className="text-2xs text-success">{ollamaStatus}</p>}{ollamaError && <p role="alert" className="text-2xs text-danger">{ollamaError}</p>}
-        </SectionCard>
+        <OllamaSettings />
 
         <div className="flex flex-wrap items-center justify-between gap-2 pb-2">
           <p className="flex items-center gap-1.5 font-mono text-2xs uppercase tracking-[0.12em] text-muted/60">

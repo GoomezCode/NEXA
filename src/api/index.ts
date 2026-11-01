@@ -1,7 +1,6 @@
 import { queryClient } from '@/app/query-client';
 import { useAuthStore } from '@/stores/auth-store';
 import { getSettingsSnapshot } from '@/stores/settings-store';
-import { useUiStore } from '@/stores/ui-store';
 
 import { HttpChatAdapter } from './adapters/http';
 import { createLocalChatRepository } from './adapters/local-chat';
@@ -30,7 +29,7 @@ function namespace(): string {
 /**
  * Retorna o adaptador ativo. A escolha vem das preferências persistidas
  * (`demoMode`/`apiUrl`), que herdam `VITE_DEMO_MODE` e `VITE_API_URL` na
- * primeira execução. Alterações de conexão exigem recarregar a página.
+ * primeira execução.
  */
 export function getChatAdapter(): ChatAdapter {
   if (adapter) {
@@ -67,7 +66,6 @@ useAuthStore.subscribe(() => {
   identity = next;
   adapter = undefined;
   queryClient.clear();
-  useUiStore.getState().setActiveSessionId(null);
 });
 
 useConnectionStore.subscribe(() => {
@@ -76,9 +74,13 @@ useConnectionStore.subscribe(() => {
   identity = next;
   adapter = undefined;
   queryClient.clear();
-  useUiStore.getState().setActiveSessionId(null);
 });
 
 export function resetChatAdapterForTests(): void {
   adapter = undefined;
+}
+
+export function resetChatAdapter(): void {
+  adapter = undefined;
+  queryClient.clear();
 }

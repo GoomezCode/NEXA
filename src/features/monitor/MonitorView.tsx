@@ -1,5 +1,4 @@
 import {
-  Activity,
   Check,
   Clock,
   Cpu,
@@ -18,54 +17,25 @@ import { useApiHealth } from '@/api/health';
 import { useModels, type Capability } from '@/api/models';
 import { useUsage } from '@/api/usage';
 import { cn } from '@/lib/utils';
+import { Badge as SharedBadge } from '@/components/ui/Badge';
+import { Panel } from '@/components/ui/Panel';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { useAuthStore } from '@/stores/auth-store';
 import { useModelStore } from '@/stores/model-store';
 import { useSettingsStore } from '@/stores/settings-store';
 import { useConnectionStore } from '@/stores/connection-store';
 import { ollamaBase, useOllamaHealth, useOllamaProcesses } from '@/api/ollama';
 import { ApiLetter } from './ApiLetter';
-import { ProviderKeysPanel } from './ProviderKeysPanel';
+import { useNavigate } from 'react-router-dom';
 
 type Tone = 'success' | 'warning' | 'danger' | 'muted';
 
-const TONE_STYLES: Record<Tone, string> = {
-  success: 'border-success/25 bg-success/5 text-success',
-  warning: 'border-warning/25 bg-warning/5 text-warning',
-  danger: 'border-danger/25 bg-danger/5 text-danger',
-  muted: 'border-white/10 bg-white/5 text-muted',
-};
-
 function Badge({ tone, label }: { tone: Tone; label: string }) {
   return (
-    <span
-      className={cn(
-        'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 font-mono text-2xs uppercase tracking-[0.14em]',
-        TONE_STYLES[tone],
-      )}
-    >
+    <SharedBadge tone={tone === 'muted' ? 'neutral' : tone}>
       <span className="h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true" />
       {label}
-    </span>
-  );
-}
-
-function Panel({
-  title,
-  icon: Icon,
-  children,
-}: {
-  title: string;
-  icon: typeof Activity;
-  children: ReactNode;
-}) {
-  return (
-    <section className="rounded-2xl border border-border bg-surface/50 p-4 sm:p-5">
-      <h3 className="flex items-center gap-2 font-display text-2xs tracking-[0.2em] text-primary">
-        <Icon className="h-3.5 w-3.5" aria-hidden="true" />
-        {title}
-      </h3>
-      <div className="mt-3 space-y-2.5">{children}</div>
-    </section>
+    </SharedBadge>
   );
 }
 
@@ -133,6 +103,7 @@ function QuotaMeter({
 }
 
 export function MonitorView() {
+  const navigate = useNavigate();
   const offlineMode = useConnectionStore((state) => state.mode === 'offline');
   const health = useApiHealth();
   const usage = useUsage();
@@ -308,9 +279,9 @@ export function MonitorView() {
                   {modelsError}
                 </p>
               ) : models.isLoading ? (
-                <p role="status" className="font-mono text-2xs uppercase tracking-[0.12em] text-muted">
-                  Carregando catálogo…
-                </p>
+                <div role="status" aria-label="Carregando catálogo" className="space-y-2">
+                  {[0, 1, 2].map((row) => <Skeleton key={row} className="h-12" />)}
+                </div>
               ) : (
                 <>
                   <div className="flex flex-wrap items-center justify-between gap-2">
@@ -470,7 +441,10 @@ export function MonitorView() {
           </div>
         </div>
 
-        <ProviderKeysPanel />
+        <Panel title="CHAVES DE PROVEDORES" icon={ShieldCheck}>
+          <p className="text-xs leading-relaxed text-muted">As chaves próprias agora ficam em Ajustes, junto das outras opções de conexão.</p>
+          <button type="button" onClick={() => navigate('/settings#settings-providers')} className="min-h-11 rounded-xl border border-primary/30 bg-primary/10 px-3 font-mono text-2xs uppercase tracking-wider text-primary hover:bg-primary/15">Abrir provedores em Ajustes</button>
+        </Panel>
 
         <ApiLetter />
 

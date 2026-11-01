@@ -5,6 +5,7 @@ import type { ChatMessage } from '@/api/types';
 import { NexaMark } from '@/components/brand/NexaMark';
 import { formatTime } from '@/lib/format';
 import { cn } from '@/lib/utils';
+import { useStreamStore } from '@/stores/stream-store';
 
 const MarkdownContent = lazy(() =>
   import('./MarkdownContent').then((module) => ({ default: module.MarkdownContent })),
@@ -19,7 +20,9 @@ export const MessageBubble = memo(function MessageBubble({ message }: { message:
   const isUser = message.role === 'user';
   const isStreaming = message.status === 'streaming';
   const note = STATUS_NOTE[message.status];
-  const deferredContent = useDeferredValue(message.content);
+  const activeStream = useStreamStore((state) => state.messageId === message.id ? state.content : null);
+  const content = isStreaming ? activeStream ?? message.content : message.content;
+  const deferredContent = useDeferredValue(content);
 
   return (
     <article
@@ -56,8 +59,8 @@ export const MessageBubble = memo(function MessageBubble({ message }: { message:
             <p className="whitespace-pre-wrap text-base leading-relaxed sm:text-sm">{message.content}</p>
           ) : (
             <div className="nexa-markdown text-base leading-relaxed sm:text-sm">
-              <Suspense fallback={<p className="whitespace-pre-wrap">{message.content}</p>}>
-                <MarkdownContent content={isStreaming ? deferredContent : message.content} />
+              <Suspense fallback={<p className="whitespace-pre-wrap">{content}</p>}>
+                <MarkdownContent content={isStreaming ? deferredContent : content} />
               </Suspense>
               {isStreaming && <span className="nexa-caret" aria-hidden="true" />}
             </div>
@@ -84,6 +87,9 @@ export const MessageBubble = memo(function MessageBubble({ message }: { message:
           )}
           {!isUser && message.status === 'done' && message.finish_reason === 'stop' && (
             <span className="text-muted/60">NEXA</span>
+          )}
+          {!isUser && message.status === 'done' && (message.memoriesUsed ?? 0) > 0 && (
+            <span className="text-muted/70">{message.memoriesUsed} {message.memoriesUsed === 1 ? 'memória usada' : 'memórias usadas'}</span>
           )}
         </div>
       </div>

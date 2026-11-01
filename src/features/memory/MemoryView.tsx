@@ -1,153 +1,26 @@
-import { Brain, Database, Pencil, Plus, Search, Trash2, X } from 'lucide-react';
-import { useMemo, useState, type FormEvent } from 'react';
+import * as AlertDialog from '@radix-ui/react-alert-dialog';
+import { Skeleton } from '@/components/ui/Skeleton';
+import { Brain, Database, Pencil, Plus, Search, Trash2 } from 'lucide-react';
+import { useMemo, useState } from 'react';
 
 import { formatSessionTime } from '@/lib/format';
 
 import {
-  parseMemoryTags,
   useCreateMemory,
   useDeleteMemory,
   useMemories,
   useSetMemoryEnabled,
   useUpdateMemory,
   type MemoryEntry,
+  type MemoryInput,
 } from './api';
+import { MemoryForm } from './MemoryForm';
 
 function fold(value: string): string {
   return value
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase();
-}
-
-function MemoryForm({
-  editing,
-  title,
-  content,
-  tagsText,
-  error,
-  saving,
-  onTitleChange,
-  onContentChange,
-  onTagsChange,
-  onSubmit,
-  onCancel,
-}: {
-  editing: MemoryEntry | null;
-  title: string;
-  content: string;
-  tagsText: string;
-  error: string | null;
-  saving: boolean;
-  onTitleChange: (value: string) => void;
-  onContentChange: (value: string) => void;
-  onTagsChange: (value: string) => void;
-  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
-  onCancel: () => void;
-}) {
-  const canSave = title.trim().length > 0 && content.trim().length > 0 && !saving;
-
-  return (
-    <form
-      aria-labelledby="memory-form-title"
-      onSubmit={onSubmit}
-      className="rounded-2xl border border-primary/25 bg-surface/60 p-4 sm:p-5"
-    >
-      <div className="flex items-center justify-between gap-3">
-        <h3
-          id="memory-form-title"
-          className="font-display text-2xs tracking-[0.2em] text-primary"
-        >
-          {editing ? 'EDITAR MEMÓRIA' : 'NOVA MEMÓRIA'}
-        </h3>
-        <button
-          type="button"
-          onClick={onCancel}
-          aria-label="Fechar formulário"
-          className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 text-muted transition hover:border-white/20 hover:text-foreground"
-        >
-          <X className="h-4 w-4" aria-hidden="true" />
-        </button>
-      </div>
-
-      <div className="mt-3 grid gap-3 sm:grid-cols-2">
-        <div>
-          <label htmlFor="memory-title" className="block text-2xs text-muted">
-            Nome
-          </label>
-          <input
-            id="memory-title"
-            value={title}
-            maxLength={80}
-            autoFocus
-            onChange={(event) => onTitleChange(event.target.value)}
-            placeholder="Ex.: Preferências de resposta"
-            className="mt-1 w-full rounded-xl border border-white/10 bg-background/60 px-3 py-2 text-sm text-foreground outline-none transition focus:border-primary/40"
-          />
-        </div>
-
-        <div>
-          <label htmlFor="memory-tags" className="block text-2xs text-muted">
-            Tags
-          </label>
-          <input
-            id="memory-tags"
-            value={tagsText}
-            onChange={(event) => onTagsChange(event.target.value)}
-            placeholder="sistema, preferências"
-            className="mt-1 w-full rounded-xl border border-white/10 bg-background/60 px-3 py-2 text-sm text-foreground outline-none transition focus:border-primary/40"
-          />
-          <p className="mt-1 font-mono text-2xs uppercase tracking-[0.08em] text-muted/60">
-            separe por vírgulas · até 8 tags
-          </p>
-        </div>
-      </div>
-
-      <div className="mt-3">
-        <label htmlFor="memory-content" className="block text-2xs text-muted">
-          Conteúdo
-        </label>
-        <textarea
-          id="memory-content"
-          value={content}
-          rows={4}
-          maxLength={4000}
-          onChange={(event) => onContentChange(event.target.value)}
-          placeholder="O que a NEXA deve lembrar?"
-          className="mt-1 w-full resize-y rounded-xl border border-white/10 bg-background/60 px-3 py-2 text-sm leading-relaxed text-foreground outline-none transition focus:border-primary/40"
-        />
-      </div>
-
-      {error && (
-        <p role="alert" className="mt-2 text-2xs text-danger">
-          {error}
-        </p>
-      )}
-
-      <div className="mt-3 flex flex-wrap items-center gap-2">
-        <button
-          type="submit"
-          disabled={!canSave}
-          className="inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-primary/35 bg-primary/10 px-4 py-2 font-mono text-2xs uppercase tracking-[0.12em] text-primary transition hover:bg-primary/15 disabled:cursor-not-allowed disabled:opacity-40"
-        >
-          <Plus className="h-3.5 w-3.5" aria-hidden="true" />
-          Salvar memória
-        </button>
-        <button
-          type="button"
-          onClick={onCancel}
-          className="inline-flex min-h-11 items-center rounded-xl border border-white/10 px-4 py-2 font-mono text-2xs uppercase tracking-[0.12em] text-muted transition hover:border-white/20 hover:text-foreground"
-        >
-          Cancelar
-        </button>
-        {editing && (
-          <span className="font-mono text-2xs uppercase tracking-[0.08em] text-muted/60">
-            atualizada em {formatSessionTime(editing.updatedAt)}
-          </span>
-        )}
-      </div>
-    </form>
-  );
 }
 
 export function MemoryView() {
@@ -161,9 +34,6 @@ export function MemoryView() {
   const [activeTag, setActiveTag] = useState<string | null>(null);
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<MemoryEntry | null>(null);
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const [tagsText, setTagsText] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
 
@@ -207,9 +77,6 @@ export function MemoryView() {
 
   const openCreate = () => {
     setEditing(null);
-    setTitle('');
-    setContent('');
-    setTagsText('');
     setFormError(null);
     setConfirmingId(null);
     setFormOpen(true);
@@ -217,9 +84,6 @@ export function MemoryView() {
 
   const openEdit = (entry: MemoryEntry) => {
     setEditing(entry);
-    setTitle(entry.title);
-    setContent(entry.content);
-    setTagsText(entry.tags.join(', '));
     setFormError(null);
     setConfirmingId(null);
     setFormOpen(true);
@@ -231,11 +95,9 @@ export function MemoryView() {
     setFormError(null);
   };
 
-  const submit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const submit = (input: MemoryInput) => {
     setFormError(null);
 
-    const input = { title, content, tags: parseMemoryTags(tagsText) };
     const onSuccess = () => closeForm();
     const onError = (error: unknown) =>
       setFormError(error instanceof Error ? error.message : 'Não foi possível salvar a memória.');
@@ -253,7 +115,7 @@ export function MemoryView() {
   };
 
   return (
-    <section aria-label="Memória" className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
+    <section aria-label="Memória" className="min-h-0 flex-1 overflow-y-auto p-4 pb-24 sm:p-6 sm:pb-24">
       <div className="mx-auto w-full max-w-3xl space-y-4">
         <header className="rounded-2xl border border-border bg-surface/60 p-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
@@ -285,15 +147,10 @@ export function MemoryView() {
 
         {formOpen && (
           <MemoryForm
+            key={editing?.id ?? 'new-memory'}
             editing={editing}
-            title={title}
-            content={content}
-            tagsText={tagsText}
             error={formError}
             saving={saving}
-            onTitleChange={setTitle}
-            onContentChange={setContent}
-            onTagsChange={setTagsText}
             onSubmit={submit}
             onCancel={closeForm}
           />
@@ -358,10 +215,8 @@ export function MemoryView() {
         </div>
 
         {memories.isLoading && (
-          <div role="status" className="rounded-2xl border border-border bg-surface/40 p-6">
-            <p className="font-mono text-2xs uppercase tracking-[0.12em] text-muted">
-              Carregando memórias…
-            </p>
+          <div role="status" aria-label="Carregando memórias" className="space-y-3 rounded-2xl border border-border bg-surface/40 p-6">
+            {[0, 1, 2].map((row) => <Skeleton key={row} className="h-20" />)}
           </div>
         )}
 
@@ -477,40 +332,19 @@ export function MemoryView() {
                 </label>
 
                 {confirmingId === entry.id ? (
-                  <div
-                    role="alertdialog"
-                    aria-label={`Esquecer ${entry.title}`}
-                    className="mt-3 rounded-xl border border-danger/30 bg-danger/5 p-3"
-                  >
-                    <p className="text-[12px] text-foreground">Esquecer “{entry.title}”?</p>
-                    <p className="mt-0.5 font-mono text-2xs uppercase tracking-[0.08em] text-muted">
-                      Esta ação não pode ser desfeita
-                    </p>
-                    <div className="mt-3 flex gap-2">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          deleteMemory.mutate(entry.id, {
-                            onSuccess: () => {
-                              setConfirmingId(null);
-                              setActiveTag(null);
-                            },
-                          })
-                        }
-                        disabled={deleteMemory.isPending}
-                        className="inline-flex min-h-11 items-center rounded-lg border border-danger/35 bg-danger/15 px-3 py-2 font-mono text-2xs uppercase tracking-[0.12em] text-danger transition hover:bg-danger/25 disabled:opacity-50"
-                      >
-                        Esquecer
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setConfirmingId(null)}
-                        className="inline-flex min-h-11 items-center rounded-lg border border-white/10 px-3 py-2 font-mono text-2xs uppercase tracking-[0.12em] text-muted transition hover:text-foreground"
-                      >
-                        Cancelar
-                      </button>
-                    </div>
-                  </div>
+                  <AlertDialog.Root open onOpenChange={(open) => { if (!open) setConfirmingId(null); }}>
+                    <AlertDialog.Portal>
+                      <AlertDialog.Overlay className="fixed inset-0 z-[89] bg-black/60 backdrop-blur-sm" />
+                      <AlertDialog.Content aria-describedby="delete-memory-description" className="fixed left-1/2 top-1/2 z-[90] w-[min(26rem,calc(100vw-2rem))] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-border bg-surface p-5 shadow-2xl">
+                        <AlertDialog.Title className="font-display text-sm tracking-wide text-foreground">Esquecer “{entry.title}”?</AlertDialog.Title>
+                        <AlertDialog.Description id="delete-memory-description" className="mt-2 text-sm text-muted">Esta ação não pode ser desfeita.</AlertDialog.Description>
+                        <div className="mt-5 flex justify-end gap-2">
+                          <AlertDialog.Cancel asChild><button type="button" className="min-h-11 rounded-xl border border-border px-3 text-sm text-muted">Cancelar</button></AlertDialog.Cancel>
+                          <button type="button" onClick={() => deleteMemory.mutate(entry.id, { onSuccess: () => { setConfirmingId(null); setActiveTag(null); } })} disabled={deleteMemory.isPending} className="min-h-11 rounded-xl border border-danger/40 bg-danger/10 px-3 text-sm text-danger disabled:opacity-50">{deleteMemory.isPending ? 'Esquecendo…' : 'Esquecer'}</button>
+                        </div>
+                      </AlertDialog.Content>
+                    </AlertDialog.Portal>
+                  </AlertDialog.Root>
                 ) : (
                   <div className="mt-3 flex flex-wrap gap-2">
                     <button

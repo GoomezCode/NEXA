@@ -6,13 +6,15 @@ import { describeError } from '@/api/errors';
 import type { AiState, ChatMessage } from '@/api/types';
 import { useOnlineStatus } from '@/hooks/use-online-status';
 import { createId } from '@/lib/id';
-import { cancelSpeech, SpeechStreamer } from '@/lib/speech';
+import { cancelSpeech, SpeechStreamer, type SpeechEngine } from '@/lib/speech';
 import { notify } from '@/stores/notification-store';
 import { useModelStore } from '@/stores/model-store';
 import { useSettingsStore } from '@/stores/settings-store';
 import { useUiStore } from '@/stores/ui-store';
 import { useSessionMetricsStore } from '@/stores/session-metrics-store';
 import { useConnectionStore } from '@/stores/connection-store';
+import { useStreamStore } from '@/stores/stream-store';
+import { buildPersonalization } from './personalization';
 
 import { messageKeys, sessionKeys, useMessages } from './api';
 
@@ -59,7 +61,7 @@ export function useChat(sessionId: string | null): UseChatResult {
   );
   const error = errorState?.sessionId === sessionId ? errorState.message : null;
   const abortRef = useRef<AbortController | null>(null);
-  const speechRef = useRef<SpeechStreamer | null>(null);
+  const speechRef = useRef<SpeechEngine | null>(null);
 
   useEffect(() => {
     return () => {
@@ -117,10 +119,13 @@ export function useChat(sessionId: string | null): UseChatResult {
       setUsageFromStream(undefined);
       setIsStreaming(true);
       setAiState('processing');
+      useStreamStore.getState().begin(assistantId);
+      let personalization: Awaited<ReturnType<typeof buildPersonalization>> = { memories: [] };
       // The stream must own a speech queue before the first token arrives. Without
       // this instance every push/finish below is a no-op, including the final tail.
       speechRef.current = new SpeechStreamer();
       let pendingContent = '';
+      let streamContent = '';
       let pendingFlushTimer = 0;
       const flushContent = () => {
         if (pendingFlushTimer) window.clearTimeout(pendingFlushTimer);
@@ -128,13 +133,8 @@ export function useChat(sessionId: string | null): UseChatResult {
         const contentChunk = pendingContent;
         pendingContent = '';
         if (!contentChunk) return;
-        updateMessages((current) =>
-          current.map((message) =>
-            message.id === assistantId
-              ? { ...message, content: message.content + contentChunk }
-              : message,
-          ),
-        );
+        streamContent += contentChunk;
+        useStreamStore.getState().append(assistantId, contentChunk);
       };
       const queueContent = (value: string) => {
         pendingContent += value;
@@ -162,6 +162,7 @@ export function useChat(sessionId: string | null): UseChatResult {
       ]);
 
       try {
+        personalization = await buildPersonalization(trimmed);
         let receivedToken = false;
 
         for await (const event of getChatAdapter().streamReply({
@@ -169,6 +170,7 @@ export function useChat(sessionId: string | null): UseChatResult {
           content: trimmed,
           signal: controller.signal,
           modelId: useModelStore.getState().selectedModelId,
+          personalization,
         })) {
           if (event.type === 'token') {
             if (!receivedToken) {
@@ -215,7 +217,7 @@ export function useChat(sessionId: string | null): UseChatResult {
         flushContent();
         updateMessages((current) =>
           current.map((message) =>
-            message.id === assistantId ? { ...message, status: 'done' } : message,
+            message.id === assistantId ? { ...message, content: streamContent, memoriesUsed: personalization.memories.length, status: 'done' } : message,
           ),
         );
         setAiState('idle');
@@ -247,7 +249,7 @@ export function useChat(sessionId: string | null): UseChatResult {
         if (caught instanceof DOMException && caught.name === 'AbortError') {
           updateMessages((current) =>
             current.map((message) =>
-              message.id === assistantId ? { ...message, status: 'stopped' } : message,
+              message.id === assistantId ? { ...message, content: streamContent, status: 'stopped' } : message,
             ),
           );
           setAiState('idle');
@@ -258,7 +260,7 @@ export function useChat(sessionId: string | null): UseChatResult {
 
         updateMessages((current) =>
           current.map((message) =>
-            message.id === assistantId ? { ...message, status: 'error' } : message,
+            message.id === assistantId ? { ...message, content: streamContent, status: 'error' } : message,
           ),
         );
 
@@ -270,6 +272,7 @@ export function useChat(sessionId: string | null): UseChatResult {
         notify({ tone: 'error', title: info.title, message: info.message });
       } finally {
         if (pendingFlushTimer) window.clearTimeout(pendingFlushTimer);
+        useStreamStore.getState().clear(assistantId);
         setIsStreaming(false);
         abortRef.current = null;
         void queryClient.invalidateQueries({ queryKey: sessionKeys.all });

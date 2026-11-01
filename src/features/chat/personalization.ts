@@ -48,7 +48,7 @@ export function selectRelevantMemories(
 export async function buildPersonalization(message: string): Promise<ChatPersonalization> {
   const settingsName = getSettingsSnapshot().displayName.trim();
   const accountName = isOfflineMode() ? undefined : useAuthStore.getState().session?.username?.trim();
-  const displayName = settingsName && settingsName !== 'Operador' ? settingsName : accountName;
+  const displayName = settingsName || accountName;
   const memories = await listMemories();
   return {
     ...(displayName ? { display_name: displayName.slice(0, 60) } : {}),

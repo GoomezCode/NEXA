@@ -16,6 +16,12 @@
   --nexa-muted: #8fa3bf;
   --nexa-border: rgba(0, 229, 255, 0.15);
   --nexa-border-soft: rgba(255, 255, 255, 0.07);
+  --nexa-white: #fff;
+  --nexa-orb-idle: #00e5ff;
+  --nexa-orb-listening: #34d399;
+  --nexa-orb-processing: #fbbf24;
+  --nexa-orb-responding: #a78bfa;
+  --nexa-orb-error: #fb7185;
 
   --nexa-radius-sm: 8px;
   --nexa-radius-md: 12px;
@@ -35,11 +41,13 @@
   --font-ui: 'Rajdhani', 'Segoe UI', sans-serif;
   --font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', monospace;
 
-  --nexa-text-2xs: 0.6875rem;
+  --nexa-text-2xs: 0.75rem;
+  --glass-blur: 16px;
   --nexa-text-xs-plus: 0.75rem;
 }
 
 @theme inline {
+  --color-white: var(--nexa-white);
   --color-background: var(--nexa-bg);
   --color-surface: var(--nexa-surface);
   --color-surface-2: var(--nexa-surface-2);
@@ -64,4 +72,66 @@
   --radius-md: var(--nexa-radius-md);
   --radius-lg: var(--nexa-radius-lg);
   --radius-xl: var(--nexa-radius-xl);
+}
+
+:root[data-theme='violet'] {
+  --nexa-primary: #a78bfa;
+  --nexa-primary-soft: rgb(167 139 250 / 12%);
+  --nexa-secondary: #00e5ff;
+  --nexa-border: rgb(167 139 250 / 24%);
+  --nexa-border-soft: rgb(255 255 255 / 9%);
+}
+
+:root[data-theme='rose'] {
+  --nexa-bg: #100911;
+  --nexa-surface: #190f18;
+  --nexa-surface-2: #241423;
+  --nexa-primary: #f472b6;
+  --nexa-primary-soft: rgb(244 114 182 / 14%);
+  --nexa-secondary: #fda4af;
+  --nexa-text: #fff1f7;
+  --nexa-muted: #c3a6b5;
+  --nexa-border: rgb(244 114 182 / 25%);
+  --nexa-border-soft: rgb(255 209 230 / 10%);
+}
+
+:root[data-theme='classic'] {
+  --nexa-bg: #080c12;
+  --nexa-surface: #101923;
+  --nexa-surface-2: #18232e;
+  --nexa-primary: #8fb6c9;
+  --nexa-primary-soft: rgb(143 182 201 / 10%);
+  --nexa-secondary: #b0c4ce;
+  --nexa-text: #e2e9ed;
+  --nexa-muted: #9aaab3;
+  --nexa-border: rgb(143 182 201 / 20%);
+  --nexa-border-soft: rgb(255 255 255 / 8%);
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+  --nexa-bg: #f4f7fb;
+  --nexa-surface: #fff;
+  --nexa-surface-2: #eaf0f7;
+  --nexa-primary: #0077c8;
+  --nexa-primary-soft: rgb(0 119 200 / 10%);
+  --nexa-secondary: #6d45bd;
+  --nexa-text: #0b1526;
+  --nexa-muted: #52627a;
+  --nexa-border: rgb(0 88 150 / 20%);
+  --nexa-border-soft: rgb(14 37 65 / 12%);
+  --nexa-white: #0b1526;
+}
+
+:root[data-theme='contrast'] {
+  --nexa-bg: #000;
+  --nexa-surface: #050505;
+  --nexa-surface-2: #111;
+  --nexa-primary: #0ff;
+  --nexa-secondary: #ff0;
+  --nexa-text: #fff;
+  --nexa-muted: #e0e0e0;
+  --nexa-border: rgb(255 255 255 / 60%);
+  --nexa-border-soft: rgb(255 255 255 / 32%);
+  --nexa-white: #fff;
 }

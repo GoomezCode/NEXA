@@ -26,6 +26,23 @@ export const registerSchema = z
     message: 'As senhas não conferem.',
   });
 
+const authFormFields = z.object({
+  username: z.string(),
+  email: z.string(),
+  password: z.string(),
+  confirm: z.string(),
+});
+
+export function authFormSchema(mode: 'login' | 'register') {
+  return authFormFields.superRefine((values, context) => {
+    const result = mode === 'login' ? loginSchema.safeParse(values) : registerSchema.safeParse(values);
+    if (result.success) return;
+    for (const issue of result.error.issues) {
+      context.addIssue({ code: 'custom', path: issue.path, message: issue.message });
+    }
+  });
+}
+
 export function fieldErrors(error: z.ZodError): Record<string, string> {
   const out: Record<string, string> = {};
 
