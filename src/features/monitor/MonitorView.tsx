@@ -198,7 +198,7 @@ export function MonitorView() {
                 </span>
               )}
             </div>
-            <dl className="space-y-1.5">
+            <dl className="space-y-2">
               <Row label="endpoint" value={<span className="font-mono text-2xs">{endpoint}</span>} />
               <Row label="adaptador" value={demoMode ? 'Mock local' : 'HTTP remoto'} />
             </dl>
@@ -219,7 +219,7 @@ export function MonitorView() {
                 label={session?.role === 'guest' ? 'convidado' : (session?.role ?? 'sem sessão')}
               />
             </div>
-            <dl className="space-y-1.5">
+            <dl className="space-y-2">
               <Row label="usuário" value={session?.username ?? '—'} />
               <Row
                 label="validade"
@@ -247,7 +247,7 @@ export function MonitorView() {
                   remaining={usage.data?.daily_remaining}
                   limit={usage.data?.daily_limit}
                 />
-                <dl className="space-y-1.5">
+                <dl className="space-y-2">
                   <Row label="renova em" value={showDate(usage.data?.resets_at)} />
                 </dl>
               </>
@@ -318,7 +318,7 @@ export function MonitorView() {
                     )}
                   </div>
 
-                  <dl className="space-y-1.5">
+                  <dl className="space-y-2">
                     <Row
                       label="modelo padrão"
                       value={<span className="font-mono text-2xs">{models.data?.default_model ?? 'Automático'}</span>}
@@ -331,7 +331,7 @@ export function MonitorView() {
 
                   <ul
                     aria-label="Selecionar modelo"
-                    className="max-h-72 space-y-1.5 overflow-y-auto pr-1"
+                    className="max-h-72 space-y-2 overflow-y-auto pr-1"
                   >
                     <li>
                       <button
@@ -370,7 +370,7 @@ export function MonitorView() {
                             aria-pressed={selected}
                             aria-label={`Usar modelo ${model.name}`}
                             className={cn(
-                              'w-full rounded-xl border p-2.5 text-left transition',
+                              'w-full rounded-xl border p-3 text-left transition',
                               selected
                                 ? 'border-primary/35 bg-primary/10'
                                 : 'border-white/5 bg-background/40 hover:border-primary/25',

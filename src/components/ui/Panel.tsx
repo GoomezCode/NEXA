@@ -27,9 +27,9 @@ export function Panel({
     });
   };
   return (
-    <section aria-labelledby={props['aria-labelledby'] ?? resolvedTitleId} className={cn('nexa-spotlight rounded-2xl border border-border bg-surface/50', className)} onPointerMove={updateSpotlight} {...props}>
+    <section aria-labelledby={props['aria-labelledby'] ?? resolvedTitleId} className={cn('nexa-spotlight rounded-2xl border border-border bg-surface/50 p-4 sm:p-5', className)} onPointerMove={updateSpotlight} {...props}>
       {title && <h3 id={resolvedTitleId} className="flex items-center gap-2 font-display text-2xs tracking-[0.2em] text-primary">{Icon && <Icon className="h-3.5 w-3.5" aria-hidden="true" />}{title}</h3>}
-      <div className={title ? 'mt-3 space-y-2.5' : undefined}>{children}</div>
+      <div className={title ? 'mt-3 space-y-3' : undefined}>{children}</div>
     </section>
   );
 }
@@ -48,7 +48,7 @@ export function SectionCard({
   className?: string;
 }) {
   return (
-    <Panel aria-labelledby={id} className={cn('p-4 sm:p-5', className)} title={title} titleId={id} icon={Icon}>
+    <Panel aria-labelledby={id} className={className} title={title} titleId={id} icon={Icon}>
       {children}
     </Panel>
   );
