@@ -1,4 +1,4 @@
-import { useRef, type HTMLAttributes, type PointerEvent, type ReactNode } from 'react';
+import { useId, useRef, type HTMLAttributes, type PointerEvent, type ReactNode } from 'react';
 import type { LucideIcon } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
@@ -12,6 +12,8 @@ export function Panel({
   onPointerMove,
   ...props
 }: HTMLAttributes<HTMLElement> & { title?: string; titleId?: string; icon?: LucideIcon }) {
+  const generatedTitleId = useId();
+  const resolvedTitleId = title ? titleId ?? generatedTitleId : undefined;
   const frame = useRef<number | null>(null);
   const updateSpotlight = (event: PointerEvent<HTMLElement>) => {
     onPointerMove?.(event);
@@ -25,8 +27,8 @@ export function Panel({
     });
   };
   return (
-    <section className={cn('nexa-spotlight rounded-2xl border border-border bg-surface/50', className)} onPointerMove={updateSpotlight} {...props}>
-      {title && <h3 id={titleId} className="flex items-center gap-2 font-display text-2xs tracking-[0.2em] text-primary">{Icon && <Icon className="h-3.5 w-3.5" aria-hidden="true" />}{title}</h3>}
+    <section aria-labelledby={props['aria-labelledby'] ?? resolvedTitleId} className={cn('nexa-spotlight rounded-2xl border border-border bg-surface/50', className)} onPointerMove={updateSpotlight} {...props}>
+      {title && <h3 id={resolvedTitleId} className="flex items-center gap-2 font-display text-2xs tracking-[0.2em] text-primary">{Icon && <Icon className="h-3.5 w-3.5" aria-hidden="true" />}{title}</h3>}
       <div className={title ? 'mt-3 space-y-2.5' : undefined}>{children}</div>
     </section>
   );

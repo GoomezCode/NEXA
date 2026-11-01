@@ -12,20 +12,25 @@ import {
   Volume2,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 
 import { logout } from '@/api/auth';
 import { isSpeechRecognitionSupported } from '@/features/voice/use-speech-recognition';
 import { cancelSpeech, isSpeechSynthesisSupported, speakText } from '@/lib/speech';
 import { useAuthStore } from '@/stores/auth-store';
-import { DEFAULT_SETTINGS, useSettingsStore } from '@/stores/settings-store';
 import { useConnectionStore } from '@/stores/connection-store';
-import { ollamaVersion } from '@/api/ollama';
+import { DEFAULT_SETTINGS, useSettingsStore } from '@/stores/settings-store';
 import { resetChatAdapter } from '@/api';
 import { SectionCard } from '@/components/ui/Panel';
 import { Button } from '@/components/ui/Button';
 import { Field } from '@/components/ui/Field';
 import { Switch as SettingSwitch } from '@/components/ui/Switch';
 import { ProviderKeysPanel } from '@/features/monitor/ProviderKeysPanel';
+import { OllamaSettings } from './OllamaSettings';
+
+const profileSchema = z.object({ displayName: z.string().trim().max(60, 'Use até 60 caracteres.') });
 
 function AccountSettings() {
   const session = useAuthStore((state) => state.session);
@@ -67,11 +72,6 @@ function AccountSettings() {
 }
 
 export function SettingsView() {
-  const connectionMode = useConnectionStore((state) => state.mode);
-  const ollamaUrl = useConnectionStore((state) => state.ollamaUrl);
-  const numCtx = useConnectionStore((state) => state.numCtx);
-  const setConnectionMode = useConnectionStore((state) => state.setMode);
-  const setOllamaConfig = useConnectionStore((state) => state.setOllamaConfig);
   const settings = useSettingsStore((state) => state.settings);
   const accountName = useAuthStore((state) => state.session?.username ?? '');
   const update = useSettingsStore((state) => state.update);
@@ -81,11 +81,18 @@ export function SettingsView() {
   const [demoMode, setDemoMode] = useState(settings.demoMode);
   const [connectionError, setConnectionError] = useState<string | null>(null);
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
-  const [ollamaError, setOllamaError] = useState<string | null>(null);
-  const [ollamaStatus, setOllamaStatus] = useState<string | null>(null);
+  const profileForm = useForm({
+    resolver: zodResolver(profileSchema),
+    defaultValues: { displayName: settings.displayName },
+  });
+  const resetProfile = profileForm.reset;
 
   const voiceInputSupported = isSpeechRecognitionSupported();
   const speechSupported = isSpeechSynthesisSupported();
+  useEffect(() => {
+    resetProfile({ displayName: settings.displayName });
+  }, [resetProfile, settings.displayName]);
+
   useEffect(() => {
     if (!speechSupported) return;
     const synth = window.speechSynthesis;
@@ -115,10 +122,11 @@ export function SettingsView() {
     setApiUrl(DEFAULT_SETTINGS.apiUrl);
     setDemoMode(DEFAULT_SETTINGS.demoMode);
     setConnectionError(null);
+    resetProfile({ displayName: DEFAULT_SETTINGS.displayName });
   };
 
   return (
-    <section aria-label="Ajustes" className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
+    <section aria-label="Ajustes" className="min-h-0 flex-1 overflow-y-auto p-4 pb-24 sm:p-6 sm:pb-24">
       <div className="mx-auto w-full max-w-2xl space-y-3">
         <header className="rounded-2xl border border-border bg-surface/60 p-5">
           <p className="font-mono text-2xs uppercase tracking-[0.28em] text-primary/70">
@@ -138,17 +146,11 @@ export function SettingsView() {
         </nav>
 
         <SectionCard id="settings-profile" title="PERFIL" icon={User}>
-          <label htmlFor="settings-display-name" className="block text-2xs text-muted">
-            Como a NEXA deve chamar você
-          </label>
-          <input
-            id="settings-display-name"
-            value={settings.displayName}
-            placeholder={accountName || 'Seu nome'}
-            maxLength={60}
-            onChange={(event) => update({ displayName: event.target.value })}
-            className="w-full rounded-xl border border-white/10 bg-background/60 px-3 py-2 text-sm text-foreground outline-none transition focus:border-primary/40"
-          />
+          <form onSubmit={profileForm.handleSubmit(({ displayName }) => update({ displayName }))} className="space-y-2">
+            <Field id="settings-display-name" label="Como a NEXA deve chamar você" placeholder={accountName || 'Seu nome'} maxLength={60} aria-invalid={Boolean(profileForm.formState.errors.displayName)} {...profileForm.register('displayName')} />
+            {profileForm.formState.errors.displayName && <p role="alert" className="text-xs text-danger">{profileForm.formState.errors.displayName.message}</p>}
+            <Button type="submit" variant="primary" disabled={!profileForm.formState.isDirty}>Salvar perfil</Button>
+          </form>
         </SectionCard>
 
         <SectionCard id="settings-voice" title="VOZ" icon={Mic}>
@@ -317,19 +319,7 @@ export function SettingsView() {
           </div>
         </SectionCard>
 
-        <SectionCard id="settings-offline" title="MODO OFFLINE (OLLAMA)" icon={Plug}>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <Field id="settings-ollama-url" label="URL local" value={ollamaUrl} onChange={(event) => setOllamaConfig(event.target.value, numCtx)} />
-            <Field id="settings-ollama-context" label="Contexto (num_ctx)" type="number" min={512} max={131072} step={512} value={numCtx} onChange={(event) => setOllamaConfig(ollamaUrl, Math.max(512, Number(event.target.value) || 4096))} />
-          </div>
-          <p className="text-xs leading-relaxed text-muted">Use <code>/ollama</code> pelo proxy same-origin. URLs diretas aceitam somente localhost ou loopback.</p>
-          <div className="flex flex-wrap gap-2">
-            <Button onClick={() => { setOllamaError(null); setOllamaStatus(null); void ollamaVersion().then((version) => setOllamaStatus(`Ollama ${version} conectado`)).catch((error: unknown) => setOllamaError(error instanceof Error ? error.message : 'Falha ao conectar.')); }}>Testar conexão</Button>
-            <Button variant="primary" onClick={() => { if (connectionMode === 'offline') { setConnectionMode('api'); useAuthStore.getState().clear(); } else setConnectionMode('offline'); }}>{connectionMode === 'offline' ? 'Sair do offline' : 'Entrar no offline'}</Button>
-          </div>
-          {ollamaStatus && <p role="status" className="text-xs text-success">{ollamaStatus}</p>}
-          {ollamaError && <p role="alert" className="text-xs text-danger">{ollamaError}</p>}
-        </SectionCard>
+        <OllamaSettings />
 
         <div className="flex flex-wrap items-center justify-between gap-2 pb-2">
           <p className="flex items-center gap-1.5 font-mono text-2xs uppercase tracking-[0.12em] text-muted/60">

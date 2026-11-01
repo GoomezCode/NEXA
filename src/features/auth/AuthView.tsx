@@ -1,5 +1,8 @@
 import { Eye, EyeOff, LogIn, UserPlus } from 'lucide-react';
-import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
+import { useMemo, useState } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 import { ensureGuest, loginWithPassword, registerAccount } from '@/api/auth';
 import { ApiError } from '@/api/client/problem';
@@ -12,32 +15,29 @@ import { useConnectionStore } from '@/stores/connection-store';
 import { appEnv } from '@/lib/env';
 import { Field } from '@/components/ui/Field';
 
-import { fieldErrors, loginSchema, registerSchema } from './schemas';
+import { authFormSchema, loginSchema, registerSchema } from './schemas';
 
 type Mode = 'login' | 'register';
 
 const REGISTRATION_ENABLED = appEnv.registrationEnabled;
+type AuthFormValues = z.infer<ReturnType<typeof authFormSchema>>;
 
 export function AuthView() {
   const expired = useAuthStore((state) => state.status === 'expired');
   const [mode, setMode] = useState<Mode>('login');
-  const [values, setValues] = useState({ username: '', email: '', password: '', confirm: '' });
-  const [errors, setErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-
-  useEffect(() => {
-    const first = ['username', 'email', 'password', 'confirm'].find((field) => errors[field]);
-    if (first) document.getElementById(`auth-${first}`)?.focus();
-  }, [errors]);
-
-  const change = (key: keyof typeof values) => (event: ChangeEvent<HTMLInputElement>) =>
-    setValues((current) => ({ ...current, [key]: event.target.value }));
+  const resolver = useMemo(() => zodResolver(authFormSchema(mode)), [mode]);
+  const { register, handleSubmit, clearErrors, setError, formState: { errors } } = useForm<AuthFormValues>({
+    resolver,
+    mode: 'onBlur',
+    defaultValues: { username: '', email: '', password: '', confirm: '' },
+  });
 
   const switchMode = (next: Mode) => {
     setMode(next);
-    setErrors({});
+    clearErrors();
     setFormError(null);
   };
 
@@ -49,11 +49,12 @@ export function AuthView() {
       await action();
     } catch (error) {
       if (error instanceof ApiError && error.errors?.length) {
-        setErrors(
-          Object.fromEntries(
-            error.errors.map((item) => [item.field.split('.').pop() ?? item.field, item.reason]),
-          ),
-        );
+        for (const item of error.errors) {
+          const field = item.field.split('.').pop();
+          if (field === 'username' || field === 'email' || field === 'password' || field === 'confirm') {
+            setError(field, { type: 'server', message: item.reason });
+          }
+        }
       }
 
       setFormError(describeError(error).message);
@@ -62,29 +63,15 @@ export function AuthView() {
     }
   };
 
-  const submit = (event: FormEvent) => {
-    event.preventDefault();
-
+  const submit = async (values: AuthFormValues) => {
     if (mode === 'login') {
       const parsed = loginSchema.safeParse(values);
-      if (!parsed.success) {
-        setErrors(fieldErrors(parsed.error));
-        return;
-      }
-
-      setErrors({});
-      void run(() => loginWithPassword(parsed.data.username, parsed.data.password));
+      if (parsed.success) await run(() => loginWithPassword(parsed.data.username, parsed.data.password));
       return;
     }
 
     const parsed = registerSchema.safeParse(values);
-    if (!parsed.success) {
-      setErrors(fieldErrors(parsed.error));
-      return;
-    }
-
-    setErrors({});
-    void run(() =>
+    if (parsed.success) await run(() =>
       registerAccount({
         username: parsed.data.username,
         email: parsed.data.email || undefined,
@@ -158,7 +145,7 @@ export function AuthView() {
           id="auth-panel"
           role="tabpanel"
           aria-labelledby={`auth-tab-${mode}`}
-          onSubmit={submit}
+          onSubmit={(event) => void handleSubmit(submit)(event)}
           noValidate
           className="mt-4 space-y-3"
         >
@@ -173,9 +160,8 @@ export function AuthView() {
               <Field
                 id="auth-username"
                 label="Usuário"
-                value={values.username}
-                onChange={change('username')}
-                error={errors.username}
+                error={errors.username?.message}
+                {...register('username')}
                 autoComplete="username"
                 autoCapitalize="none"
                 spellCheck={false}
@@ -187,9 +173,8 @@ export function AuthView() {
                   id="auth-email"
                   label="E-mail (opcional)"
                   type="email"
-                  value={values.email}
-                  onChange={change('email')}
-                  error={errors.email}
+                  error={errors.email?.message}
+                  {...register('email')}
                   autoComplete="email"
                 />
               )}
@@ -198,9 +183,8 @@ export function AuthView() {
                 id="auth-password"
                 label="Senha"
                 type={showPassword ? 'text' : 'password'}
-                value={values.password}
-                onChange={change('password')}
-                error={errors.password}
+                error={errors.password?.message}
+                {...register('password')}
                 autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
                 maxLength={128}
                 trailing={passwordToggle}
@@ -211,9 +195,8 @@ export function AuthView() {
                   id="auth-confirm"
                   label="Confirmar senha"
                   type={showPassword ? 'text' : 'password'}
-                  value={values.confirm}
-                  onChange={change('confirm')}
-                  error={errors.confirm}
+                  error={errors.confirm?.message}
+                  {...register('confirm')}
                   autoComplete="new-password"
                   maxLength={128}
                 />

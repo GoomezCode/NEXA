@@ -12,18 +12,17 @@ import { useMemories } from '@/features/memory/api';
 import { formatSessionTime } from '@/lib/format';
 import { useAuthStore } from '@/stores/auth-store';
 import { useModelStore } from '@/stores/model-store';
-import { useSessionMetricsStore } from '@/stores/session-metrics-store';
 import { useSettingsStore } from '@/stores/settings-store';
 import { useUiStore } from '@/stores/ui-store';
 import { useConnectionStore } from '@/stores/connection-store';
 import { useSpeechStore } from '@/stores/speech-store';
 import { IconButton } from '@/components/ui/Button';
+import { useCoreMetrics } from './use-core-metrics';
 
 const SUBSYSTEMS = [
   { icon: Radio, label: 'Streaming', value: 'SSE ativo' },
   { icon: ShieldCheck, label: 'Sanitização', value: 'Markdown seguro' },
 ] as const;
-const EMPTY_METRICS: import('@/stores/session-metrics-store').ResponseMetric[] = [];
 
 export function ContextPanel({ sessionId }: { sessionId: string | null }) {
   const [now, setNow] = useState(0);
@@ -55,17 +54,10 @@ export function ContextPanel({ sessionId }: { sessionId: string | null }) {
   const usage = useUsage();
   const models = useModels();
   const memories = useMemories();
-  const metricRows = useSessionMetricsStore((state) => sessionId ? state.bySession[sessionId] ?? EMPTY_METRICS : EMPTY_METRICS);
-  const latest = metricRows.at(-1);
-  const tokenTotals = metricRows.reduce((sum, item) => ({
-    input: sum.input + (item.inputTokens ?? 0), output: sum.output + (item.outputTokens ?? 0),
-  }), { input: 0, output: 0 });
+  const { latest, tokenTotals, averageLatency, averageSpeed } = useCoreMetrics(sessionId);
   const modelId = latest?.modelId ?? selectedModel ?? models.data?.default_model ?? undefined;
   const model = models.data?.models.find((item) => item.model_id === modelId);
   const activeMemories = memories.data?.filter((memory) => memory.enabled).length ?? 0;
-  const averageLatency = metricRows.length ? metricRows.reduce((sum, item) => sum + (item.firstTokenMs ?? 0), 0) / metricRows.filter((item) => item.firstTokenMs !== undefined).length : undefined;
-  const averageSpeedRows = metricRows.filter((item) => item.tokensPerSecond !== undefined);
-  const averageSpeed = averageSpeedRows.length ? averageSpeedRows.reduce((sum, item) => sum + (item.tokensPerSecond ?? 0), 0) / averageSpeedRows.length : undefined;
   const sessions = useSessions();
   const messages = useMessageCount(sessionId);
   const session = sessions.data?.find((item) => item.id === sessionId);

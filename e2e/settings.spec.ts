@@ -9,6 +9,7 @@ test('persiste as preferências dos ajustes após recarregar', async ({ page }) 
 
   const name = page.getByRole('textbox', { name: 'Como a NEXA deve chamar você' });
   await name.fill('Marina');
+  await page.getByRole('button', { name: 'Salvar perfil' }).click();
 
   await page.getByRole('switch', { name: 'Reduzir animações' }).click();
   await expect(page.locator('html')).toHaveAttribute('data-reduced-motion', 'true');

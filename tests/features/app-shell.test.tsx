@@ -180,6 +180,7 @@ describe('AppShell', () => {
     await user.clear(nameInput);
     await user.type(nameInput, 'Marina');
     expect(nameInput).toHaveValue('Marina');
+    await user.click(screen.getByRole('button', { name: 'Salvar perfil' }));
 
     cleanup();
     const secondUser = userEvent.setup();
