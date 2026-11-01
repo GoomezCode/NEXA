@@ -316,7 +316,7 @@
 .nexa-cards-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: var(--nexa-space-3);
+  gap: var(--nexa-space-4);
 }
 
 @container (min-width: 42rem) {

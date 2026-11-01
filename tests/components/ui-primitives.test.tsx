@@ -23,6 +23,7 @@ describe('primitivos de interface', () => {
     expect(screen.getByLabelText('E-mail')).toHaveAttribute('aria-invalid', 'true');
     expect(screen.getByLabelText('E-mail')).toHaveAttribute('aria-describedby', 'email-error');
     expect(screen.getByRole('region', { name: 'Conta' })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Conta' })).toHaveClass('p-4', 'sm:p-5');
   });
 
   it('aciona o switch, renderiza o badge e oculta o skeleton da tecnologia assistiva', async () => {
