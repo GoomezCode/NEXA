@@ -6,10 +6,11 @@ import { useSessions } from '@/features/chat/api';
 import { ChatView } from '@/features/chat/ChatView';
 import { SessionsSidebar } from '@/features/chat/SessionsSidebar';
 import { ConnectionNotifier } from '@/features/notifications/ConnectionNotifier';
-import { NotificationCenter } from '@/features/notifications/NotificationCenter';
 import { useSettingsStore } from '@/stores/settings-store';
 import { useUiStore } from '@/stores/ui-store';
 import { useVisualViewport } from '@/hooks/use-visual-viewport';
+import { useLocation, useNavigate, matchPath } from 'react-router-dom';
+import { Toaster } from 'sonner';
 
 import { BackgroundCanvas } from './BackgroundCanvas';
 import { ContextPanel } from './ContextPanel';
@@ -53,21 +54,30 @@ function ViewLoading({ label }: { label: string }) {
 
 export function AppShell() {
   useVisualViewport();
-  const activeView = useUiStore((state) => state.activeView);
-  const activeSessionId = useUiStore((state) => state.activeSessionId);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const routeMatch = matchPath('/c/:sessionId', location.pathname);
+  const activeSessionId = routeMatch?.params.sessionId ?? null;
+  const activeView = location.pathname === '/settings' ? 'settings'
+    : location.pathname === '/memory' ? 'memory'
+      : location.pathname === '/monitor' ? 'monitor' : 'chat';
   const sidebarOpen = useUiStore((state) => state.sidebarOpen);
-  const setActiveSessionId = useUiStore((state) => state.setActiveSessionId);
-  const setActiveView = useUiStore((state) => state.setActiveView);
   const demoMode = useSettingsStore((state) => state.settings.demoMode);
   const sessions = useSessions();
 
   useGlobalShortcuts();
 
   useEffect(() => {
-    if (!activeSessionId && sessions.data && sessions.data.length > 0) {
-      setActiveSessionId(sessions.data[0].id);
+    if (location.pathname === '/' && sessions.data && sessions.data.length > 0) {
+      navigate(`/c/${sessions.data[0]!.id}`, { replace: true });
     }
-  }, [activeSessionId, sessions.data, setActiveSessionId]);
+  }, [location.pathname, navigate, sessions.data]);
+
+  useEffect(() => {
+    if (!['/', '/settings', '/memory', '/monitor'].includes(location.pathname) && !routeMatch) {
+      navigate('/', { replace: true });
+    }
+  }, [location.pathname, navigate, routeMatch]);
 
   return (
     <div className="nexa-app-root relative flex h-dvh flex-col overflow-hidden bg-background text-foreground">
@@ -86,6 +96,7 @@ export function AppShell() {
 
       <div className="nexa-grid pointer-events-none absolute inset-0" aria-hidden="true" />
       <BackgroundCanvas />
+      <div className="nexa-aurora pointer-events-none absolute" aria-hidden="true" />
 
       <div
         className="pointer-events-none absolute -top-40 left-1/2 h-[30rem] w-[30rem] -translate-x-1/2 rounded-full bg-primary/8 blur-3xl"
@@ -107,7 +118,7 @@ export function AppShell() {
             </p>
             <button
               type="button"
-              onClick={() => setActiveView('settings')}
+              onClick={() => navigate('/settings')}
               className="ml-auto min-h-11 shrink-0 rounded-lg border border-warning/25 px-2.5 py-1 font-mono text-2xs uppercase tracking-[0.1em] text-warning transition hover:bg-warning/10"
             >
               Ajustes
@@ -115,15 +126,16 @@ export function AppShell() {
           </div>
         )}
 
-        <div className="relative flex min-h-0 flex-1">
+        <div className="relative flex min-h-0 flex-1 min-[640px]:max-lg:pl-16">
           {sidebarOpen && (
-            <aside className="hidden w-56 shrink-0 border-r border-white/5 bg-surface/25 md:flex md:flex-col lg:w-64">
+            <aside className="hidden w-56 shrink-0 border-r border-white/5 bg-surface/25 lg:flex lg:flex-col lg:w-64">
               <SessionsSidebar className="min-h-0 flex-1" />
             </aside>
           )}
 
           <ChunkLoadBoundary key={activeView}>
-            <main id="nexa-main" tabIndex={-1} className="nexa-content-container relative flex min-w-0 flex-1 flex-col">
+            <div key={activeView} className="nexa-view-enter flex min-h-0 min-w-0 flex-1 flex-col">
+            <main id="nexa-main" tabIndex={-1} className="nexa-content-container relative flex min-h-0 min-w-0 flex-1 flex-col">
               {activeView === 'chat' ? (
                 <ChatView sessionId={activeSessionId} />
               ) : activeView === 'settings' ? (
@@ -140,6 +152,7 @@ export function AppShell() {
                 </Suspense>
               )}
             </main>
+            </div>
           </ChunkLoadBoundary>
 
           {activeView === 'chat' && <ContextPanel sessionId={activeSessionId} />}
@@ -149,7 +162,7 @@ export function AppShell() {
       </div>
 
       <SessionsSheet />
-      <NotificationCenter />
+      <Toaster position="top-right" style={{ top: 'max(1rem, var(--safe-top))', right: 'max(1rem, var(--safe-right))' }} toastOptions={{ classNames: { toast: 'border border-border bg-surface text-foreground shadow-xl', description: 'text-muted' } }} />
       <ConnectionNotifier />
     </div>
   );

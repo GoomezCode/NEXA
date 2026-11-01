@@ -221,6 +221,73 @@
   padding-inline: max(0.5rem, var(--safe-left)) max(0.5rem, var(--safe-right));
 }
 
+.nexa-aurora {
+  top: -15rem;
+  left: 50%;
+  width: min(48rem, 120vw);
+  height: 30rem;
+  transform: translate3d(-50%, 0, 0);
+  border-radius: 50%;
+  background: radial-gradient(ellipse, color-mix(in oklab, var(--nexa-primary) 16%, transparent), transparent 68%);
+  opacity: 0.55;
+}
+
+.nexa-spotlight {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.nexa-skeleton { animation: nexa-skeleton 1.4s ease-in-out infinite; }
+
+.nexa-message-enter { animation: nexa-message-enter 180ms ease-out both; }
+.nexa-view-enter { animation: nexa-view-enter 160ms ease-out both; }
+.nexa-nav-indicator { animation: nexa-nav-enter 150ms ease-out both; }
+
+@keyframes nexa-message-enter {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes nexa-view-enter {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes nexa-nav-enter {
+  from { opacity: 0.55; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes nexa-skeleton {
+  50% { opacity: 0.48; }
+}
+
+.nexa-spotlight::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  content: '';
+  background: radial-gradient(24rem circle at var(--spot-x, 50%) var(--spot-y, 50%), color-mix(in oklab, var(--nexa-primary) 7%, transparent), transparent 70%);
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+
+@media (pointer: fine) {
+  .nexa-spotlight:hover::before { opacity: 1; }
+}
+
+@media (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  :root[data-fx='full'] .nexa-aurora,
+  :root[data-fx='balanced'] .nexa-aurora { animation: nexa-aurora-drift 14s ease-in-out infinite alternate; }
+}
+
+@keyframes nexa-aurora-drift {
+  from { transform: translate3d(-54%, 0, 0) scale(0.96); opacity: 0.32; }
+  to { transform: translate3d(-46%, 14px, 0) scale(1.04); opacity: 0.62; }
+}
+
 .nexa-notification-center {
   left: max(0.75rem, var(--safe-left));
   right: max(0.75rem, var(--safe-right));
@@ -364,9 +431,23 @@
 }
 
 @media (max-width: 47.999rem) {
-  [class*='backdrop-blur'] { backdrop-filter: none !important; }
+  [class*='backdrop-blur'] { backdrop-filter: blur(var(--glass-blur)) !important; }
   .nexa-sheet::backdrop { backdrop-filter: none; }
 }
+
+:root[data-fx='balanced'] { --glass-blur: 10px; }
+:root[data-fx='lite'] { --glass-blur: 0px; }
+:root[data-fx='lite'] .nexa-spin-slow,
+:root[data-fx='lite'] .nexa-spin-reverse,
+:root[data-fx='lite'] .nexa-pulse { animation: none !important; }
+:root[data-fx='lite'] .nexa-skeleton { animation: none; }
+:root[data-fx='lite'] .nexa-message-enter,
+:root[data-fx='lite'] .nexa-view-enter,
+:root[data-fx='lite'] .nexa-nav-indicator,
+:root[data-reduced-motion='true'] .nexa-message-enter,
+:root[data-reduced-motion='true'] .nexa-view-enter,
+:root[data-reduced-motion='true'] .nexa-nav-indicator { animation: none; }
+:root[data-keyboard='open'] .nexa-mobile-dock { display: none; }
 
 @media (pointer: coarse) {
   button,

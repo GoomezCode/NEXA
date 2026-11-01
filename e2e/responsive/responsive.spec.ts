@@ -22,6 +22,17 @@ test('HUD não cria rolagem horizontal na matriz de larguras e alturas', async (
   for (const viewport of VIEWPORTS) {
     await page.setViewportSize(viewport);
     await expectNoHorizontalScroll(page);
+    if (viewport.width < 640) {
+      await expect(page.getByRole('navigation', { name: 'Navegação móvel' })).toBeVisible();
+      await expect(page.getByRole('button', { name: 'Abrir conversas' })).toBeVisible();
+    } else if (viewport.width < 1024) {
+      await expect(page.getByRole('navigation', { name: 'Navegação tablet' })).toBeVisible();
+      await expect(page.getByRole('navigation', { name: 'Navegação móvel' })).toBeHidden();
+      await expect(page.getByRole('button', { name: 'Abrir conversas' })).toBeVisible();
+    } else {
+      await expect(page.getByRole('navigation', { name: 'Navegação principal' })).toBeVisible();
+      await expect(page.getByRole('navigation', { name: 'Navegação móvel' })).toBeHidden();
+    }
   }
 });
 

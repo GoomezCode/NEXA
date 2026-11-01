@@ -121,6 +121,7 @@ export class MockChatAdapter implements ChatAdapter {
       await this.repo.finishAssistant(input.sessionId, assistantId, {
         content: text,
         status: 'done',
+        memoriesUsed: input.personalization?.memories.length ?? 0,
       });
 
       yield {

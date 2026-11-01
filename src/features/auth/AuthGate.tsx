@@ -1,11 +1,11 @@
-import { useEffect, type ReactNode } from 'react';
+import { Suspense, lazy, useEffect, type ReactNode } from 'react';
 
 import { ensureGuest } from '@/api/auth';
 import { useAuthStore } from '@/stores/auth-store';
 import { useSettingsStore } from '@/stores/settings-store';
 import { useConnectionStore } from '@/stores/connection-store';
 
-import { AuthView } from './AuthView';
+const AuthView = lazy(() => import('./AuthView').then((module) => ({ default: module.AuthView })));
 
 const MAX_TIMEOUT = 2 ** 31 - 1;
 
@@ -28,5 +28,9 @@ export function AuthGate({ children }: { children: ReactNode }) {
   }, [session, offline]);
 
   if (offline || demoMode || session) return <>{children}</>;
-  return <AuthView />;
+  return (
+    <Suspense fallback={<div role="status" className="flex min-h-dvh items-center justify-center font-mono text-2xs uppercase tracking-[0.2em] text-primary/70">Carregando acesso</div>}>
+      <AuthView />
+    </Suspense>
+  );
 }

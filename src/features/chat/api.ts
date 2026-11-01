@@ -26,6 +26,15 @@ export function useMessages(sessionId: string | null) {
   });
 }
 
+export function useMessageCount(sessionId: string | null) {
+  return useQuery({
+    queryKey: messageKeys.session(sessionId ?? 'none'),
+    queryFn: () => (sessionId ? getChatAdapter().listMessages(sessionId) : Promise.resolve([])),
+    enabled: Boolean(sessionId),
+    select: (messages) => messages.length,
+  });
+}
+
 export function useCreateSession() {
   const queryClient = useQueryClient();
 

@@ -2,6 +2,7 @@ import { CornerDownLeft, Mic, Send, Square } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 
 import { cn } from '@/lib/utils';
+import { IconButton } from '@/components/ui/Button';
 
 interface ComposerProps {
   disabled?: boolean;
@@ -45,6 +46,25 @@ export function Composer({
   maxLength,
 }: ComposerProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const shellRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const shell = shellRef.current;
+    if (!shell) return;
+    const updateHeight = () => {
+      document.documentElement.style.setProperty('--composer-height', `${shell.getBoundingClientRect().height}px`);
+    };
+    updateHeight();
+    if (typeof ResizeObserver === 'undefined') {
+      return () => document.documentElement.style.removeProperty('--composer-height');
+    }
+    const observer = new ResizeObserver(updateHeight);
+    observer.observe(shell);
+    return () => {
+      observer.disconnect();
+      document.documentElement.style.removeProperty('--composer-height');
+    };
+  }, []);
 
   useEffect(() => {
     const textarea = textareaRef.current;
@@ -72,7 +92,7 @@ export function Composer({
   };
 
   return (
-    <div className="nexa-composer-shell shrink-0 border-t border-white/5 bg-background/50 px-3 py-3 pb-[max(0.75rem,var(--safe-bottom))] sm:px-5">
+    <div ref={shellRef} className="nexa-composer-shell shrink-0 border-t border-white/5 bg-background/50 px-3 py-3 pb-[max(0.75rem,var(--safe-bottom))] sm:px-5">
       {voiceEnabled && (listening || interim || voiceError) && (
         <div
           role={voiceError ? 'alert' : 'status'}
@@ -127,30 +147,40 @@ export function Composer({
         />
 
         {voiceEnabled && (
-          <button
-            type="button"
+          <IconButton
+            label={!voiceSupported
+              ? 'Entrada por voz indisponível neste navegador'
+              : listening
+                ? 'Encerrar entrada por voz'
+                : 'Entrada por voz: segure para falar'}
             onPointerDown={(event) => {
               if (event.button !== 0 || voiceBlocked) {
                 return;
               }
 
               event.preventDefault();
+              if (event.pointerType === 'touch') {
+                if (listening) onVoiceStop();
+                else onVoiceStart();
+                return;
+              }
               onVoiceStart();
             }}
             onPointerUp={(event) => {
-              if (voiceBlocked) {
+              if (voiceBlocked || event.pointerType === 'touch') {
                 return;
               }
 
               event.preventDefault();
               onVoiceStop();
             }}
-            onPointerLeave={() => {
-              if (listening) {
+            onPointerLeave={(event) => {
+              if (event.pointerType !== 'touch' && listening) {
                 onVoiceStop();
               }
             }}
             onPointerCancel={onVoiceCancel}
+            onContextMenu={(event) => event.preventDefault()}
             onKeyDown={(event) => {
               if ((event.key === ' ' || event.key === 'Enter') && !voiceBlocked && !listening) {
                 event.preventDefault();
@@ -165,13 +195,6 @@ export function Composer({
             }}
             disabled={voiceBlocked}
             aria-pressed={listening}
-            aria-label={
-              !voiceSupported
-                ? 'Entrada por voz indisponível neste navegador'
-                : listening
-                  ? 'Encerrar entrada por voz'
-                  : 'Entrada por voz: segure para falar'
-            }
             title={
               !voiceSupported
                 ? 'Reconhecimento de voz indisponível neste navegador'
@@ -180,35 +203,33 @@ export function Composer({
                   : 'Segure para falar'
             }
             className={cn(
-              'flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border transition disabled:cursor-not-allowed disabled:opacity-40',
+              'flex h-11 w-11 shrink-0 touch-none select-none items-center justify-center rounded-xl border transition disabled:cursor-not-allowed disabled:opacity-40',
               listening
                 ? 'border-danger/40 bg-danger/15 text-danger'
                 : 'border-white/10 bg-white/5 text-muted hover:border-primary/35 hover:text-primary',
             )}
           >
             <Mic className={cn('h-4 w-4', listening && 'animate-pulse')} aria-hidden="true" />
-          </button>
+          </IconButton>
         )}
 
         {isStreaming ? (
-          <button
-            type="button"
+          <IconButton
+            label="Parar resposta"
             onClick={onStop}
-            aria-label="Parar resposta"
             className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-danger/35 bg-danger/10 text-danger transition hover:bg-danger/15"
           >
             <Square className="h-3.5 w-3.5" aria-hidden="true" />
-          </button>
+          </IconButton>
         ) : (
-          <button
-            type="button"
+          <IconButton
+            label="Enviar mensagem"
             onClick={submit}
             disabled={!canSend}
-            aria-label="Enviar mensagem"
             className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-primary/40 bg-primary/15 text-primary transition hover:bg-primary/25 disabled:cursor-not-allowed disabled:border-white/10 disabled:bg-white/5 disabled:text-muted/60"
           >
             <Send className="h-4 w-4" aria-hidden="true" />
-          </button>
+          </IconButton>
         )}
       </div>
 

@@ -1,4 +1,5 @@
 import { getSettingsSnapshot } from '@/stores/settings-store';
+import { useSpeechStore } from '@/stores/speech-store';
 
 export function isSpeechSynthesisSupported(): boolean {
   return typeof window !== 'undefined' && 'speechSynthesis' in window;
@@ -28,11 +29,21 @@ function enqueueSpeechText(text: string): void {
   const voice = synth.getVoices().find((item) => item.voiceURI === settings.speechVoiceURI) ??
     synth.getVoices().find((item) => item.lang.toLowerCase().startsWith('pt-br'));
   if (voice) utterance.voice = voice;
+  utterance.onstart = () => useSpeechStore.getState().setSpeaking(true);
+  utterance.onend = () => useSpeechStore.getState().setSpeaking(false);
+  utterance.onerror = () => useSpeechStore.getState().setSpeaking(false);
   synth.speak(utterance);
 }
 
 /** Quebra o stream em frases curtas para começar a leitura antes da resposta terminar. */
-export class SpeechStreamer {
+export interface SpeechEngine {
+  push(chunk: string): void;
+  finish(): void;
+  cancel(): void;
+}
+
+/** Implementação local de TTS baseada na Web Speech API do navegador. */
+export class SpeechStreamer implements SpeechEngine {
   private buffer = '';
   private carry = '';
   private inCode = false;
@@ -111,6 +122,7 @@ export class SpeechStreamer {
 }
 
 export function cancelSpeech(): void {
+  useSpeechStore.getState().setSpeaking(false);
   if (!isSpeechSynthesisSupported()) {
     return;
   }

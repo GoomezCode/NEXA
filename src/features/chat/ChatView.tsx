@@ -133,6 +133,23 @@ export function ChatView({ sessionId }: { sessionId: string | null }) {
             </span>
           )}
         </div>
+        <div className="ml-auto flex max-w-[52%] items-center gap-1.5 sm:hidden">
+          {offlineMode ? (
+            <select
+              aria-label="Modelo Ollama"
+              value={selectedModelId ?? ''}
+              onChange={(event) => setSelectedModel(event.target.value || null)}
+              disabled={!models.data?.models.length}
+              className="min-w-0 max-w-36 rounded-full border border-white/10 bg-background px-2 py-1 font-mono text-2xs text-foreground"
+            >
+              <option value="">Automático</option>
+              {(models.data?.models ?? []).map((model) => <option key={model.model_id} value={model.model_id}>{model.name}</option>)}
+            </select>
+          ) : null}
+          <span className="truncate rounded-full border border-white/10 bg-white/5 px-2 py-1 font-mono text-2xs text-muted">
+            {offlineMode ? 'offline' : demoMode ? 'demo' : online ? 'online' : 'sem rede'}
+          </span>
+        </div>
       </div>
 
       <MessageList

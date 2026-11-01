@@ -9,6 +9,7 @@ test('persiste as preferências dos ajustes após recarregar', async ({ page }) 
 
   const name = page.getByRole('textbox', { name: 'Como a NEXA deve chamar você' });
   await name.fill('Marina');
+  await page.getByRole('button', { name: 'Salvar perfil' }).click();
 
   await page.getByRole('switch', { name: 'Reduzir animações' }).click();
   await expect(page.locator('html')).toHaveAttribute('data-reduced-motion', 'true');
@@ -43,6 +44,41 @@ test('mantém a entrada por voz desligada após recarregar', async ({ page }) =>
   );
 });
 
+test('persiste a aparência selecionada e aplica o tema ao documento', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Abrir ajustes' }).click();
+  await page.getByLabel('Tema da interface').selectOption('light');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+  await page.getByRole('button', { name: 'Abrir ajustes' }).click();
+  await expect(page.getByLabel('Tema da interface')).toHaveValue('light');
+});
+
+test('aplica e persiste o tema Rosa', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Abrir ajustes' }).click();
+  await page.getByLabel('Tema da interface').selectOption('rose');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'rose');
+  await expect(page.locator('html')).toHaveCSS('--nexa-primary', '#f472b6');
+
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'rose');
+  await page.getByRole('button', { name: 'Abrir ajustes' }).click();
+  await expect(page.getByLabel('Tema da interface')).toHaveValue('rose');
+});
+
+test('aplica o modo econômico de efeitos e mantém a escolha', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Abrir ajustes' }).click();
+  const effects = page.getByLabel('Efeitos visuais');
+  await effects.selectOption('lite');
+  await expect(page.locator('html')).toHaveAttribute('data-fx', 'lite');
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('data-fx', 'lite');
+});
+
 test('restaura os padrões dos ajustes', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: 'Abrir ajustes' }).click();
@@ -51,7 +87,8 @@ test('restaura os padrões dos ajustes', async ({ page }) => {
   await name.fill('Marina');
   await page.getByRole('button', { name: 'Restaurar padrões' }).click();
 
-  await expect(name).toHaveValue('Operador');
+  await expect(name).toHaveValue('');
+  await expect(name).toHaveAttribute('placeholder', 'Seu nome');
 });
 
 test('o aviso de demonstração leva aos ajustes', async ({ page }) => {

@@ -1,10 +1,13 @@
+import * as AlertDialog from '@radix-ui/react-alert-dialog';
 import { MessageSquare, Pencil, Plus, RefreshCw, Search, Trash2, X } from 'lucide-react';
 import type { FormEvent } from 'react';
 import { useState } from 'react';
 
 import { formatSessionTime } from '@/lib/format';
 import { cn } from '@/lib/utils';
-import { useUiStore } from '@/stores/ui-store';
+import { useConnectionStore } from '@/stores/connection-store';
+import { useSettingsStore } from '@/stores/settings-store';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { useCreateSession, useDeleteSession, useRenameSession, useSessions } from './api';
 
@@ -18,9 +21,11 @@ export function SessionsSidebar({ onSelect, className }: SessionsSidebarProps) {
   const createSession = useCreateSession();
   const renameSession = useRenameSession();
   const deleteSession = useDeleteSession();
-  const activeSessionId = useUiStore((state) => state.activeSessionId);
-  const setActiveSessionId = useUiStore((state) => state.setActiveSessionId);
-  const setActiveView = useUiStore((state) => state.setActiveView);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const activeSessionId = location.pathname.match(/^\/c\/([^/]+)/)?.[1] ?? null;
+  const offlineMode = useConnectionStore((state) => state.mode === 'offline');
+  const demoMode = useSettingsStore((state) => state.settings.demoMode);
 
   const [query, setQuery] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -34,8 +39,7 @@ export function SessionsSidebar({ onSelect, className }: SessionsSidebarProps) {
     : allSessions;
 
   const selectSession = (id: string) => {
-    setActiveSessionId(id);
-    setActiveView('chat');
+    navigate(`/c/${id}`);
     onSelect?.();
   };
 
@@ -72,7 +76,7 @@ export function SessionsSidebar({ onSelect, className }: SessionsSidebarProps) {
       onSuccess: () => {
         if (activeSessionId === id) {
           const remaining = allSessions.filter((session) => session.id !== id);
-          setActiveSessionId(remaining[0]?.id ?? null);
+          navigate(remaining[0] ? `/c/${remaining[0].id}` : '/');
         }
 
         setConfirmingId(null);
@@ -178,33 +182,19 @@ export function SessionsSidebar({ onSelect, className }: SessionsSidebarProps) {
             if (confirmingId === session.id) {
               return (
                 <li key={session.id}>
-                  <div
-                    role="alertdialog"
-                    aria-label={`Excluir ${session.title}`}
-                    className="rounded-xl border border-danger/30 bg-danger/5 p-2.5"
-                  >
-                    <p className="text-xs text-foreground">Excluir “{session.title}”?</p>
-                    <p className="mt-0.5 font-mono text-2xs uppercase tracking-[0.1em] text-muted">
-                      Esta ação não pode ser desfeita
-                    </p>
-                    <div className="mt-2 flex gap-2">
-                      <button
-                        type="button"
-                        onClick={() => confirmDelete(session.id)}
-                        disabled={deleteSession.isPending}
-                        className="rounded-lg border border-danger/35 bg-danger/15 px-2.5 py-1.5 font-mono text-2xs uppercase tracking-[0.12em] text-danger transition hover:bg-danger/25 disabled:opacity-50"
-                      >
-                        Excluir
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setConfirmingId(null)}
-                        className="rounded-lg border border-white/10 px-2.5 py-1.5 font-mono text-2xs uppercase tracking-[0.12em] text-muted transition hover:text-foreground"
-                      >
-                        Cancelar
-                      </button>
-                    </div>
-                  </div>
+                  <AlertDialog.Root open onOpenChange={(open) => { if (!open) setConfirmingId(null); }}>
+                    <AlertDialog.Portal>
+                      <AlertDialog.Overlay className="fixed inset-0 z-[89] bg-black/60 backdrop-blur-sm" />
+                      <AlertDialog.Content aria-describedby="delete-session-description" className="fixed left-1/2 top-1/2 z-[90] w-[min(26rem,calc(100vw-2rem))] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-border bg-surface p-5 shadow-2xl">
+                        <AlertDialog.Title className="font-display text-sm tracking-wide text-foreground">Excluir “{session.title}”?</AlertDialog.Title>
+                        <AlertDialog.Description id="delete-session-description" className="mt-2 text-sm text-muted">Esta ação não pode ser desfeita.</AlertDialog.Description>
+                        <div className="mt-5 flex justify-end gap-2">
+                          <AlertDialog.Cancel asChild><button type="button" className="min-h-11 rounded-xl border border-border px-3 text-sm text-muted">Cancelar</button></AlertDialog.Cancel>
+                          <button type="button" onClick={() => confirmDelete(session.id)} disabled={deleteSession.isPending} className="min-h-11 rounded-xl border border-danger/40 bg-danger/10 px-3 text-sm text-danger disabled:opacity-50">{deleteSession.isPending ? 'Excluindo…' : 'Excluir'}</button>
+                        </div>
+                      </AlertDialog.Content>
+                    </AlertDialog.Portal>
+                  </AlertDialog.Root>
                 </li>
               );
             }
@@ -267,7 +257,7 @@ export function SessionsSidebar({ onSelect, className }: SessionsSidebarProps) {
                     type="button"
                     onClick={() => selectSession(session.id)}
                     aria-current={active ? 'true' : undefined}
-                    className="flex w-full items-start gap-2.5 rounded-xl px-2.5 py-2 pr-28 text-left"
+                    className="flex w-full items-start gap-2.5 rounded-xl px-2.5 py-2 pr-20 text-left sm:pr-28"
                   >
                     <MessageSquare
                       className={cn(
@@ -326,7 +316,7 @@ export function SessionsSidebar({ onSelect, className }: SessionsSidebarProps) {
         <p className="font-mono text-2xs uppercase leading-relaxed tracking-[0.14em] text-muted/70">
           Histórico local
           <br />
-          modo demonstração
+          {offlineMode ? 'Ollama local · offline' : demoMode ? 'modo demonstração' : 'API conectada'}
         </p>
       </div>
     </div>

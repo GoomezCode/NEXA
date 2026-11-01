@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -13,7 +14,7 @@ import { useUiStore } from '@/stores/ui-store';
 function renderWithClient(node: ReactNode) {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
 
-  return render(<QueryClientProvider client={client}>{node}</QueryClientProvider>);
+  return render(<MemoryRouter><QueryClientProvider client={client}>{node}</QueryClientProvider></MemoryRouter>);
 }
 
 beforeEach(() => {

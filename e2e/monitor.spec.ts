@@ -79,8 +79,8 @@ test('seleciona um modelo do catálogo e mantém a escolha após recarregar', as
   await expect(option).toHaveAttribute('aria-pressed', 'true');
 
   await page.reload();
-  await expect(page.getByRole('textbox', { name: 'Mensagem para a NEXA' })).toBeVisible();
-  await openMonitor();
+  await expect(page).toHaveURL(/\/monitor$/);
+  await expect(page.getByRole('heading', { name: 'Monitor', exact: true })).toBeVisible();
 
   await expect(page.getByRole('button', { name: 'Usar modelo Nexa Mini' })).toHaveAttribute(
     'aria-pressed',

@@ -1,12 +1,8 @@
 import { Eye, EyeOff, LogIn, UserPlus } from 'lucide-react';
-import {
-  useEffect,
-  useState,
-  type ChangeEvent,
-  type FormEvent,
-  type InputHTMLAttributes,
-  type ReactNode,
-} from 'react';
+import { useMemo, useState } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 import { ensureGuest, loginWithPassword, registerAccount } from '@/api/auth';
 import { ApiError } from '@/api/client/problem';
@@ -16,73 +12,32 @@ import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/auth-store';
 import { useSettingsStore } from '@/stores/settings-store';
 import { useConnectionStore } from '@/stores/connection-store';
+import { appEnv } from '@/lib/env';
+import { Field } from '@/components/ui/Field';
 
-import { fieldErrors, loginSchema, registerSchema } from './schemas';
+import { authFormSchema, loginSchema, registerSchema } from './schemas';
 
 type Mode = 'login' | 'register';
 
-const REGISTRATION_ENABLED = import.meta.env.VITE_REGISTRATION_ENABLED === 'true';
-
-function Field({
-  id,
-  label,
-  error,
-  trailing,
-  ...input
-}: {
-  id: string;
-  label: string;
-  error?: string;
-  trailing?: ReactNode;
-} & InputHTMLAttributes<HTMLInputElement>) {
-  return (
-    <div>
-      <label htmlFor={id} className="block text-2xs text-muted">
-        {label}
-      </label>
-      <div className="relative mt-1">
-        <input
-          id={id}
-          aria-invalid={error ? true : undefined}
-          aria-describedby={error ? `${id}-error` : undefined}
-          className={cn(
-            'nexa-field w-full rounded-xl border bg-background/60 px-3 py-2 text-base sm:text-sm text-foreground outline-none transition focus:border-primary/40',
-            trailing && 'pr-12',
-            error ? 'border-danger/40' : 'border-white/10',
-          )}
-          {...input}
-        />
-        {trailing && <div className="absolute right-0 top-1/2 -translate-y-1/2">{trailing}</div>}
-      </div>
-      {error && (
-        <p id={`${id}-error`} className="mt-1 text-2xs text-danger">
-          {error}
-        </p>
-      )}
-    </div>
-  );
-}
+const REGISTRATION_ENABLED = appEnv.registrationEnabled;
+type AuthFormValues = z.infer<ReturnType<typeof authFormSchema>>;
 
 export function AuthView() {
   const expired = useAuthStore((state) => state.status === 'expired');
   const [mode, setMode] = useState<Mode>('login');
-  const [values, setValues] = useState({ username: '', email: '', password: '', confirm: '' });
-  const [errors, setErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-
-  useEffect(() => {
-    const first = ['username', 'email', 'password', 'confirm'].find((field) => errors[field]);
-    if (first) document.getElementById(`auth-${first}`)?.focus();
-  }, [errors]);
-
-  const change = (key: keyof typeof values) => (event: ChangeEvent<HTMLInputElement>) =>
-    setValues((current) => ({ ...current, [key]: event.target.value }));
+  const resolver = useMemo(() => zodResolver(authFormSchema(mode)), [mode]);
+  const { register, handleSubmit, clearErrors, setError, formState: { errors } } = useForm<AuthFormValues>({
+    resolver,
+    mode: 'onBlur',
+    defaultValues: { username: '', email: '', password: '', confirm: '' },
+  });
 
   const switchMode = (next: Mode) => {
     setMode(next);
-    setErrors({});
+    clearErrors();
     setFormError(null);
   };
 
@@ -94,11 +49,12 @@ export function AuthView() {
       await action();
     } catch (error) {
       if (error instanceof ApiError && error.errors?.length) {
-        setErrors(
-          Object.fromEntries(
-            error.errors.map((item) => [item.field.split('.').pop() ?? item.field, item.reason]),
-          ),
-        );
+        for (const item of error.errors) {
+          const field = item.field.split('.').pop();
+          if (field === 'username' || field === 'email' || field === 'password' || field === 'confirm') {
+            setError(field, { type: 'server', message: item.reason });
+          }
+        }
       }
 
       setFormError(describeError(error).message);
@@ -107,29 +63,15 @@ export function AuthView() {
     }
   };
 
-  const submit = (event: FormEvent) => {
-    event.preventDefault();
-
+  const submit = async (values: AuthFormValues) => {
     if (mode === 'login') {
       const parsed = loginSchema.safeParse(values);
-      if (!parsed.success) {
-        setErrors(fieldErrors(parsed.error));
-        return;
-      }
-
-      setErrors({});
-      void run(() => loginWithPassword(parsed.data.username, parsed.data.password));
+      if (parsed.success) await run(() => loginWithPassword(parsed.data.username, parsed.data.password));
       return;
     }
 
     const parsed = registerSchema.safeParse(values);
-    if (!parsed.success) {
-      setErrors(fieldErrors(parsed.error));
-      return;
-    }
-
-    setErrors({});
-    void run(() =>
+    if (parsed.success) await run(() =>
       registerAccount({
         username: parsed.data.username,
         email: parsed.data.email || undefined,
@@ -203,23 +145,23 @@ export function AuthView() {
           id="auth-panel"
           role="tabpanel"
           aria-labelledby={`auth-tab-${mode}`}
-          onSubmit={submit}
+          onSubmit={(event) => void handleSubmit(submit)(event)}
           noValidate
           className="mt-4 space-y-3"
         >
           {mode === 'register' && !REGISTRATION_ENABLED ? (
             <p className="rounded-xl border border-white/10 bg-background/40 p-3 text-[12px] leading-relaxed text-muted">
-              O cadastro público ainda não está disponível nesta API. Peça uma conta ao
-              administrador ou continue como convidado.
+              O cadastro está desativado nesta implantação. Configure
+              {' '}VITE_REGISTRATION_ENABLED=true na Web e
+              {' '}ALLOW_SELF_REGISTRATION=true na API para habilitá-lo.
             </p>
           ) : (
             <>
               <Field
                 id="auth-username"
                 label="Usuário"
-                value={values.username}
-                onChange={change('username')}
-                error={errors.username}
+                error={errors.username?.message}
+                {...register('username')}
                 autoComplete="username"
                 autoCapitalize="none"
                 spellCheck={false}
@@ -231,9 +173,8 @@ export function AuthView() {
                   id="auth-email"
                   label="E-mail (opcional)"
                   type="email"
-                  value={values.email}
-                  onChange={change('email')}
-                  error={errors.email}
+                  error={errors.email?.message}
+                  {...register('email')}
                   autoComplete="email"
                 />
               )}
@@ -242,9 +183,8 @@ export function AuthView() {
                 id="auth-password"
                 label="Senha"
                 type={showPassword ? 'text' : 'password'}
-                value={values.password}
-                onChange={change('password')}
-                error={errors.password}
+                error={errors.password?.message}
+                {...register('password')}
                 autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
                 maxLength={128}
                 trailing={passwordToggle}
@@ -255,9 +195,8 @@ export function AuthView() {
                   id="auth-confirm"
                   label="Confirmar senha"
                   type={showPassword ? 'text' : 'password'}
-                  value={values.confirm}
-                  onChange={change('confirm')}
-                  error={errors.confirm}
+                  error={errors.confirm?.message}
+                  {...register('confirm')}
                   autoComplete="new-password"
                   maxLength={128}
                 />

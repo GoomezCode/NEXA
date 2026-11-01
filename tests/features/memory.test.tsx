@@ -107,7 +107,7 @@ describe('MemoryView', () => {
 
     await user.click(screen.getByRole('button', { name: 'Esquecer Configuração atualizada' }));
     const dialog = screen.getByRole('alertdialog', {
-      name: 'Esquecer Configuração atualizada',
+      name: /Esquecer.*Configuração atualizada/,
     });
     await user.click(within(dialog).getByRole('button', { name: 'Esquecer' }));
 

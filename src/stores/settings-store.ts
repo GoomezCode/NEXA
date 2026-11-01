@@ -1,30 +1,32 @@
 import { create } from 'zustand';
+import { appEnv } from '@/lib/env';
 
 export interface AppSettings {
   displayName: string;
+  theme: 'hud' | 'violet' | 'rose' | 'classic' | 'light' | 'contrast';
   voiceInputEnabled: boolean;
   ttsEnabled: boolean;
   speechRate: number;
   speechVoiceURI: string;
   reducedMotion: boolean;
+  effectsMode: 'auto' | 'full' | 'balanced' | 'lite';
   apiUrl: string;
   demoMode: boolean;
 }
 
 const STORAGE_KEY = 'nexa:settings:v1';
 
-const ENV_DEMO = import.meta.env.VITE_DEMO_MODE !== 'false';
-const ENV_API_URL = import.meta.env.VITE_API_URL ?? '/api/v1';
-
 export const DEFAULT_SETTINGS: AppSettings = {
-  displayName: 'Operador',
+  displayName: '',
+  theme: 'hud',
   voiceInputEnabled: true,
   ttsEnabled: false,
   speechRate: 1,
   speechVoiceURI: '',
   reducedMotion: false,
-  apiUrl: ENV_API_URL,
-  demoMode: ENV_DEMO,
+  effectsMode: 'auto',
+  apiUrl: appEnv.apiUrl,
+  demoMode: appEnv.demoMode,
 };
 
 function sanitizeSettings(value: unknown): AppSettings {
@@ -37,9 +39,14 @@ function sanitizeSettings(value: unknown): AppSettings {
 
   return {
     displayName:
-      typeof candidate.displayName === 'string'
-        ? candidate.displayName.slice(0, 60)
-        : DEFAULT_SETTINGS.displayName,
+      candidate.displayName === 'Operador'
+        ? ''
+        : typeof candidate.displayName === 'string'
+          ? candidate.displayName.slice(0, 60)
+          : DEFAULT_SETTINGS.displayName,
+    theme: ['hud', 'violet', 'rose', 'classic', 'light', 'contrast'].includes(String(candidate.theme))
+      ? (candidate.theme as AppSettings['theme'])
+      : DEFAULT_SETTINGS.theme,
     voiceInputEnabled:
       typeof candidate.voiceInputEnabled === 'boolean'
         ? candidate.voiceInputEnabled
@@ -56,6 +63,9 @@ function sanitizeSettings(value: unknown): AppSettings {
       typeof candidate.reducedMotion === 'boolean'
         ? candidate.reducedMotion
         : DEFAULT_SETTINGS.reducedMotion,
+    effectsMode: ['auto', 'full', 'balanced', 'lite'].includes(String(candidate.effectsMode))
+      ? (candidate.effectsMode as AppSettings['effectsMode'])
+      : DEFAULT_SETTINGS.effectsMode,
     apiUrl:
       typeof candidate.apiUrl === 'string' && candidate.apiUrl.trim()
         ? candidate.apiUrl.trim()

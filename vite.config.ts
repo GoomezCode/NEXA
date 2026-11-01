@@ -2,6 +2,7 @@ import { fileURLToPath, URL } from 'node:url';
 
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
+import { visualizer } from 'rollup-plugin-visualizer';
 import { defineConfig, loadEnv, type ProxyOptions } from 'vite';
 
 export default defineConfig(({ mode }) => {
@@ -20,7 +21,13 @@ export default defineConfig(({ mode }) => {
   };
 
   return {
-    plugins: [react(), tailwindcss()],
+    plugins: [
+      react(),
+      tailwindcss(),
+      ...(env.ANALYZE === 'true'
+        ? [visualizer({ filename: 'dist/stats.html', gzipSize: true, brotliSize: true, open: false })]
+        : []),
+    ],
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url)),

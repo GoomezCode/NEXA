@@ -1,45 +1,31 @@
 import { Menu, PanelLeft, Settings } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 
 import { logout } from '@/api/auth';
 import { NexaMark } from '@/components/brand/NexaMark';
+import { Badge } from '@/components/ui/Badge';
 import { useOnlineStatus } from '@/hooks/use-online-status';
 import { formatClock, formatShortDate } from '@/lib/format';
 import { useAuthStore } from '@/stores/auth-store';
 import { useSettingsStore } from '@/stores/settings-store';
 import { useUiStore } from '@/stores/ui-store';
 import { useConnectionStore } from '@/stores/connection-store';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 function StatusChip({ tone, label }: { tone: 'success' | 'warning'; label: string }) {
-  const styles =
-    tone === 'success'
-      ? 'border-success/25 bg-success/5 text-success'
-      : 'border-warning/25 bg-warning/5 text-warning';
-
   return (
-    <span
-      className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 font-mono text-2xs uppercase tracking-[0.14em] ${styles}`}
-    >
+    <Badge tone={tone}>
       <span
         className={`h-1.5 w-1.5 rounded-full ${tone === 'success' ? 'bg-success' : 'bg-warning'}`}
         aria-hidden="true"
       />
       {label}
-    </span>
+    </Badge>
   );
 }
 
-export function TopBar() {
+const Clock = memo(function Clock() {
   const [now, setNow] = useState(() => new Date());
-  const online = useOnlineStatus();
-  const demoMode = useSettingsStore((state) => state.settings.demoMode);
-  const offlineMode = useConnectionStore((state) => state.mode === 'offline');
-  const session = useAuthStore((state) => state.session);
-  const aiState = useUiStore((state) => state.aiState);
-  const busy = aiState === 'processing' || aiState === 'responding';
-  const setActiveView = useUiStore((state) => state.setActiveView);
-  const setSessionsSheetOpen = useUiStore((state) => state.setSessionsSheetOpen);
-  const toggleSidebar = useUiStore((state) => state.toggleSidebar);
 
   useEffect(() => {
     const interval = window.setInterval(() => setNow(new Date()), 1000);
@@ -47,11 +33,33 @@ export function TopBar() {
   }, []);
 
   return (
+    <div className="text-right leading-tight">
+      <p className="font-mono text-sm tabular-nums text-primary">{formatClock(now)}</p>
+      <p className="hidden font-mono text-2xs uppercase tracking-[0.12em] text-muted sm:block">
+        {formatShortDate(now)}
+      </p>
+    </div>
+  );
+});
+
+export function TopBar() {
+  const online = useOnlineStatus();
+  const demoMode = useSettingsStore((state) => state.settings.demoMode);
+  const offlineMode = useConnectionStore((state) => state.mode === 'offline');
+  const session = useAuthStore((state) => state.session);
+  const aiState = useUiStore((state) => state.aiState);
+  const busy = aiState === 'processing' || aiState === 'responding';
+  const navigate = useNavigate();
+  const [, setSearchParams] = useSearchParams();
+  const toggleSidebar = useUiStore((state) => state.toggleSidebar);
+
+  return (
     <header className="relative z-20 flex h-14 min-h-[calc(3.5rem+var(--safe-top))] shrink-0 items-center gap-2 border-b border-white/5 bg-background/70 px-3 ps-[max(0.75rem,var(--safe-left))] pe-[max(0.75rem,var(--safe-right))] pt-[var(--safe-top)] backdrop-blur-xl sm:gap-3 sm:px-5">
       <button
+        id="open-sessions-button"
         type="button"
-        onClick={() => setSessionsSheetOpen(true)}
-        className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-muted transition hover:border-primary/30 hover:text-primary md:hidden"
+        onClick={() => setSearchParams((current) => { const next = new URLSearchParams(current); next.set('panel', 'sessions'); return next; })}
+        className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-muted transition hover:border-primary/30 hover:text-primary lg:hidden"
         aria-label="Abrir conversas"
       >
         <Menu className="h-4 w-4" aria-hidden="true" />
@@ -60,7 +68,7 @@ export function TopBar() {
       <button
         type="button"
         onClick={toggleSidebar}
-        className="hidden h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-muted transition hover:border-primary/30 hover:text-primary md:flex"
+        className="hidden h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-muted transition hover:border-primary/30 hover:text-primary lg:flex"
         aria-label="Alternar barra lateral"
       >
         <PanelLeft className="h-4 w-4" aria-hidden="true" />
@@ -76,7 +84,7 @@ export function TopBar() {
         </div>
       </div>
 
-      <div className="ml-2 hidden items-center gap-2 md:flex">
+      <div className="ml-2 hidden items-center gap-2 lg:flex">
         {offlineMode ? (
           <>
             <StatusChip tone="warning" label="modo offline · ollama local" />
@@ -117,17 +125,15 @@ export function TopBar() {
         </>}
       </div>
 
-      <div className="ml-auto flex items-center gap-2 sm:gap-3">
-        <div className="text-right leading-tight">
-          <p className="font-mono text-sm tabular-nums text-primary">{formatClock(now)}</p>
-          <p className="hidden font-mono text-2xs uppercase tracking-[0.12em] text-muted sm:block">
-            {formatShortDate(now)}
-          </p>
+      <div className="ml-auto flex min-w-0 items-center gap-2 sm:gap-3">
+        <div className="lg:hidden">
+          <StatusChip tone={offlineMode || !online || demoMode ? 'warning' : 'success'} label={offlineMode ? 'offline' : !online ? 'sem rede' : demoMode ? 'demo' : 'online'} />
         </div>
+        <div className="hidden sm:block"><Clock /></div>
 
         <button
           type="button"
-          onClick={() => setActiveView('settings')}
+          onClick={() => navigate('/settings')}
           className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-muted transition hover:border-primary/30 hover:text-primary"
           aria-label="Abrir ajustes"
         >

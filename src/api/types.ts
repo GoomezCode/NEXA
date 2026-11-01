@@ -20,6 +20,8 @@ export interface ChatMessage {
   createdAt: string;
   status: MessageStatus;
   finish_reason?: string;
+  /** Número de memórias locais usadas para contextualizar esta resposta. */
+  memoriesUsed?: number;
 }
 
 export interface UsageInfo {
