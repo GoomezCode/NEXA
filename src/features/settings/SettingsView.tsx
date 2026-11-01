@@ -242,6 +242,7 @@ export function SettingsView() {
             >
               <option value="hud">NEXA HUD</option>
               <option value="violet">Violeta</option>
+              <option value="rose">Rosa</option>
               <option value="classic">Clássico</option>
               <option value="light">Claro</option>
               <option value="contrast">Alto contraste</option>

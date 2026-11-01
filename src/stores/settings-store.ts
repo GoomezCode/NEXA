@@ -3,7 +3,7 @@ import { appEnv } from '@/lib/env';
 
 export interface AppSettings {
   displayName: string;
-  theme: 'hud' | 'violet' | 'classic' | 'light' | 'contrast';
+  theme: 'hud' | 'violet' | 'rose' | 'classic' | 'light' | 'contrast';
   voiceInputEnabled: boolean;
   ttsEnabled: boolean;
   speechRate: number;
@@ -44,7 +44,7 @@ function sanitizeSettings(value: unknown): AppSettings {
         : typeof candidate.displayName === 'string'
           ? candidate.displayName.slice(0, 60)
           : DEFAULT_SETTINGS.displayName,
-    theme: ['hud', 'violet', 'classic', 'light', 'contrast'].includes(String(candidate.theme))
+    theme: ['hud', 'violet', 'rose', 'classic', 'light', 'contrast'].includes(String(candidate.theme))
       ? (candidate.theme as AppSettings['theme'])
       : DEFAULT_SETTINGS.theme,
     voiceInputEnabled:

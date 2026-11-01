@@ -4,7 +4,7 @@ Este documento descreve os componentes e temas que existem no NEXA Web. Os estil
 
 ## Temas
 
-O tema é persistido em `settings-store` e aplicado como `data-theme` no elemento `<html>`. Os valores aceitos são `hud` (padrão), `violet`, `classic`, `light` e `contrast`. A opção `classic` é apenas uma paleta da interface NEXA atual; não carrega uma segunda aplicação.
+O tema é persistido em `settings-store` e aplicado como `data-theme` no elemento `<html>`. Os valores aceitos são `hud` (padrão), `violet`, `rose`, `classic`, `light` e `contrast`. A opção `classic` é apenas uma paleta da interface NEXA atual; não carrega uma segunda aplicação.
 
 Os temas substituem os tokens semânticos de fundo, superfície, texto, borda e cor primária. Componentes devem preferir esses tokens (`bg-surface`, `text-foreground`, `border-border`, `text-primary`) a cores fixas para acompanhar a troca de paleta.
 

@@ -82,6 +82,19 @@
   --nexa-border-soft: rgb(255 255 255 / 9%);
 }
 
+:root[data-theme='rose'] {
+  --nexa-bg: #100911;
+  --nexa-surface: #190f18;
+  --nexa-surface-2: #241423;
+  --nexa-primary: #f472b6;
+  --nexa-primary-soft: rgb(244 114 182 / 14%);
+  --nexa-secondary: #fda4af;
+  --nexa-text: #fff1f7;
+  --nexa-muted: #c3a6b5;
+  --nexa-border: rgb(244 114 182 / 25%);
+  --nexa-border-soft: rgb(255 209 230 / 10%);
+}
+
 :root[data-theme='classic'] {
   --nexa-bg: #080c12;
   --nexa-surface: #101923;

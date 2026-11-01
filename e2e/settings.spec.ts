@@ -56,6 +56,19 @@ test('persiste a aparência selecionada e aplica o tema ao documento', async ({ 
   await expect(page.getByLabel('Tema da interface')).toHaveValue('light');
 });
 
+test('aplica e persiste o tema Rosa', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Abrir ajustes' }).click();
+  await page.getByLabel('Tema da interface').selectOption('rose');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'rose');
+  await expect(page.locator('html')).toHaveCSS('--nexa-primary', '#f472b6');
+
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'rose');
+  await page.getByRole('button', { name: 'Abrir ajustes' }).click();
+  await expect(page.getByLabel('Tema da interface')).toHaveValue('rose');
+});
+
 test('aplica o modo econômico de efeitos e mantém a escolha', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: 'Abrir ajustes' }).click();
