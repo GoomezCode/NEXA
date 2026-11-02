@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { formatClock, formatShortDate } from '@/lib/format';
 import { cn } from '@/lib/utils';
+import { logout } from '@/api/auth';
 import { useConnectionStore } from '@/stores/connection-store';
 import { logout } from '@/api/auth';
 import { useAuthStore } from '@/stores/auth-store';
@@ -162,6 +163,23 @@ export function Dock() {
             onClick={() => setActiveView(item.id)}
           />
         ))}
+        {offlineMode && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              useConnectionStore.getState().setMode('api');
+              logout();
+            }}
+            aria-label="Sair do modo offline"
+            title="Sair do modo offline"
+            className="h-11 min-w-11 gap-1.5 rounded-lg border border-transparent px-2 text-muted hover:border-border hover:bg-surface-2 hover:text-foreground sm:px-3"
+          >
+            <LogOut className="h-4 w-4" aria-hidden="true" />
+            <span className="hidden text-2xs font-medium uppercase tracking-[0.1em] sm:inline">Sair</span>
+          </Button>
+        )}
       </div>
 
       <div className="flex min-w-0 flex-1 items-center justify-end gap-1.5 sm:gap-3">
