@@ -69,6 +69,19 @@ test('aplica e persiste o tema Rosa', async ({ page }) => {
   await expect(page.getByLabel('Tema da interface')).toHaveValue('rose');
 });
 
+test('aplica e persiste o tema Escuro', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('navigation', { name: 'Navegação principal' }).getByRole('button', { name: 'Ajustes' }).click();
+  await page.getByLabel('Tema da interface').selectOption('dark');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await expect(page.locator('html')).toHaveCSS('--nexa-primary', '#0d0d10');
+
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await page.getByRole('navigation', { name: 'Navegação principal' }).getByRole('button', { name: 'Ajustes' }).click();
+  await expect(page.getByLabel('Tema da interface')).toHaveValue('dark');
+});
+
 test('aplica o modo econômico de efeitos e mantém a escolha', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('navigation', { name: 'Navegação principal' }).getByRole('button', { name: 'Ajustes' }).click();

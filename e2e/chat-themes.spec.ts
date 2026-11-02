@@ -5,6 +5,7 @@ const themes = [
   'violet',
   'rose',
   'classic',
+  'dark',
   'light',
   'light-rose',
   'light-lavender',
