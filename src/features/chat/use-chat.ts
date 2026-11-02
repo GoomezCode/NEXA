@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { getChatAdapter } from '@/api';
 import { describeError } from '@/api/errors';
-import type { AiState, AttachmentMeta, ChatMessage } from '@/api/types';
+import type { AiState, AttachmentMeta, ChatAdapter, ChatMessage } from '@/api/types';
 import { useOnlineStatus } from '@/hooks/use-online-status';
 import { createId } from '@/lib/id';
 import { cancelSpeech, SpeechStreamer, type SpeechEngine } from '@/lib/speech';
@@ -30,7 +30,7 @@ export interface UseChatResult {
   error: string | null;
   /** Envio pausado por falta de rede fora do modo demonstração. */
   sendBlockedByNetwork: boolean;
-  sendMessage: (content: string, attachments?: PendingAttachment[]) => Promise<void>;
+  sendMessage: (content: string, attachments?: PendingAttachment[], adapterOverride?: ChatAdapter) => Promise<void>;
   stop: () => void;
   retry: () => void;
   retryLast: () => void;
@@ -90,7 +90,7 @@ export function useChat(sessionId: string | null): UseChatResult {
   );
 
   const sendMessage = useCallback(
-    async (content: string, attachments: PendingAttachment[] = []) => {
+    async (content: string, attachments: PendingAttachment[] = [], adapterOverride?: ChatAdapter) => {
       const trimmed = content.trim();
       const metas: AttachmentMeta[] = attachments.map(({ meta }) => meta);
 
@@ -175,7 +175,7 @@ export function useChat(sessionId: string | null): UseChatResult {
         personalization = await buildPersonalization(trimmed);
         let receivedToken = false;
 
-        for await (const event of getChatAdapter().streamReply({
+        for await (const event of (adapterOverride ?? getChatAdapter()).streamReply({
           sessionId,
           content: trimmed,
           signal: controller.signal,
