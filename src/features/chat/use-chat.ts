@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { getChatAdapter } from '@/api';
 import { describeError } from '@/api/errors';
-import type { AiState, ChatMessage } from '@/api/types';
+import type { AiState, AttachmentMeta, ChatMessage } from '@/api/types';
 import { useOnlineStatus } from '@/hooks/use-online-status';
 import { createId } from '@/lib/id';
 import { cancelSpeech, SpeechStreamer, type SpeechEngine } from '@/lib/speech';
@@ -15,6 +15,9 @@ import { useSessionMetricsStore } from '@/stores/session-metrics-store';
 import { useConnectionStore } from '@/stores/connection-store';
 import { useStreamStore } from '@/stores/stream-store';
 import { buildPersonalization } from './personalization';
+import { namespace } from '@/api';
+import { createAttachmentStore } from './attachments/store';
+import type { PendingAttachment } from './Composer';
 
 import { messageKeys, sessionKeys, useMessages } from './api';
 
@@ -27,7 +30,7 @@ export interface UseChatResult {
   error: string | null;
   /** Envio pausado por falta de rede fora do modo demonstração. */
   sendBlockedByNetwork: boolean;
-  sendMessage: (content: string) => Promise<void>;
+  sendMessage: (content: string, attachments?: PendingAttachment[]) => Promise<void>;
   stop: () => void;
   retry: () => void;
   retryLast: () => void;
@@ -87,11 +90,12 @@ export function useChat(sessionId: string | null): UseChatResult {
   );
 
   const sendMessage = useCallback(
-    async (content: string) => {
+    async (content: string, attachments: PendingAttachment[] = []) => {
       const trimmed = content.trim();
+      const metas: AttachmentMeta[] = attachments.map(({ meta }) => meta);
 
       if (
-        !trimmed ||
+        (!trimmed && !attachments.length) ||
         !sessionId ||
         abortRef.current ||
         messagesQuery.isLoading ||
@@ -151,6 +155,7 @@ export function useChat(sessionId: string | null): UseChatResult {
           content: trimmed,
           createdAt,
           status: 'done',
+          ...(metas.length ? { attachments: metas } : {}),
         },
         {
           id: assistantId,
@@ -162,6 +167,10 @@ export function useChat(sessionId: string | null): UseChatResult {
       ]);
 
       try {
+        const attachmentStore = createAttachmentStore(namespace());
+        for (const attachment of attachments) {
+          if (!await attachmentStore.get(attachment.meta.id)) await attachmentStore.put(attachment.meta.id, { blob: attachment.blob, ...(attachment.thumb ? { thumb: attachment.thumb } : {}), ...(attachment.text ? { text: attachment.text } : {}) });
+        }
         personalization = await buildPersonalization(trimmed);
         let receivedToken = false;
 
@@ -171,6 +180,7 @@ export function useChat(sessionId: string | null): UseChatResult {
           signal: controller.signal,
           modelId: useModelStore.getState().selectedModelId,
           personalization,
+          attachments: metas,
         })) {
           if (event.type === 'token') {
             if (!receivedToken) {
@@ -315,14 +325,16 @@ export function useChat(sessionId: string | null): UseChatResult {
       }
     }
 
-    const content = index >= 0 ? current[index]?.content : undefined;
+    const target = index >= 0 ? current[index] : undefined;
+    const content = target?.content;
 
-    if (!content) {
+    if (content === undefined || (!content && !target?.attachments?.length)) {
       return;
     }
 
     updateMessages(() => current.slice(0, index));
-    void sendMessage(content);
+    const reused = target?.attachments?.map((meta) => ({ meta, blob: new Blob([]) }));
+    void sendMessage(content, reused);
   }, [messagesQuery.data, sendBlockedByNetwork, sendMessage, updateMessages]);
 
   return {

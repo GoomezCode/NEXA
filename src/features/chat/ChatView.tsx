@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import type { DragEvent } from 'react';
 
 import { useSpeechRecognition } from '@/features/voice/use-speech-recognition';
 import { useOnlineStatus } from '@/hooks/use-online-status';
@@ -35,9 +36,25 @@ export function ChatView({ sessionId }: { sessionId: string | null }) {
   const models = useModels();
   const voiceInputEnabled = useSettingsStore((state) => state.settings.voiceInputEnabled);
   const role = useAuthStore((state) => state.session?.role ?? 'guest');
-  const maxMessageChars = role === 'admin' ? 8000 : 2000;
+  const maxMessageChars = offlineMode || role === 'admin' ? undefined : 2000;
   const setAiState = useUiStore((state) => state.setAiState);
   const [draft, setDraft] = useState('');
+  const [attachmentNotice, setAttachmentNotice] = useState('');
+  const [droppedFiles, setDroppedFiles] = useState<File[]>([]);
+  const [draggingFiles, setDraggingFiles] = useState(false);
+  const dragDepth = useRef(0);
+
+  const hasFiles = (event: DragEvent<HTMLElement>) => Array.from(event.dataTransfer.types).includes('Files');
+
+  useEffect(() => {
+    const handleAttachmentError = (event: Event) => {
+      const message = (event as CustomEvent<string>).detail;
+      setAttachmentNotice(message);
+      notify({ tone: 'error', title: 'Anexo não adicionado', message });
+    };
+    window.addEventListener('nexa-attachment-error', handleAttachmentError);
+    return () => window.removeEventListener('nexa-attachment-error', handleAttachmentError);
+  }, []);
 
   const voice = useSpeechRecognition({
     onFinal: (text) => {
@@ -71,7 +88,30 @@ export function ChatView({ sessionId }: { sessionId: string | null }) {
   }, [setAiState]);
 
   return (
-    <section aria-label="Conversa" className="flex min-h-0 flex-1 flex-col">
+    <section
+      aria-label="Conversa"
+      className="relative flex min-h-0 flex-1 flex-col"
+      onDragEnter={(event) => {
+        if (!hasFiles(event)) return;
+        event.preventDefault();
+        dragDepth.current += 1;
+        setDraggingFiles(true);
+      }}
+      onDragLeave={(event) => {
+        if (!hasFiles(event)) return;
+        dragDepth.current -= 1;
+        if (dragDepth.current <= 0) { dragDepth.current = 0; setDraggingFiles(false); }
+      }}
+      onDragOver={(event) => { if (hasFiles(event)) event.preventDefault(); }}
+      onDrop={(event) => {
+        if (!hasFiles(event)) return;
+        event.preventDefault();
+        dragDepth.current = 0;
+        setDraggingFiles(false);
+        setDroppedFiles(Array.from(event.dataTransfer.files));
+      }}
+    >
+      {draggingFiles && <div aria-hidden="true" className="pointer-events-none fixed inset-3 z-50 grid place-items-center rounded-2xl border-2 border-dashed border-primary bg-surface/90 text-lg text-primary">Solte para anexar</div>}
       <h2 className="sr-only sm:not-sr-only sm:mx-auto sm:mt-3 sm:block sm:w-full sm:max-w-[760px] sm:px-6 sm:text-xs sm:font-medium sm:text-muted">
         {session?.title ?? 'Nova conversa'}
       </h2>
@@ -133,6 +173,7 @@ export function ChatView({ sessionId }: { sessionId: string | null }) {
           setDraft('');
           void sendMessage(value);
         }}
+        onSendAttachments={(value, attachments) => { setDraft(''); void sendMessage(value, attachments); }}
         onStop={stop}
         voiceEnabled={voiceInputEnabled}
         voiceSupported={voice.supported}
@@ -143,6 +184,10 @@ export function ChatView({ sessionId }: { sessionId: string | null }) {
         onVoiceStop={voice.stop}
         onVoiceCancel={voice.cancel}
         maxLength={maxMessageChars}
+        attachmentNotice={attachmentNotice}
+        apiMode={!offlineMode && !demoMode}
+        externalFiles={droppedFiles}
+        onAttachmentsChange={(items) => { setAttachmentNotice(items.length ? `${items.length} anexos adicionados` : ''); }}
       />
     </section>
   );

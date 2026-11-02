@@ -4,6 +4,25 @@ export type MessageRole = 'user' | 'assistant' | 'system';
 
 export type MessageStatus = 'sending' | 'streaming' | 'done' | 'error' | 'stopped';
 
+export type AttachmentKind = 'image' | 'text' | 'pdf';
+export interface AttachmentMeta {
+  id: string;
+  kind: AttachmentKind;
+  name: string;
+  mime: string;
+  size: number;
+  width?: number;
+  height?: number;
+  textChars?: number;
+  truncated?: boolean;
+  pages?: number;
+  createdAt: string;
+}
+
+export type ChatContentPart =
+  | { type: 'text'; text: string }
+  | { type: 'image'; media_type: 'image/png' | 'image/jpeg' | 'image/webp' | 'image/gif'; data: string };
+
 export type FinishReason = 'stop' | 'length' | 'timeout' | 'tool_use';
 
 export interface Session {
@@ -22,6 +41,7 @@ export interface ChatMessage {
   finish_reason?: string;
   /** Número de memórias locais usadas para contextualizar esta resposta. */
   memoriesUsed?: number;
+  attachments?: AttachmentMeta[];
 }
 
 export interface UsageInfo {
@@ -64,6 +84,7 @@ export interface ChatStreamInput {
   /** null/undefined = "Automático" (campo `model` omitido no corpo). */
   modelId?: string | null;
   personalization?: { display_name?: string; memories: { title: string; content: string }[] };
+  attachments?: AttachmentMeta[];
 }
 
 /**

@@ -9,6 +9,7 @@ import { OllamaChatAdapter } from './adapters/ollama';
 import { createIndexedDbChatStorage } from './storage/indexed-db';
 import type { ChatAdapter } from './types';
 import { isOfflineMode, useConnectionStore } from '@/stores/connection-store';
+import { createAttachmentStore } from '@/features/chat/attachments/store';
 
 let adapter: ChatAdapter | undefined;
 
@@ -20,7 +21,8 @@ function demoFailureRequested(): boolean {
   return new URLSearchParams(window.location.search).get('demoError') === '1';
 }
 
-function namespace(): string {
+export function namespace(): string {
+  if (getSettingsSnapshot().demoMode && !isOfflineMode()) return 'demo';
   if (isOfflineMode()) return 'offline';
   const session = useAuthStore.getState().session;
   return !session || session.role === 'guest' ? 'guest' : `user:${session.userId}`;
@@ -39,16 +41,18 @@ export function getChatAdapter(): ChatAdapter {
   const { demoMode } = getSettingsSnapshot();
 
   adapter = isOfflineMode()
-    ? new OllamaChatAdapter(createLocalChatRepository({ storage: createIndexedDbChatStorage('nexa:chat:v2:offline') }))
+    ? new OllamaChatAdapter(createLocalChatRepository({ storage: createIndexedDbChatStorage('nexa:chat:v2:offline'), attachmentStore: createAttachmentStore('offline') }))
     : demoMode
     ? new MockChatAdapter({
         storage: createIndexedDbChatStorage(),
+        attachmentStore: createAttachmentStore('demo'),
         tokenDelayMs: Number(import.meta.env.VITE_MOCK_TOKEN_DELAY ?? 22),
         failFirstStream: demoFailureRequested(),
       })
     : new HttpChatAdapter(
         createLocalChatRepository({
           storage: createIndexedDbChatStorage(`nexa:chat:v2:${namespace()}`),
+          attachmentStore: createAttachmentStore(namespace()),
         }),
       );
 

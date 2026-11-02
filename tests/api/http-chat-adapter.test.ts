@@ -3,7 +3,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { HttpChatAdapter } from '@/api/adapters/http';
 import { createLocalChatRepository } from '@/api/adapters/local-chat';
 import { ApiError } from '@/api/client/problem';
-import type { ChatStreamEvent } from '@/api/types';
+import type { AttachmentMeta, ChatStreamEvent } from '@/api/types';
+import type { AttachmentStore } from '@/features/chat/attachments/store';
 import { resetAuthForTests, useAuthStore } from '@/stores/auth-store';
 
 function jsonResponse(body: unknown, status = 200): Response {
@@ -134,6 +135,41 @@ describe('HttpChatAdapter', () => {
     const messages = await adapter.listMessages('boas-vindas');
     expect(messages.at(-2)).toMatchObject({ role: 'user', content: 'Oi' });
     expect(messages.at(-1)).toMatchObject({ role: 'assistant', status: 'done', content: 'ok' });
+  });
+
+  it('envia imagens como partes tipadas e mantém somente metadados no histórico', async () => {
+    signIn();
+    const id = `image-${crypto.randomUUID()}`;
+    const pngBytes = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 1, 2, 3]);
+    const store: AttachmentStore = {
+      put: vi.fn(), get: vi.fn(), deleteMany: vi.fn(),
+      getMany: vi.fn().mockResolvedValue([{ blob: { arrayBuffer: async () => pngBytes.slice().buffer } as Blob }]),
+    };
+    const attachment: AttachmentMeta = {
+      id, kind: 'image', name: 'captura.png', mime: 'image/png', size: pngBytes.length,
+      width: 1, height: 1, createdAt: new Date().toISOString(),
+    };
+    const fetchMock = vi.fn().mockResolvedValue(
+      sseResponse('data: {"content":"vi a imagem"}\n\nevent: done\ndata: {"finish_reason":"stop"}\n\n'),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    const adapter = new HttpChatAdapter(createLocalChatRepository(), store);
+    for await (const _event of adapter.streamReply({
+      sessionId: 'boas-vindas', content: 'O que aparece aqui?', attachments: [attachment],
+      signal: new AbortController().signal,
+    })) { /* consome a resposta */ }
+
+    const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    const body = JSON.parse(String(init.body)) as { messages: { content: unknown }[] };
+    expect(body.messages.at(-1)?.content).toEqual([
+      expect.objectContaining({ type: 'text' }),
+      { type: 'image', media_type: 'image/png', data: 'iVBORwECAw==' },
+    ]);
+    const storedMessage = (await adapter.listMessages('boas-vindas')).at(-2);
+    expect(storedMessage?.attachments).toEqual([attachment]);
+    expect(storedMessage?.content).toBe('O que aparece aqui?');
+    expect(JSON.stringify(storedMessage)).not.toContain('iVBORwECAw==');
   });
 
   it('converte 401 em ApiError e encerra a sessão do usuário', async () => {
