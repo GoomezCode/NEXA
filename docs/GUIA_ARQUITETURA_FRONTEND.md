@@ -36,7 +36,7 @@ flowchart TD
 2. `src/app/App.tsx` aplica no `<html>` o tema, a preferência de movimento reduzido e o modo de efeitos. Também monta o `BrowserRouter`, `QueryClientProvider`, `ErrorBoundary`, `AuthGate` e `AppShell`.
 3. `src/app/providers.tsx` fornece o `queryClient` compartilhado. O cliente e seus defaults ficam em `src/app/query-client.ts`.
 4. `src/features/auth/AuthGate.tsx` deixa passar o modo offline, demonstração ou uma sessão válida; caso contrário, carrega a tela de autenticação sob demanda.
-5. `src/features/layout/AppShell.tsx` compõe cabeçalho, navegação, avisos, fundo e conteúdo da tela atual.
+5. `src/features/layout/AppShell.tsx` compõe navegação, avisos, fundo e conteúdo da tela atual.
 
 `ChunkLoadBoundary` trata falha ao carregar uma tela dividida em chunk. `ErrorBoundary` trata erros de renderização que escapam das telas. Erros de requisição são tratados localmente com os estados de Query ou convertidos por `src/api/errors.ts`.
 

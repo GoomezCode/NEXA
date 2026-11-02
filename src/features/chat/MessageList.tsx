@@ -2,6 +2,7 @@ import { ArrowDown, RefreshCw, Sparkles } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 import type { ChatMessage } from '@/api/types';
+import { NexaMark } from '@/components/brand/NexaMark';
 import { Skeleton } from '@/components/ui/Skeleton';
 
 import { MessageBubble } from './MessageBubble';
@@ -100,6 +101,10 @@ export function MessageList({
     return (
       <div className="flex min-h-0 flex-1 items-center justify-center overflow-y-auto p-5 sm:p-8">
         <div className="w-full max-w-xl text-center">
+          <div className="mb-5 flex items-center justify-center gap-2 text-muted">
+            <NexaMark size={26} />
+            <span className="font-display text-2xs tracking-[0.3em]">NEXA</span>
+          </div>
           <h3 className="nexa-empty-title text-2xl font-medium tracking-tight text-foreground sm:text-3xl">
             Como posso ajudar?
           </h3>

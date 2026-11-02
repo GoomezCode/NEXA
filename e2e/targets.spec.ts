@@ -14,15 +14,18 @@ test.describe('alvos de toque no mobile', () => {
     await page.goto('/');
     await expect(page.getByRole('heading', { name: 'Boas-vindas' })).toBeVisible();
 
-    await expectMinTarget(page.getByRole('button', { name: 'Abrir conversas' }), 'Abrir conversas');
-    await expectMinTarget(page.getByRole('button', { name: 'Abrir ajustes' }), 'Abrir ajustes');
+    await expectMinTarget(page.getByRole('button', { name: /conversas/i }), 'Conversas');
+    await expectMinTarget(
+      page.getByRole('navigation', { name: 'Navegação principal' }).getByRole('button', { name: 'Ajustes' }),
+      'Ajustes',
+    );
     await expectMinTarget(
       page.getByRole('button', { name: /Entrada por voz/i }),
       'Entrada por voz',
     );
     await expectMinTarget(page.getByRole('button', { name: 'Enviar mensagem' }), 'Enviar mensagem');
 
-    const nav = page.getByRole('navigation', { name: 'Navegação móvel' });
+    const nav = page.getByRole('navigation', { name: 'Navegação principal' });
 
     for (const name of ['Chat', 'Memória', 'Monitor', 'Ajustes']) {
       await expectMinTarget(nav.getByRole('button', { name }), `Dock: ${name}`);
@@ -33,7 +36,7 @@ test.describe('alvos de toque no mobile', () => {
     await page.goto('/');
     await expect(page.getByRole('heading', { name: 'Boas-vindas' })).toBeVisible();
 
-    await page.getByRole('button', { name: 'Abrir conversas' }).click();
+    await page.getByRole('button', { name: /conversas/i }).click();
     const sheet = page.getByRole('dialog', { name: 'Conversas' });
 
     await expectMinTarget(

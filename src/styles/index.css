@@ -115,14 +115,6 @@
   .nexa-pulse {
     animation: nexa-pulse 3.2s ease-in-out infinite;
   }
-
-  .nexa-scan {
-    animation: nexa-scan 5s linear infinite;
-  }
-
-  .nexa-glow-text {
-    text-shadow: 0 0 18px color-mix(in srgb, var(--accent) calc(24% * var(--bg-effect-opacity)), transparent);
-  }
 }
 
 @custom-variant short (@media (max-height: 32rem));
@@ -155,23 +147,6 @@
   50% {
     opacity: 0.9;
     transform: scale(1.045);
-  }
-}
-
-@keyframes nexa-scan {
-  0% {
-    transform: translateY(-100%);
-    opacity: 0;
-  }
-  12% {
-    opacity: 0.65;
-  }
-  88% {
-    opacity: 0.65;
-  }
-  100% {
-    transform: translateY(100%);
-    opacity: 0;
   }
 }
 
@@ -220,8 +195,9 @@
   }
 }
 
-.nexa-mobile-dock {
+.nexa-dock {
   padding-inline: max(0.5rem, var(--safe-left)) max(0.5rem, var(--safe-right));
+  padding-bottom: max(0.375rem, var(--safe-bottom));
 }
 
 .nexa-aurora {
@@ -244,7 +220,6 @@
 .nexa-skeleton { animation: nexa-skeleton 1.4s ease-in-out infinite; }
 
 .nexa-view-enter { animation: nexa-view-enter 160ms ease-out both; }
-.nexa-nav-indicator { animation: nexa-nav-enter 150ms ease-out both; }
 
 @keyframes nexa-message-enter {
   from { opacity: 0; transform: translateY(8px); }
@@ -254,11 +229,6 @@
 @keyframes nexa-view-enter {
   from { opacity: 0; transform: translateY(5px); }
   to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes nexa-nav-enter {
-  from { opacity: 0.55; transform: scale(0.96); }
-  to { opacity: 1; transform: scale(1); }
 }
 
 @keyframes nexa-skeleton {
@@ -297,8 +267,6 @@
 }
 
 @media (max-height: 32rem) and (max-width: 767px) and (orientation: landscape) {
-  .nexa-shell-content { padding-right: 3.5rem; }
-  .nexa-shell-content > header { height: 2.75rem; }
   .nexa-sheet { height: 100dvh; max-height: 100dvh; }
   .nexa-markdown-table { scrollbar-width: thin; }
 }
@@ -571,11 +539,9 @@
 :root[data-fx='lite'] .nexa-skeleton { animation: none; }
 :root[data-fx='lite'] .nexa-message-enter,
 :root[data-fx='lite'] .nexa-view-enter,
-:root[data-fx='lite'] .nexa-nav-indicator,
 :root[data-reduced-motion='true'] .nexa-message-enter,
-:root[data-reduced-motion='true'] .nexa-view-enter,
-:root[data-reduced-motion='true'] .nexa-nav-indicator { animation: none; }
-:root[data-keyboard='open'] .nexa-mobile-dock { display: none; }
+:root[data-reduced-motion='true'] .nexa-view-enter { animation: none; }
+:root[data-keyboard='open'] .nexa-dock { display: none; }
 
 @media (pointer: coarse) {
   button,

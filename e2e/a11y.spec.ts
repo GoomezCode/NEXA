@@ -9,7 +9,10 @@ const VIEWS: { name: ViewName; open: (page: Page) => Promise<void> }[] = [
   {
     name: 'ajustes',
     open: async (page) => {
-      await page.getByRole('button', { name: 'Abrir ajustes' }).click();
+      await page
+        .getByRole('navigation', { name: 'Navegação principal' })
+        .getByRole('button', { name: 'Ajustes' })
+        .click();
       await expect(page.getByRole('heading', { name: 'Ajustes' })).toBeVisible();
     },
   },

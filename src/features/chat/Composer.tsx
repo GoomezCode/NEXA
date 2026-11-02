@@ -46,25 +46,6 @@ export function Composer({
   maxLength,
 }: ComposerProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const shellRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const shell = shellRef.current;
-    if (!shell) return;
-    const updateHeight = () => {
-      document.documentElement.style.setProperty('--composer-height', `${shell.getBoundingClientRect().height}px`);
-    };
-    updateHeight();
-    if (typeof ResizeObserver === 'undefined') {
-      return () => document.documentElement.style.removeProperty('--composer-height');
-    }
-    const observer = new ResizeObserver(updateHeight);
-    observer.observe(shell);
-    return () => {
-      observer.disconnect();
-      document.documentElement.style.removeProperty('--composer-height');
-    };
-  }, []);
 
   useEffect(() => {
     const textarea = textareaRef.current;
@@ -92,7 +73,7 @@ export function Composer({
   };
 
   return (
-    <div ref={shellRef} className="nexa-composer-shell shrink-0 px-3 pt-3 pb-[max(0.75rem,var(--safe-bottom))] sm:px-5">
+    <div className="nexa-composer-shell shrink-0 px-3 pb-3 pt-3 sm:px-5">
       {voiceEnabled && (listening || interim || voiceError) && (
         <div
           role={voiceError ? 'alert' : 'status'}

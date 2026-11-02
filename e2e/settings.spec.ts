@@ -4,7 +4,7 @@ test('persiste as preferências dos ajustes após recarregar', async ({ page }) 
   await page.goto('/');
   await expect(page.getByRole('heading', { name: 'Boas-vindas' })).toBeVisible();
 
-  await page.getByRole('button', { name: 'Abrir ajustes' }).click();
+  await page.getByRole('navigation', { name: 'Navegação principal' }).getByRole('button', { name: 'Ajustes' }).click();
   await expect(page.getByRole('heading', { name: 'Ajustes' })).toBeVisible();
 
   const name = page.getByRole('textbox', { name: 'Como a NEXA deve chamar você' });
@@ -15,7 +15,7 @@ test('persiste as preferências dos ajustes após recarregar', async ({ page }) 
   await expect(page.locator('html')).toHaveAttribute('data-reduced-motion', 'true');
 
   await page.reload();
-  await page.getByRole('button', { name: 'Abrir ajustes' }).click();
+  await page.getByRole('navigation', { name: 'Navegação principal' }).getByRole('button', { name: 'Ajustes' }).click();
 
   await expect(page.getByRole('textbox', { name: 'Como a NEXA deve chamar você' })).toHaveValue(
     'Marina',
@@ -28,7 +28,7 @@ test('persiste as preferências dos ajustes após recarregar', async ({ page }) 
 
 test('mantém a entrada por voz desligada após recarregar', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('button', { name: 'Abrir ajustes' }).click();
+  await page.getByRole('navigation', { name: 'Navegação principal' }).getByRole('button', { name: 'Ajustes' }).click();
   await expect(page.getByRole('heading', { name: 'Ajustes' })).toBeVisible();
 
   const voiceSwitch = page.getByRole('switch', { name: 'Entrada por voz' });
@@ -36,7 +36,7 @@ test('mantém a entrada por voz desligada após recarregar', async ({ page }) =>
   await expect(voiceSwitch).toHaveAttribute('aria-checked', 'false');
 
   await page.reload();
-  await page.getByRole('button', { name: 'Abrir ajustes' }).click();
+  await page.getByRole('navigation', { name: 'Navegação principal' }).getByRole('button', { name: 'Ajustes' }).click();
 
   await expect(page.getByRole('switch', { name: 'Entrada por voz' })).toHaveAttribute(
     'aria-checked',
@@ -46,32 +46,32 @@ test('mantém a entrada por voz desligada após recarregar', async ({ page }) =>
 
 test('persiste a aparência selecionada e aplica o tema ao documento', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('button', { name: 'Abrir ajustes' }).click();
+  await page.getByRole('navigation', { name: 'Navegação principal' }).getByRole('button', { name: 'Ajustes' }).click();
   await page.getByLabel('Tema da interface').selectOption('light');
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
 
   await page.reload();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
-  await page.getByRole('button', { name: 'Abrir ajustes' }).click();
+  await page.getByRole('navigation', { name: 'Navegação principal' }).getByRole('button', { name: 'Ajustes' }).click();
   await expect(page.getByLabel('Tema da interface')).toHaveValue('light');
 });
 
 test('aplica e persiste o tema Rosa', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('button', { name: 'Abrir ajustes' }).click();
+  await page.getByRole('navigation', { name: 'Navegação principal' }).getByRole('button', { name: 'Ajustes' }).click();
   await page.getByLabel('Tema da interface').selectOption('rose');
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'rose');
   await expect(page.locator('html')).toHaveCSS('--nexa-primary', '#f472b6');
 
   await page.reload();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'rose');
-  await page.getByRole('button', { name: 'Abrir ajustes' }).click();
+  await page.getByRole('navigation', { name: 'Navegação principal' }).getByRole('button', { name: 'Ajustes' }).click();
   await expect(page.getByLabel('Tema da interface')).toHaveValue('rose');
 });
 
 test('aplica o modo econômico de efeitos e mantém a escolha', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('button', { name: 'Abrir ajustes' }).click();
+  await page.getByRole('navigation', { name: 'Navegação principal' }).getByRole('button', { name: 'Ajustes' }).click();
   const effects = page.getByLabel('Efeitos visuais');
   await effects.selectOption('lite');
   await expect(page.locator('html')).toHaveAttribute('data-fx', 'lite');
@@ -81,7 +81,7 @@ test('aplica o modo econômico de efeitos e mantém a escolha', async ({ page })
 
 test('restaura os padrões dos ajustes', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('button', { name: 'Abrir ajustes' }).click();
+  await page.getByRole('navigation', { name: 'Navegação principal' }).getByRole('button', { name: 'Ajustes' }).click();
 
   const name = page.getByRole('textbox', { name: 'Como a NEXA deve chamar você' });
   await name.fill('Marina');

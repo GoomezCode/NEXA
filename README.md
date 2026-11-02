@@ -70,7 +70,7 @@ Essa configuração funciona com `npm run dev` e `npm run preview`. Para uma hos
 
 O catálogo exclui modelos remotos e modelos identificados como exclusivos de embeddings. **Automático** seleciona o modelo conversacional local mais recente. A primeira resposta pode levar alguns minutos enquanto o Ollama carrega o modelo. Se não houver modelos, execute `ollama pull <modelo>`.
 
-Para sair, use **Sair do offline** no cabeçalho ou em Ajustes. Conversas e memórias ficam armazenadas localmente no navegador; limpar os dados do site remove esse conteúdo. O modo não inclui imagens, ferramentas, sincronização com a API ou instalação de modelos pela interface.
+Para sair, use **Sair do offline** em Ajustes. Conversas e memórias ficam armazenadas localmente no navegador; limpar os dados do site remove esse conteúdo. O modo não inclui imagens, ferramentas, sincronização com a API ou instalação de modelos pela interface.
 
 ### Diagnóstico rápido
 

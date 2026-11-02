@@ -29,10 +29,8 @@ beforeEach(async () => {
 });
 
 describe('AppShell', () => {
-  it('carrega a marca, a conversa inicial e o composer', async () => {
+  it('carrega a conversa inicial e o composer', async () => {
     render(<App />);
-
-    expect(screen.getByRole('heading', { name: 'NEXA' })).toBeInTheDocument();
 
     expect(await screen.findByRole('heading', { name: 'Boas-vindas' })).toBeInTheDocument();
     expect(screen.getByRole('textbox', { name: 'Mensagem para a NEXA' })).toBeInTheDocument();
@@ -172,7 +170,8 @@ describe('AppShell', () => {
     render(<App />);
 
     await screen.findByRole('heading', { name: 'Boas-vindas' });
-    await user.click(screen.getByRole('button', { name: 'Abrir ajustes' }));
+    const nav = screen.getByRole('navigation', { name: 'Navegação principal' });
+    await user.click(within(nav).getByRole('button', { name: 'Ajustes' }));
 
     const nameInput = await screen.findByRole('textbox', {
       name: 'Como a NEXA deve chamar você',
@@ -185,7 +184,8 @@ describe('AppShell', () => {
     cleanup();
     const secondUser = userEvent.setup();
     render(<App />);
-    await secondUser.click(await screen.findByRole('button', { name: 'Abrir ajustes' }));
+    const secondNav = await screen.findByRole('navigation', { name: 'Navegação principal' });
+    await secondUser.click(within(secondNav).getByRole('button', { name: 'Ajustes' }));
 
     expect(
       await screen.findByRole('textbox', { name: 'Como a NEXA deve chamar você' }),
