@@ -1,4 +1,4 @@
-import { Menu, PanelLeft, Settings } from 'lucide-react';
+import { Menu, PanelLeft, PanelRight, Settings } from 'lucide-react';
 import { memo, useEffect, useState } from 'react';
 
 import { logout } from '@/api/auth';
@@ -10,7 +10,7 @@ import { useAuthStore } from '@/stores/auth-store';
 import { useSettingsStore } from '@/stores/settings-store';
 import { useUiStore } from '@/stores/ui-store';
 import { useConnectionStore } from '@/stores/connection-store';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { matchPath, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 
 function StatusChip({ tone, label }: { tone: 'success' | 'warning'; label: string }) {
   return (
@@ -52,6 +52,10 @@ export function TopBar() {
   const navigate = useNavigate();
   const [, setSearchParams] = useSearchParams();
   const toggleSidebar = useUiStore((state) => state.toggleSidebar);
+  const contextPanelOpen = useUiStore((state) => state.contextPanelOpen);
+  const toggleContextPanel = useUiStore((state) => state.toggleContextPanel);
+  const location = useLocation();
+  const isChat = location.pathname === '/' || Boolean(matchPath('/c/:sessionId', location.pathname));
 
   return (
     <header className="relative z-20 flex h-14 min-h-[calc(3.5rem+var(--safe-top))] shrink-0 items-center gap-2 border-b border-white/5 bg-background/70 px-3 ps-[max(0.75rem,var(--safe-left))] pe-[max(0.75rem,var(--safe-right))] pt-[var(--safe-top)] backdrop-blur-xl sm:gap-3 sm:px-5">
@@ -130,6 +134,19 @@ export function TopBar() {
           <StatusChip tone={offlineMode || !online || demoMode ? 'warning' : 'success'} label={offlineMode ? 'offline' : !online ? 'sem rede' : demoMode ? 'demo' : 'online'} />
         </div>
         <div className="hidden sm:block"><Clock /></div>
+
+        {isChat && (
+          <button
+            type="button"
+            onClick={toggleContextPanel}
+            aria-pressed={contextPanelOpen}
+            aria-label={contextPanelOpen ? 'Ocultar painel Núcleo NEXA' : 'Mostrar painel Núcleo NEXA'}
+            title={contextPanelOpen ? 'Ocultar painel Núcleo NEXA' : 'Mostrar painel Núcleo NEXA'}
+            className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-muted transition hover:border-primary/30 hover:text-primary"
+          >
+            <PanelRight className="h-4 w-4" aria-hidden="true" />
+          </button>
+        )}
 
         <button
           type="button"

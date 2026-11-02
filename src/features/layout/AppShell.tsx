@@ -62,6 +62,7 @@ export function AppShell() {
     : location.pathname === '/memory' ? 'memory'
       : location.pathname === '/monitor' ? 'monitor' : 'chat';
   const sidebarOpen = useUiStore((state) => state.sidebarOpen);
+  const contextPanelOpen = useUiStore((state) => state.contextPanelOpen);
   const demoMode = useSettingsStore((state) => state.settings.demoMode);
   const sessions = useSessions();
 
@@ -155,7 +156,7 @@ export function AppShell() {
             </div>
           </ChunkLoadBoundary>
 
-          {activeView === 'chat' && <ContextPanel sessionId={activeSessionId} />}
+          {activeView === 'chat' && contextPanelOpen && <ContextPanel sessionId={activeSessionId} />}
         </div>
 
         <Dock />

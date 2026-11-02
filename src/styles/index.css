@@ -342,14 +342,14 @@
 }
 
 .nexa-markdown strong {
-  color: #ffffff;
+  color: var(--nexa-text);
   font-weight: 600;
 }
 
 .nexa-markdown a {
   color: var(--nexa-primary);
   text-decoration: underline;
-  text-decoration-color: rgba(0, 229, 255, 0.4);
+  text-decoration-color: color-mix(in srgb, var(--nexa-primary) 45%, transparent);
   text-underline-offset: 2px;
 }
 
@@ -377,18 +377,18 @@
 .nexa-markdown code {
   border: 1px solid var(--nexa-border-soft);
   border-radius: 4px;
-  background: rgba(4, 7, 15, 0.8);
+  background: color-mix(in srgb, var(--nexa-surface-2) 82%, var(--nexa-bg));
   padding: 0.1rem 0.3rem;
   font-family: var(--font-mono);
   font-size: 0.82em;
-  color: #9beeff;
+  color: var(--nexa-primary);
 }
 
 .nexa-markdown pre {
   overflow-x: auto;
   border: 1px solid var(--nexa-border-soft);
   border-radius: var(--nexa-radius-sm);
-  background: rgba(4, 7, 15, 0.9);
+  background: #0d1117;
   padding: 0.75rem;
 }
 
@@ -397,7 +397,7 @@
   background: transparent;
   padding: 0;
   font-size: 0.78rem;
-  color: var(--nexa-text);
+  color: #e6edf3;
 }
 
 .nexa-markdown blockquote {
@@ -412,7 +412,7 @@
   font-family: var(--font-display);
   font-size: 0.9rem;
   letter-spacing: 0.08em;
-  color: #ffffff;
+  color: var(--nexa-text);
 }
 
 .nexa-markdown table {
@@ -479,8 +479,17 @@
 }
 
 .nexa-markdown th {
-  background: rgba(0, 229, 255, 0.08);
+  background: color-mix(in srgb, var(--nexa-primary) 9%, var(--nexa-surface));
   font-weight: 600;
+}
+
+/* Classes utilitárias originalmente pensadas para superfícies escuras. */
+:root[data-theme^='light'] [class*='border-white/'] {
+  border-color: var(--nexa-border-soft);
+}
+
+:root[data-theme^='light'] [class*='bg-white/'] {
+  background-color: color-mix(in srgb, var(--nexa-text) 4%, transparent);
 }
 
 .nexa-markdown hr {
