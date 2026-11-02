@@ -74,7 +74,7 @@ test('aplica e persiste o tema Escuro', async ({ page }) => {
   await page.getByRole('navigation', { name: 'Navegação principal' }).getByRole('button', { name: 'Ajustes' }).click();
   await page.getByLabel('Tema da interface').selectOption('dark');
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
-  await expect(page.locator('html')).toHaveCSS('--nexa-primary', '#7aa2ff');
+  await expect(page.locator('html')).toHaveCSS('--nexa-primary', '#a78bfa');
 
   await page.reload();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');

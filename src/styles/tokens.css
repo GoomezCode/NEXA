@@ -143,17 +143,17 @@
 
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --nexa-bg: #0b0d10;
-  --nexa-surface: #13171c;
-  --nexa-surface-2: #1b2128;
-  --nexa-primary: #7aa2ff;
-  --nexa-primary-soft: rgb(122 162 255 / 12%);
-  --nexa-secondary: #8ee0c8;
-  --nexa-text: #e7ecf2;
-  --nexa-muted: #9aa6b5;
-  --nexa-border: rgb(122 162 255 / 20%);
-  --nexa-border-soft: rgb(255 255 255 / 8%);
-  --bg-effect-opacity: 0.012;
+  --nexa-bg: #0d0d14;
+  --nexa-surface: #14141c;
+  --nexa-surface-2: #1a1a24;
+  --nexa-primary: #a78bfa;
+  --nexa-primary-soft: rgb(167 139 255 / 12%);
+  --nexa-secondary: #00d4aa;
+  --nexa-text: #f0f0f0;
+  --nexa-muted: #7a7a8a;
+  --nexa-border: #3a3a4a;
+  --nexa-border-soft: rgba(255, 255, 255, 0.08);
+  --bg-effect-opacity: 0.02;
 }
 
 :root[data-theme='light'] {
