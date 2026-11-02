@@ -23,7 +23,7 @@ Interface conversacional da NEXA, construída com React, TypeScript e Vite. Pode
 - Modo OFFLINE com Ollama local, catálogo de modelos instalados e streaming NDJSON.
 - Memórias locais, personalização, entrada por voz e leitura opcional das respostas.
 - Interface NEXA HUD responsiva, com rotas de chat, memória, monitoramento e ajustes.
-- Seis temas de interface, modos de efeitos visuais e formulários com validação acessível.
+- Dez temas de interface (incluindo claro, escuro e alto contraste), modos de efeitos visuais e formulários com validação acessível.
 - Destaque de blocos de código carregado sob demanda e visualizações de carregamento compartilhadas.
 
 ## Requisitos

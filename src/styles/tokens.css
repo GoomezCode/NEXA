@@ -141,6 +141,21 @@
   --nexa-border-soft: rgb(255 255 255 / 8%);
 }
 
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --nexa-bg: #0b0d10;
+  --nexa-surface: #13171c;
+  --nexa-surface-2: #1b2128;
+  --nexa-primary: #7aa2ff;
+  --nexa-primary-soft: rgb(122 162 255 / 12%);
+  --nexa-secondary: #8ee0c8;
+  --nexa-text: #e7ecf2;
+  --nexa-muted: #9aa6b5;
+  --nexa-border: rgb(122 162 255 / 20%);
+  --nexa-border-soft: rgb(255 255 255 / 8%);
+  --bg-effect-opacity: 0.012;
+}
+
 :root[data-theme='light'] {
   color-scheme: light;
   --nexa-bg: #f4f7fb;
