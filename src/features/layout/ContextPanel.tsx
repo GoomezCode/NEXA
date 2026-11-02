@@ -59,6 +59,15 @@ export function ContextPanel({ sessionId, desktopOpen }: { sessionId: string | n
   const { latest, tokenTotals, averageLatency, averageSpeed } = useCoreMetrics(sessionId);
   const modelId = latest?.modelId ?? selectedModel ?? models.data?.default_model ?? undefined;
   const model = models.data?.models.find((item) => item.model_id === modelId);
+  const availableModels = (models.data?.models ?? []).filter((item) => {
+    if (item.selectable === false) return false;
+    const provider = models.data?.providers.find((entry) => entry.provider === item.provider);
+    return provider?.available !== false;
+  });
+  const groupedModels = (models.data?.providers ?? []).flatMap((provider) => {
+    const items = availableModels.filter((item) => item.provider === provider.provider);
+    return provider.available && items.length ? [{ provider: provider.name, items }] : [];
+  });
   const activeMemories = memories.data?.filter((memory) => memory.enabled).length ?? 0;
   const sessions = useSessions();
   const messages = useMessageCount(sessionId);
@@ -91,13 +100,16 @@ export function ContextPanel({ sessionId, desktopOpen }: { sessionId: string | n
           </header>
           <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4 pb-[max(1rem,var(--safe-bottom))]">
             <div className="flex items-center gap-3 rounded-xl border border-border/60 bg-background/40 p-3"><Orb state={aiState} size="sm" /><div className="min-w-0"><p role="status" aria-live="polite" className="font-mono text-xs uppercase tracking-wider text-primary">{isSpeaking ? 'Lendo resposta' : AI_STATE_LABEL[aiState]}</p><p className="mt-1 text-sm text-foreground">{offlineMode ? 'Ollama local' : demoMode ? 'NEXA demonstração' : model?.provider ?? 'Provedor —'} · {modelId ?? (offlineMode ? 'Automático' : 'Modelo —')}</p></div></div>
-            {offlineMode && (
+            {(offlineMode || !demoMode) && (
               <div className="mt-3">
-                <label htmlFor="ollama-model-picker-mobile" className="font-mono text-2xs uppercase tracking-[0.12em] text-muted">Modelo</label>
-                <select id="ollama-model-picker-mobile" aria-label="Modelo Ollama" value={selectedModel ?? ''} onChange={(event) => setSelectedModel(event.target.value || null)} disabled={!models.data?.models.length} className="mt-1 min-h-11 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground">
+                <label htmlFor="ollama-model-picker-mobile" className="font-mono text-2xs uppercase tracking-[0.12em] text-muted">{offlineMode ? 'Modelo local' : 'Provedor e modelo'}</label>
+                <select id="ollama-model-picker-mobile" aria-label={offlineMode ? 'Modelo Ollama' : 'Provedor e modelo'} value={selectedModel ?? ''} onChange={(event) => setSelectedModel(event.target.value || null)} disabled={!availableModels.length} className="mt-1 min-h-11 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground">
                   <option value="">Automático</option>
-                  {(models.data?.models ?? []).map((item) => <option key={item.model_id} value={item.model_id}>{item.name}</option>)}
+                  {offlineMode
+                    ? availableModels.map((item) => <option key={item.model_id} value={item.model_id}>{item.name}</option>)
+                    : groupedModels.map((group) => <optgroup key={group.provider} label={group.provider}>{group.items.map((item) => <option key={item.model_id} value={item.model_id}>{item.name}</option>)}</optgroup>)}
                 </select>
+                {!offlineMode && !availableModels.length && !models.isLoading && <p className="mt-1 text-2xs text-muted">Nenhum provedor disponível no momento.</p>}
               </div>
             )}
             <section className="rounded-xl border border-border/60 p-3"><h3 className="font-mono text-xs uppercase tracking-wider text-muted">Conversa</h3><p className="mt-1 truncate text-sm text-foreground">{sessionLabel}</p><p className="mt-2 text-xs text-muted">{messageCount} mensagens · {elapsedMinutes} min · {activeMemories} memórias ativas</p></section>
@@ -141,13 +153,16 @@ export function ContextPanel({ sessionId, desktopOpen }: { sessionId: string | n
         <section>
           <h2 className="font-display text-2xs tracking-[0.22em] text-primary/80">IA</h2>
           <p className="mt-2 truncate text-xs text-foreground">{offlineMode ? 'Ollama (local)' : demoMode ? 'NEXA demonstração' : model?.provider ?? 'Provedor —'}</p>
-          {offlineMode ? (
+          {(offlineMode || !demoMode) ? (
             <div className="mt-1.5">
-              <label htmlFor="ollama-model-picker" className="sr-only">Modelo Ollama</label>
-              <select id="ollama-model-picker" aria-label="Modelo Ollama" value={selectedModel ?? ''} onChange={(event) => setSelectedModel(event.target.value || null)} disabled={!models.data?.models.length} className="min-h-10 w-full rounded-lg border border-border bg-background px-2.5 font-mono text-2xs text-foreground">
+              <label htmlFor="ollama-model-picker" className="sr-only">{offlineMode ? 'Modelo Ollama' : 'Provedor e modelo'}</label>
+              <select id="ollama-model-picker" aria-label={offlineMode ? 'Modelo Ollama' : 'Provedor e modelo'} value={selectedModel ?? ''} onChange={(event) => setSelectedModel(event.target.value || null)} disabled={!availableModels.length} className="min-h-11 w-full rounded-lg border border-border bg-background px-2.5 font-mono text-2xs text-foreground">
                 <option value="">Automático</option>
-                {(models.data?.models ?? []).map((item) => <option key={item.model_id} value={item.model_id}>{item.name}</option>)}
+                {offlineMode
+                  ? availableModels.map((item) => <option key={item.model_id} value={item.model_id}>{item.name}</option>)
+                  : groupedModels.map((group) => <optgroup key={group.provider} label={group.provider}>{group.items.map((item) => <option key={item.model_id} value={item.model_id}>{item.name}</option>)}</optgroup>)}
               </select>
+              {!offlineMode && !availableModels.length && !models.isLoading && <p className="mt-1 text-2xs text-muted">Nenhum provedor disponível no momento.</p>}
             </div>
           ) : (
             <p className="truncate font-mono text-2xs text-muted">

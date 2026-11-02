@@ -2,6 +2,8 @@ import { createId } from '@/lib/id';
 
 import type { ChatStorage } from '../storage/types';
 import type { ChatMessage, MessageStatus, Session } from '../types';
+import type { AttachmentMeta } from '../types';
+import type { AttachmentStore, StoredAttachment } from '@/features/chat/attachments/store';
 
 export interface LocalChatRepository {
   listSessions(): Promise<Session[]>;
@@ -9,8 +11,9 @@ export interface LocalChatRepository {
   renameSession(id: string, title: string): Promise<Session>;
   deleteSession(id: string): Promise<void>;
   listMessages(id: string): Promise<ChatMessage[]>;
+  getAttachment(id: string): Promise<StoredAttachment | undefined>;
   /** Grava a mensagem do usuário + um placeholder 'streaming' (e remove a troca com erro em retry). */
-  beginExchange(sessionId: string, userContent: string): Promise<{ assistantId: string }>;
+  beginExchange(sessionId: string, userContent: string, attachments?: AttachmentMeta[], blobs?: Map<string, StoredAttachment>): Promise<{ assistantId: string }>;
   finishAssistant(
     sessionId: string,
     assistantId: string,
@@ -22,6 +25,7 @@ export interface LocalChatRepositoryOptions {
   storage?: ChatStorage;
   /** Cria a conversa "Boas-vindas" quando não há histórico. */
   seed?: boolean;
+  attachmentStore?: AttachmentStore;
 }
 
 function freshSession(id: string, title: string): Session {
@@ -88,6 +92,8 @@ export class IndexedDbChatRepository implements LocalChatRepository {
         throw new Error(`Sessão "${sessionId}" não encontrada.`);
       }
 
+      const ids = (this.messages.get(sessionId) ?? []).flatMap((message) => message.attachments?.map((item) => item.id) ?? []);
+      await this.options.attachmentStore?.deleteMany(ids);
       this.sessions.delete(sessionId);
       this.messages.delete(sessionId);
       await this.persistNow();
@@ -100,7 +106,11 @@ export class IndexedDbChatRepository implements LocalChatRepository {
     );
   }
 
-  beginExchange(sessionId: string, userContent: string): Promise<{ assistantId: string }> {
+  getAttachment(id: string): Promise<StoredAttachment | undefined> {
+    return this.options.attachmentStore?.get(id) ?? Promise.resolve(undefined);
+  }
+
+  beginExchange(sessionId: string, userContent: string, attachments: AttachmentMeta[] = [], blobs?: Map<string, StoredAttachment>): Promise<{ assistantId: string }> {
     return this.withReady(async () => {
       const session = this.sessions.get(sessionId);
 
@@ -117,9 +127,16 @@ export class IndexedDbChatRepository implements LocalChatRepository {
         previous?.role === 'assistant' &&
         previous.status === 'error' &&
         previousUser?.role === 'user' &&
-        previousUser.content === userContent
+        previousUser.content === userContent &&
+        JSON.stringify(previousUser.attachments?.map((item) => item.id) ?? []) === JSON.stringify(attachments.map((item) => item.id))
       ) {
         history.splice(-2, 2);
+      }
+
+      for (const attachment of attachments) {
+        const existing = await this.options.attachmentStore?.get(attachment.id);
+        const value = blobs?.get(attachment.id);
+        if (!existing && value) await this.options.attachmentStore?.put(attachment.id, value);
       }
 
       const createdAt = new Date().toISOString();
@@ -132,6 +149,7 @@ export class IndexedDbChatRepository implements LocalChatRepository {
           content: userContent,
           createdAt,
           status: 'done',
+          ...(attachments.length ? { attachments: attachments.map((item) => ({ ...item })) } : {}),
         },
         {
           id: assistantId,
