@@ -21,7 +21,7 @@ import { isSpeechRecognitionSupported } from '@/features/voice/use-speech-recogn
 import { cancelSpeech, isSpeechSynthesisSupported, speakText } from '@/lib/speech';
 import { useAuthStore } from '@/stores/auth-store';
 import { useConnectionStore } from '@/stores/connection-store';
-import { DEFAULT_SETTINGS, useSettingsStore } from '@/stores/settings-store';
+import { DEFAULT_SETTINGS, THEME_OPTIONS, useSettingsStore } from '@/stores/settings-store';
 import { resetChatAdapter } from '@/api';
 import { SectionCard } from '@/components/ui/Panel';
 import { Button } from '@/components/ui/Button';
@@ -240,16 +240,7 @@ export function SettingsView() {
               onChange={(event) => update({ theme: event.target.value as typeof settings.theme })}
               className="mt-1 min-h-11 w-full rounded-xl border border-white/10 bg-background/60 px-3 text-sm text-foreground outline-none focus:border-primary/40"
             >
-              <option value="hud">NEXA HUD</option>
-              <option value="violet">Violeta</option>
-              <option value="rose">Rosa</option>
-              <option value="classic">Clássico</option>
-              <option value="dark">Dark</option>
-              <option value="light">Claro</option>
-              <option value="light-rose">Rosa claro</option>
-              <option value="light-lavender">Lavanda clara</option>
-              <option value="light-mint">Menta clara</option>
-              <option value="contrast">Alto contraste</option>
+              {THEME_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
             </select>
           </div>
           <div>

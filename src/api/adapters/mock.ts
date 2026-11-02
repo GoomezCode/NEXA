@@ -1,12 +1,14 @@
 import { createLocalChatRepository, type LocalChatRepository } from './local-chat';
 import type { ChatStorage } from '../storage/types';
 import type { ChatAdapter, ChatMessage, ChatStreamEvent, ChatStreamInput, Session } from '../types';
+import type { AttachmentStore } from '@/features/chat/attachments/store';
 
 export interface MockChatAdapterOptions {
   /** Intervalo entre tokens. Útil para testes com 0. */
   tokenDelayMs?: number;
   /** Persistência opcional (IndexedDB no app, ausente nos testes). */
   storage?: ChatStorage;
+  attachmentStore?: AttachmentStore;
   /** Simula uma falha na primeira resposta para validar o estado de erro. */
   failFirstStream?: boolean;
 }
@@ -65,7 +67,7 @@ export class MockChatAdapter implements ChatAdapter {
   constructor(options: MockChatAdapterOptions = {}) {
     this.tokenDelayMs = options.tokenDelayMs ?? 22;
     this.failFirstStream = options.failFirstStream ?? false;
-    this.repo = createLocalChatRepository({ storage: options.storage });
+    this.repo = createLocalChatRepository({ storage: options.storage, attachmentStore: options.attachmentStore });
   }
 
   listSessions(): Promise<Session[]> {
@@ -98,9 +100,9 @@ export class MockChatAdapter implements ChatAdapter {
       throw abortError();
     }
 
-    const { assistantId } = await this.repo.beginExchange(input.sessionId, input.content);
+    const { assistantId } = await this.repo.beginExchange(input.sessionId, input.content, input.attachments);
 
-    const response = this.responseFor(input.content);
+    const response = this.responseFor(input.content, input.attachments ?? []);
     const tokens = response.match(/\S+\s*/g) ?? [response];
     let text = '';
 
@@ -142,7 +144,8 @@ export class MockChatAdapter implements ChatAdapter {
     }
   }
 
-  private responseFor(content: string): string {
+  private responseFor(content: string, attachments: ChatStreamInput['attachments'] = []): string {
+    if (attachments?.length) return `Recebi sua pergunta${content ? ` “${content}”` : ''} junto com ${attachments.map((item) => `${item.name} (${item.kind}, ${item.size} bytes)`).join(', ')}. Na demonstração, consigo citar os anexos; visão real exige modo OFFLINE com modelo de visão.`;
     const text = content.toLowerCase();
 
     if (text.includes('status') || text.includes('sistema')) {

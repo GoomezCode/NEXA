@@ -1,4 +1,4 @@
-import { Activity, Brain, MessageSquare, PanelLeft, PanelRight, Settings } from 'lucide-react';
+import { Activity, Brain, LogOut, MessageSquare, PanelLeft, PanelRight, Settings } from 'lucide-react';
 import { memo, useEffect, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 
@@ -7,6 +7,9 @@ import { useMediaQuery } from '@/hooks/use-media-query';
 import { formatClock, formatShortDate } from '@/lib/format';
 import { cn } from '@/lib/utils';
 import { useConnectionStore } from '@/stores/connection-store';
+import { logout } from '@/api/auth';
+import { useAuthStore } from '@/stores/auth-store';
+import { useSettingsStore } from '@/stores/settings-store';
 import { useUiStore } from '@/stores/ui-store';
 
 type AppView = 'chat' | 'memory' | 'monitor' | 'settings';
@@ -91,6 +94,8 @@ export function Dock() {
   const contextPanelOpen = useUiStore((state) => state.contextPanelOpen);
   const toggleContextPanel = useUiStore((state) => state.toggleContextPanel);
   const offlineMode = useConnectionStore((state) => state.mode === 'offline');
+  const session = useAuthStore((state) => state.session);
+  const demoMode = useSettingsStore((state) => state.settings.demoMode);
 
   const activeView: AppView = location.pathname === '/settings' ? 'settings'
     : location.pathname === '/memory' ? 'memory'
@@ -160,6 +165,19 @@ export function Dock() {
       </div>
 
       <div className="flex min-w-0 flex-1 items-center justify-end gap-1.5 sm:gap-3">
+        {!offlineMode && !demoMode && session && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={logout}
+            aria-label={session.role === 'guest' ? 'Sair do modo convidado' : 'Sair da conta'}
+            title={session.role === 'guest' ? 'Sair do modo convidado' : 'Sair da conta'}
+            className="h-11 w-11 shrink-0 rounded-lg border border-transparent text-muted hover:border-danger/30 hover:bg-danger/5 hover:text-danger"
+          >
+            <LogOut className="h-4 w-4" aria-hidden="true" />
+          </Button>
+        )}
         {isChat && (
           <Button
             id="dock-core-toggle"

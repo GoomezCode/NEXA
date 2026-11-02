@@ -14,6 +14,19 @@ export interface AppSettings {
   demoMode: boolean;
 }
 
+export const THEME_OPTIONS: { value: AppSettings['theme']; label: string }[] = [
+  { value: 'hud', label: 'NEXA HUD' },
+  { value: 'violet', label: 'Violeta' },
+  { value: 'rose', label: 'Rosa' },
+  { value: 'classic', label: 'Clássico' },
+  { value: 'dark', label: 'Dark' },
+  { value: 'light', label: 'Claro' },
+  { value: 'light-rose', label: 'Rosa claro' },
+  { value: 'light-lavender', label: 'Lavanda clara' },
+  { value: 'light-mint', label: 'Menta clara' },
+  { value: 'contrast', label: 'Alto contraste' },
+];
+
 const STORAGE_KEY = 'nexa:settings:v1';
 
 export const DEFAULT_SETTINGS: AppSettings = {

@@ -1,5 +1,5 @@
-import { Eye, EyeOff, LogIn, UserPlus } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { Check, Eye, EyeOff, LogIn, Palette, UserPlus } from 'lucide-react';
+import { useMemo, useRef, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -10,7 +10,7 @@ import { describeError } from '@/api/errors';
 import { NexaMark } from '@/components/brand/NexaMark';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/auth-store';
-import { useSettingsStore } from '@/stores/settings-store';
+import { THEME_OPTIONS, useSettingsStore } from '@/stores/settings-store';
 import { useConnectionStore } from '@/stores/connection-store';
 import { appEnv } from '@/lib/env';
 import { Field } from '@/components/ui/Field';
@@ -24,10 +24,14 @@ type AuthFormValues = z.infer<ReturnType<typeof authFormSchema>>;
 
 export function AuthView() {
   const expired = useAuthStore((state) => state.status === 'expired');
+  const theme = useSettingsStore((state) => state.settings.theme);
+  const updateSettings = useSettingsStore((state) => state.update);
   const [mode, setMode] = useState<Mode>('login');
   const [formError, setFormError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [themeMenuOpen, setThemeMenuOpen] = useState(false);
+  const themeButtonRef = useRef<HTMLButtonElement>(null);
   const resolver = useMemo(() => zodResolver(authFormSchema(mode)), [mode]);
   const { register, handleSubmit, clearErrors, setError, formState: { errors } } = useForm<AuthFormValues>({
     resolver,
@@ -98,6 +102,50 @@ export function AuthView() {
   return (
     <main className="fixed inset-0 flex overflow-y-auto bg-background p-4 text-foreground" style={{ padding: 'max(1rem,var(--safe-top)) max(1rem,var(--safe-right)) max(1rem,var(--safe-bottom)) max(1rem,var(--safe-left))' }}>
       <div className="nexa-grid pointer-events-none absolute inset-0" aria-hidden="true" />
+
+      <div
+        className="absolute right-[max(1rem,var(--safe-right))] top-[max(1rem,var(--safe-top))] z-20"
+        onKeyDown={(event) => {
+          if (event.key === 'Escape') {
+            setThemeMenuOpen(false);
+            themeButtonRef.current?.focus();
+          }
+        }}
+      >
+        <button
+          ref={themeButtonRef}
+          type="button"
+          aria-label="Escolher tema"
+          aria-haspopup="true"
+          aria-expanded={themeMenuOpen}
+          aria-controls="auth-theme-options"
+          title="Tema"
+          onClick={() => setThemeMenuOpen((open) => !open)}
+          className="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-surface/75 text-muted shadow-sm backdrop-blur transition hover:border-primary/35 hover:text-primary"
+        >
+          <Palette className="h-4 w-4" aria-hidden="true" />
+        </button>
+        {themeMenuOpen && (
+          <div id="auth-theme-options" role="group" aria-label="Temas disponíveis" className="absolute right-0 mt-2 max-h-[min(70dvh,28rem)] w-52 overflow-y-auto rounded-2xl border border-border bg-surface p-1.5 shadow-xl">
+            {THEME_OPTIONS.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                aria-pressed={theme === option.value}
+                onClick={() => {
+                  updateSettings({ theme: option.value });
+                  setThemeMenuOpen(false);
+                  themeButtonRef.current?.focus();
+                }}
+                className="flex min-h-11 w-full items-center justify-between gap-3 rounded-xl px-3 text-left text-sm text-foreground transition hover:bg-primary/10"
+              >
+                {option.label}
+                {theme === option.value && <Check className="h-4 w-4 text-primary" aria-hidden="true" />}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
 
       <div className="relative z-10 m-auto w-full max-w-sm shrink-0 rounded-2xl border border-border bg-surface/70 p-5 backdrop-blur-xl sm:p-6">
         <div className="flex flex-col items-center text-center">
