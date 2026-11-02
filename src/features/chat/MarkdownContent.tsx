@@ -42,11 +42,14 @@ function CodeBlock({ children }: { children?: ReactNode }) {
   };
 
   return (
-    <div className="group relative my-3 min-w-0">
-      <button type="button" onClick={() => void copy()} className="absolute right-2 top-2 z-10 min-h-9 rounded-lg border border-border bg-surface px-2.5 text-2xs text-muted opacity-100 transition hover:text-primary sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100">
-        {copied ? 'Copiado' : 'Copiar código'}
-      </button>
-      <pre className="max-w-full overflow-x-auto rounded-xl border border-border/60 bg-background/70 p-3 pt-12 font-mono text-xs leading-relaxed">{children}</pre>
+    <div className="nexa-code-block my-3 min-w-0 overflow-hidden rounded-xl border">
+      <div className="flex items-center justify-between border-b px-3 py-2">
+        <span className="text-xs text-muted">Código</span>
+        <button type="button" onClick={() => void copy()} className="nexa-code-copy">
+          {copied ? 'Copiado!' : 'Copiar'}
+        </button>
+      </div>
+      <pre className="max-w-full overflow-x-auto p-4 font-mono text-xs leading-relaxed">{children}</pre>
     </div>
   );
 }

@@ -75,7 +75,7 @@ export function ContextPanel({ sessionId }: { sessionId: string | null }) {
         <IconButton label={mobileOpen ? 'Fechar painel do núcleo' : 'Abrir painel do núcleo'} aria-expanded={mobileOpen} aria-controls="nexa-core-drawer" className="absolute bottom-[calc(var(--safe-bottom)+var(--composer-height,5.5rem)+0.75rem)] right-3 z-30 rounded-full border-primary/30 bg-surface text-primary shadow-lg xl:hidden"><PanelRight className="h-4 w-4" aria-hidden="true" /></IconButton>
       </Drawer.Trigger>
       <Drawer.Portal>
-        <Drawer.Overlay className="fixed inset-0 z-40 bg-black/55 backdrop-blur-sm xl:hidden" />
+        <Drawer.Overlay className="fixed inset-0 z-40 nexa-modal-overlay backdrop-blur-sm xl:hidden" />
         <Drawer.Content id="nexa-core-drawer" className="fixed inset-x-0 bottom-0 z-50 flex h-[90dvh] flex-col rounded-t-2xl border border-border bg-surface outline-none xl:hidden">
           <Drawer.Handle className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-muted/50" />
           <header className="flex items-center justify-between border-b border-border/60 px-4 py-3">
@@ -104,7 +104,7 @@ export function ContextPanel({ sessionId }: { sessionId: string | null }) {
       aria-label="Painel do núcleo"
       className="hidden w-72 shrink-0 flex-col border-l border-border/50 bg-surface/25 xl:flex"
     >
-      <div className="flex flex-col items-center border-b border-white/5 px-4 py-5">
+      <div className="flex flex-col items-center border-b border-border px-4 py-5">
         <Orb state={aiState} size="md" />
         <p className="mt-3 font-display text-2xs tracking-[0.22em] text-primary">NÚCLEO NEXA</p>
         <p
@@ -149,13 +149,13 @@ export function ContextPanel({ sessionId }: { sessionId: string | null }) {
         <section>
           <h2 className="font-display text-2xs tracking-[0.22em] text-primary/80">SESSÃO</h2>
           <dl className="mt-2 grid grid-cols-2 gap-2">
-            <div className="col-span-2 rounded-xl border border-white/5 bg-background/40 p-2.5">
+            <div className="col-span-2 rounded-xl border border-border bg-background/40 p-2.5">
               <dt className="font-mono text-2xs uppercase tracking-[0.12em] text-muted/70">
                 conversa
               </dt>
               <dd className="mt-0.5 truncate text-[13px] text-foreground">{sessionLabel}</dd>
             </div>
-            <div className="rounded-xl border border-white/5 bg-background/40 p-2.5">
+            <div className="rounded-xl border border-border bg-background/40 p-2.5">
               <dt className="font-mono text-2xs uppercase tracking-[0.12em] text-muted/70">
                 mensagens
               </dt>
@@ -163,7 +163,7 @@ export function ContextPanel({ sessionId }: { sessionId: string | null }) {
                 {messages.isError ? '—' : messageCount.toString().padStart(2, '0')}
               </dd>
             </div>
-            <div className="rounded-xl border border-white/5 bg-background/40 p-2.5">
+            <div className="rounded-xl border border-border bg-background/40 p-2.5">
               <dt className="font-mono text-2xs uppercase tracking-[0.12em] text-muted/70">
                 atualizada
               </dt>
@@ -208,7 +208,7 @@ export function ContextPanel({ sessionId }: { sessionId: string | null }) {
             {SUBSYSTEMS.map(({ icon: Icon, label, value }) => (
               <li
                 key={label}
-                className="flex items-center gap-2 rounded-lg border border-white/5 bg-background/30 px-2.5 py-2"
+                className="flex items-center gap-2 rounded-lg border border-border bg-background/30 px-2.5 py-2"
               >
                 <Icon className="h-3.5 w-3.5 shrink-0 text-primary/70" aria-hidden="true" />
                 <span className="font-mono text-2xs uppercase tracking-[0.1em] text-muted">
@@ -217,7 +217,7 @@ export function ContextPanel({ sessionId }: { sessionId: string | null }) {
                 <span className="ml-auto text-right text-2xs text-foreground/80">{value}</span>
               </li>
             ))}
-            <li className="flex items-center gap-2 rounded-lg border border-white/5 bg-background/30 px-2.5 py-2">
+            <li className="flex items-center gap-2 rounded-lg border border-border bg-background/30 px-2.5 py-2">
               <Cpu className="h-3.5 w-3.5 shrink-0 text-primary/70" aria-hidden="true" />
               <span className="font-mono text-2xs uppercase tracking-[0.1em] text-muted">
                 Adaptador

@@ -1,3 +1,4 @@
+import '@fontsource-variable/inter';
 import '@fontsource-variable/orbitron';
 import '@fontsource/rajdhani/latin-400.css';
 import '@fontsource/rajdhani/latin-500.css';

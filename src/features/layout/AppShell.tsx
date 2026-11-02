@@ -100,7 +100,7 @@ export function AppShell() {
       <div className="nexa-aurora pointer-events-none absolute" aria-hidden="true" />
 
       <div
-        className="pointer-events-none absolute -top-40 left-1/2 h-[30rem] w-[30rem] -translate-x-1/2 rounded-full bg-primary/8 blur-3xl"
+        className="nexa-shell-glow pointer-events-none absolute -top-40 left-1/2 h-[30rem] w-[30rem] -translate-x-1/2 rounded-full bg-primary/8 blur-3xl"
         aria-hidden="true"
       />
 
@@ -129,7 +129,7 @@ export function AppShell() {
 
         <div className="relative flex min-h-0 flex-1 min-[640px]:max-lg:pl-16">
           {sidebarOpen && (
-            <aside className="hidden w-56 shrink-0 border-r border-white/5 bg-surface/25 lg:flex lg:flex-col lg:w-64">
+            <aside className="hidden w-56 shrink-0 border-r border-border bg-surface/25 lg:flex lg:flex-col lg:w-64">
               <SessionsSidebar className="min-h-0 flex-1" />
             </aside>
           )}

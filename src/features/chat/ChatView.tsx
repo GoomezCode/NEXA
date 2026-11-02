@@ -28,6 +28,7 @@ export function ChatView({ sessionId }: { sessionId: string | null }) {
     retryLast,
   } = useChat(sessionId);
   const sessions = useSessions();
+  const session = sessions.data?.find((item) => item.id === sessionId);
   const online = useOnlineStatus();
   const demoMode = useSettingsStore((state) => state.settings.demoMode);
   const offlineMode = useConnectionStore((state) => state.mode === 'offline');
@@ -71,6 +72,9 @@ export function ChatView({ sessionId }: { sessionId: string | null }) {
 
   return (
     <section aria-label="Conversa" className="flex min-h-0 flex-1 flex-col">
+      <h2 className="sr-only sm:not-sr-only sm:mx-auto sm:mt-3 sm:block sm:w-full sm:max-w-[760px] sm:px-6 sm:text-xs sm:font-medium sm:text-muted">
+        {session?.title ?? 'Nova conversa'}
+      </h2>
       <MessageList
         messages={messages}
         isLoading={isLoading}

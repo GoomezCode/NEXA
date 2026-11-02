@@ -2,7 +2,6 @@ import { ArrowDown, RefreshCw, Sparkles } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 import type { ChatMessage } from '@/api/types';
-import { NexaMark } from '@/components/brand/NexaMark';
 import { Skeleton } from '@/components/ui/Skeleton';
 
 import { MessageBubble } from './MessageBubble';
@@ -66,9 +65,9 @@ export function MessageList({
           Carregando mensagens
         </span>
         {[0, 1, 2].map((row) => (
-            <Skeleton
+          <Skeleton
             key={row}
-              className="h-16 rounded-2xl border border-white/5"
+            className="mx-auto h-16 w-full max-w-[760px] rounded-2xl border border-border"
             style={{ width: row === 1 ? '68%' : '82%', marginLeft: row === 1 ? 'auto' : undefined }}
           />
         ))}
@@ -100,24 +99,15 @@ export function MessageList({
   if (messages.length === 0) {
     return (
       <div className="flex min-h-0 flex-1 items-center justify-center overflow-y-auto p-5 sm:p-8">
-        <div className="w-full max-w-lg text-center">
-          <div className="relative mx-auto flex h-24 w-24 items-center justify-center">
-            <div className="nexa-pulse absolute inset-0 rounded-full bg-primary/10 blur-2xl" />
-            <div className="nexa-spin-slow absolute inset-0 rounded-full border border-dashed border-primary/20" />
-            <NexaMark size={52} className="relative" />
-          </div>
-
-          <p className="mt-4 font-mono text-2xs uppercase tracking-[0.3em] text-primary/70">
-            canal aberto
-          </p>
-          <h3 className="mt-2 font-display text-lg tracking-[0.12em] text-foreground">
+        <div className="w-full max-w-xl text-center">
+          <h3 className="nexa-empty-title text-2xl font-medium tracking-tight text-foreground sm:text-3xl">
             Como posso ajudar?
           </h3>
           <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-muted">
-            Envie uma mensagem ou comece por um dos comandos abaixo.
+            Envie uma mensagem ou escolha uma sugestão para começar.
           </p>
 
-          <div className="mt-6 flex flex-wrap justify-center gap-2">
+          <div className="mt-8 grid gap-2 sm:grid-cols-3">
             {SUGGESTIONS.map((suggestion) => (
               <button
                 key={suggestion}
@@ -125,7 +115,7 @@ export function MessageList({
                 onClick={() => onSuggestion(suggestion)}
                 disabled={disabled}
                 title={disabled ? 'Sem conexão — aguardando a rede…' : undefined}
-                className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/10 bg-surface/70 px-3.5 py-2 text-xs text-muted transition hover:border-primary/35 hover:bg-primary/10 hover:text-primary disabled:cursor-not-allowed disabled:opacity-50"
+                className="nexa-suggestion-card"
               >
                 <Sparkles className="h-3 w-3" aria-hidden="true" />
                 {suggestion}
@@ -149,10 +139,14 @@ export function MessageList({
         }}
         className="h-full overflow-y-auto"
       >
-        <div ref={contentRef} className="mx-auto flex w-full max-w-3xl flex-col gap-5 px-4 py-5 sm:px-6">
-          {messages.map((message) => (
+        <div ref={contentRef} className="nexa-conversation mx-auto flex w-full max-w-[760px] flex-col gap-7 px-4 py-8 sm:px-6">
+          {messages.map((message, index) => (
             <div key={message.id} className="nexa-message-row nexa-message-enter">
-              <MessageBubble message={message} />
+              <MessageBubble
+                message={message}
+                canRetry={index === messages.length - 1 && message.role === 'assistant' && !disabled}
+                onRetry={onRetryLast}
+              />
             </div>
           ))}
 
@@ -186,7 +180,7 @@ export function MessageList({
             if (container) container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
             setShowJumpButton(false);
           }}
-          className="absolute bottom-3 right-4 inline-flex min-h-11 items-center gap-2 rounded-full border border-primary/30 bg-surface px-4 font-mono text-xs text-primary shadow-xl active:scale-95"
+          className="nexa-jump-button"
         >
           <ArrowDown className="h-4 w-4" aria-hidden="true" />
           Ir para o fim

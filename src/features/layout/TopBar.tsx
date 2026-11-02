@@ -58,12 +58,12 @@ export function TopBar() {
   const isChat = location.pathname === '/' || Boolean(matchPath('/c/:sessionId', location.pathname));
 
   return (
-    <header className="relative z-20 flex h-14 min-h-[calc(3.5rem+var(--safe-top))] shrink-0 items-center gap-2 border-b border-white/5 bg-background/70 px-3 ps-[max(0.75rem,var(--safe-left))] pe-[max(0.75rem,var(--safe-right))] pt-[var(--safe-top)] backdrop-blur-xl sm:gap-3 sm:px-5">
+    <header className="relative z-20 flex h-14 min-h-[calc(3.5rem+var(--safe-top))] shrink-0 items-center gap-2 border-b border-border bg-background/75 px-3 ps-[max(0.75rem,var(--safe-left))] pe-[max(0.75rem,var(--safe-right))] pt-[var(--safe-top)] backdrop-blur-xl sm:gap-3 sm:px-5">
       <button
         id="open-sessions-button"
         type="button"
         onClick={() => setSearchParams((current) => { const next = new URLSearchParams(current); next.set('panel', 'sessions'); return next; })}
-        className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-muted transition hover:border-primary/30 hover:text-primary lg:hidden"
+        className="flex h-11 w-11 items-center justify-center rounded-xl border border-border bg-surface/60 text-muted transition hover:border-border hover:bg-surface-2 hover:text-foreground lg:hidden"
         aria-label="Abrir conversas"
       >
         <Menu className="h-4 w-4" aria-hidden="true" />
@@ -72,7 +72,7 @@ export function TopBar() {
       <button
         type="button"
         onClick={toggleSidebar}
-        className="hidden h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-muted transition hover:border-primary/30 hover:text-primary lg:flex"
+        className="hidden h-11 w-11 items-center justify-center rounded-xl border border-border bg-surface/60 text-muted transition hover:border-border hover:bg-surface-2 hover:text-foreground lg:flex"
         aria-label="Alternar barra lateral"
       >
         <PanelLeft className="h-4 w-4" aria-hidden="true" />
@@ -99,7 +99,7 @@ export function TopBar() {
                 useConnectionStore.getState().setMode('api');
                 useAuthStore.getState().clear();
               }}
-              className="min-h-11 rounded-xl border border-white/10 px-3 font-mono text-2xs uppercase tracking-[0.12em] text-muted transition hover:border-primary/30 hover:text-primary disabled:opacity-40"
+              className="min-h-11 rounded-xl border border-border px-3 font-mono text-2xs uppercase tracking-[0.12em] text-muted transition hover:border-border hover:bg-surface-2 hover:text-foreground disabled:opacity-40"
             >Sair do offline</button>
           </>
         ) : <>
@@ -120,7 +120,7 @@ export function TopBar() {
             <button
               type="button"
               onClick={logout}
-              className="min-h-11 rounded-xl border border-white/10 px-3 font-mono text-2xs uppercase tracking-[0.12em] text-muted transition hover:border-primary/30 hover:text-primary"
+              className="min-h-11 rounded-xl border border-border px-3 font-mono text-2xs uppercase tracking-[0.12em] text-muted transition hover:border-border hover:bg-surface-2 hover:text-foreground"
             >
               {session.role === 'guest' ? 'Entrar' : 'Sair'}
             </button>
@@ -142,7 +142,7 @@ export function TopBar() {
             aria-pressed={contextPanelOpen}
             aria-label={contextPanelOpen ? 'Ocultar painel Núcleo NEXA' : 'Mostrar painel Núcleo NEXA'}
             title={contextPanelOpen ? 'Ocultar painel Núcleo NEXA' : 'Mostrar painel Núcleo NEXA'}
-            className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-muted transition hover:border-primary/30 hover:text-primary"
+            className="flex h-11 w-11 items-center justify-center rounded-xl border border-border bg-surface/60 text-muted transition hover:border-border hover:bg-surface-2 hover:text-foreground"
           >
             <PanelRight className="h-4 w-4" aria-hidden="true" />
           </button>
@@ -151,7 +151,7 @@ export function TopBar() {
         <button
           type="button"
           onClick={() => navigate('/settings')}
-          className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-muted transition hover:border-primary/30 hover:text-primary"
+          className="flex h-11 w-11 items-center justify-center rounded-xl border border-border bg-surface/60 text-muted transition hover:border-border hover:bg-surface-2 hover:text-foreground"
           aria-label="Abrir ajustes"
         >
           <Settings className="h-4 w-4" aria-hidden="true" />

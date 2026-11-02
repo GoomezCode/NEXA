@@ -7,7 +7,6 @@ interface Particle {
   vy: number;
   radius: number;
   alpha: number;
-  violet: boolean;
 }
 
 export function BackgroundCanvas() {
@@ -33,6 +32,7 @@ export function BackgroundCanvas() {
 
     const draw = () => {
       context.clearRect(0, 0, width, height);
+      const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
 
       for (let index = 0; index < particles.length; index += 1) {
         const particle = particles[index];
@@ -48,7 +48,8 @@ export function BackgroundCanvas() {
             context.beginPath();
             context.moveTo(particle.x, particle.y);
             context.lineTo(neighbor.x, neighbor.y);
-            context.strokeStyle = `rgba(0, 229, 255, ${0.055 * (1 - distance / 120)})`;
+            context.globalAlpha = 0.08 * (1 - distance / 120);
+            context.strokeStyle = accent;
             context.lineWidth = 0.6;
             context.stroke();
           }
@@ -56,11 +57,11 @@ export function BackgroundCanvas() {
 
         context.beginPath();
         context.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
-        context.fillStyle = particle.violet
-          ? `rgba(167, 139, 250, ${particle.alpha})`
-          : `rgba(0, 229, 255, ${particle.alpha})`;
+        context.globalAlpha = particle.alpha;
+        context.fillStyle = accent;
         context.fill();
       }
+      context.globalAlpha = 1;
     };
 
     const createParticles = () => {
@@ -74,8 +75,7 @@ export function BackgroundCanvas() {
         vx: (Math.random() - 0.5) * 0.16,
         vy: (Math.random() - 0.5) * 0.16,
         radius: 0.6 + Math.random() * 1.4,
-        alpha: 0.18 + Math.random() * 0.35,
-        violet: Math.random() > 0.82,
+        alpha: 0.12 + Math.random() * 0.18,
       }));
     };
 
@@ -181,7 +181,7 @@ export function BackgroundCanvas() {
   return (
     <canvas
       ref={canvasRef}
-      className="pointer-events-none absolute inset-0 h-full w-full opacity-70"
+      className="nexa-canvas pointer-events-none absolute inset-0 h-full w-full"
       aria-hidden="true"
     />
   );

@@ -92,7 +92,7 @@ export function Composer({
   };
 
   return (
-    <div ref={shellRef} className="nexa-composer-shell shrink-0 border-t border-white/5 bg-background/50 px-3 py-3 pb-[max(0.75rem,var(--safe-bottom))] sm:px-5">
+    <div ref={shellRef} className="nexa-composer-shell shrink-0 px-3 pt-3 pb-[max(0.75rem,var(--safe-bottom))] sm:px-5">
       {voiceEnabled && (listening || interim || voiceError) && (
         <div
           role={voiceError ? 'alert' : 'status'}
@@ -116,8 +116,8 @@ export function Composer({
 
       <div
         className={cn(
-          'mx-auto flex w-full max-w-3xl items-end gap-2 rounded-2xl border bg-surface/70 p-2 transition',
-          disabled ? 'border-white/5 opacity-60' : 'border-white/10 focus-within:border-primary/40',
+          'nexa-composer mx-auto flex w-full max-w-[760px] items-end gap-2 rounded-2xl border p-2.5 transition',
+          disabled ? 'opacity-70' : '',
         )}
       >
         <label htmlFor="nexa-composer" className="sr-only">
@@ -143,7 +143,7 @@ export function Composer({
           }
           aria-label="Mensagem para a NEXA"
           aria-keyshortcuts="Control+K Meta+K"
-          className="nexa-field max-h-40 min-h-10 flex-1 resize-none bg-transparent px-2 py-2 text-base leading-relaxed text-foreground outline-none placeholder:text-muted/70 disabled:cursor-not-allowed sm:text-sm"
+          className="nexa-field max-h-40 min-h-11 flex-1 resize-none bg-transparent px-2.5 py-2 text-base leading-relaxed text-foreground outline-none placeholder:text-muted disabled:cursor-not-allowed"
         />
 
         {voiceEnabled && (
@@ -203,10 +203,10 @@ export function Composer({
                   : 'Segure para falar'
             }
             className={cn(
-              'flex h-11 w-11 shrink-0 touch-none select-none items-center justify-center rounded-xl border transition disabled:cursor-not-allowed disabled:opacity-40',
+              'flex h-11 w-11 shrink-0 touch-none select-none items-center justify-center rounded-full border transition disabled:cursor-not-allowed disabled:opacity-40',
               listening
                 ? 'border-danger/40 bg-danger/15 text-danger'
-                : 'border-white/10 bg-white/5 text-muted hover:border-primary/35 hover:text-primary',
+                : 'border-border bg-surface-2 text-muted hover:border-primary/35 hover:text-primary',
             )}
           >
             <Mic className={cn('h-4 w-4', listening && 'animate-pulse')} aria-hidden="true" />
@@ -217,7 +217,7 @@ export function Composer({
           <IconButton
             label="Parar resposta"
             onClick={onStop}
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-danger/35 bg-danger/10 text-danger transition hover:bg-danger/15"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-danger/35 bg-danger/10 text-danger transition hover:bg-danger/15"
           >
             <Square className="h-3.5 w-3.5" aria-hidden="true" />
           </IconButton>
@@ -226,22 +226,22 @@ export function Composer({
             label="Enviar mensagem"
             onClick={submit}
             disabled={!canSend}
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-primary/40 bg-primary/15 text-primary transition hover:bg-primary/25 disabled:cursor-not-allowed disabled:border-white/10 disabled:bg-white/5 disabled:text-muted/60"
+            className={cn('nexa-send-button flex h-11 w-11 shrink-0 items-center justify-center rounded-full border transition disabled:cursor-not-allowed', canSend && 'is-ready')}
           >
             <Send className="h-4 w-4" aria-hidden="true" />
           </IconButton>
         )}
       </div>
 
-      <div className="mx-auto mt-2 flex w-full max-w-3xl items-center justify-between gap-3 px-1">
-        <p className="hidden items-center gap-1.5 font-mono text-2xs uppercase tracking-[0.12em] text-muted/70 pointer-fine:flex">
+      <div className="mx-auto mt-1.5 flex w-full max-w-[760px] items-center justify-between gap-3 px-1">
+        <p className="hidden items-center gap-1.5 text-xs text-muted sm:flex">
           <CornerDownLeft className="h-3 w-3" aria-hidden="true" />
           Enter envia · Shift + Enter quebra linha
         </p>
-        <p className="font-mono text-2xs uppercase tracking-[0.12em] text-muted/70">
+        <p className="text-xs text-muted">
           {value.length > 0
             ? `${value.length}${maxLength ? `/${maxLength}` : ''} caracteres`
-            : <span className="hidden pointer-fine:inline">Ctrl+K foca o campo</span>}
+            : <span className="hidden sm:inline">Ctrl+K foca o campo</span>}
         </p>
       </div>
     </div>
