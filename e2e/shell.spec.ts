@@ -4,10 +4,9 @@ import { useDemoMode } from './responsive/helpers';
 test('o shell carrega a conversa inicial', async ({ page }) => {
   await page.goto('/');
 
-  await expect(page.getByRole('heading', { name: 'NEXA' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Boas-vindas' })).toBeVisible();
   await expect(page.getByRole('textbox', { name: 'Mensagem para a NEXA' })).toBeVisible();
-  await expect(page.getByText('núcleo online')).toBeVisible();
+  await expect(page.getByRole('navigation', { name: 'Navegação principal' })).toBeVisible();
   await expect(page.getByRole('complementary', { name: 'Painel do núcleo' })).toBeVisible();
 });
 
@@ -159,7 +158,7 @@ test.describe('em viewport móvel', () => {
   test('abre o drawer de conversas', async ({ page }) => {
     await page.goto('/');
 
-    await page.getByRole('button', { name: 'Abrir conversas' }).click();
+    await page.getByRole('button', { name: /conversas/i }).click();
 
     const sheet = page.getByRole('dialog', { name: 'Conversas' });
     await expect(sheet).toBeVisible();
@@ -172,7 +171,7 @@ test.describe('em viewport móvel', () => {
   test('botão voltar fecha o drawer sem sair da conversa', async ({ page }) => {
     await useDemoMode(page);
     await page.goto('/');
-    const trigger = page.getByRole('button', { name: 'Abrir conversas' });
+    const trigger = page.getByRole('button', { name: /conversas/i });
     await trigger.click();
     const sheet = page.getByRole('dialog', { name: 'Conversas' });
     await expect(sheet).toBeVisible();
@@ -198,7 +197,7 @@ test.describe('em viewport móvel', () => {
     await page.goto('/');
 
     await page
-      .getByRole('navigation', { name: 'Navegação móvel' })
+      .getByRole('navigation', { name: 'Navegação principal' })
       .getByRole('button', { name: 'Memória' })
       .click();
 

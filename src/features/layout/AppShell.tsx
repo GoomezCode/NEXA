@@ -16,7 +16,6 @@ import { BackgroundCanvas } from './BackgroundCanvas';
 import { ContextPanel } from './ContextPanel';
 import { Dock } from './Dock';
 import { SessionsSheet } from './SessionsSheet';
-import { TopBar } from './TopBar';
 import { useGlobalShortcuts } from './use-global-shortcuts';
 
 const SettingsView = lazy(() =>
@@ -62,6 +61,7 @@ export function AppShell() {
     : location.pathname === '/memory' ? 'memory'
       : location.pathname === '/monitor' ? 'monitor' : 'chat';
   const sidebarOpen = useUiStore((state) => state.sidebarOpen);
+  const contextPanelOpen = useUiStore((state) => state.contextPanelOpen);
   const demoMode = useSettingsStore((state) => state.settings.demoMode);
   const sessions = useSessions();
 
@@ -99,13 +99,11 @@ export function AppShell() {
       <div className="nexa-aurora pointer-events-none absolute" aria-hidden="true" />
 
       <div
-        className="pointer-events-none absolute -top-40 left-1/2 h-[30rem] w-[30rem] -translate-x-1/2 rounded-full bg-primary/8 blur-3xl"
+        className="nexa-shell-glow pointer-events-none absolute -top-40 left-1/2 h-[30rem] w-[30rem] -translate-x-1/2 rounded-full bg-primary/8 blur-3xl"
         aria-hidden="true"
       />
 
-      <div className="nexa-shell-content relative z-10 flex min-h-0 flex-1 flex-col">
-        <TopBar />
-
+      <div className="nexa-shell-content relative z-10 flex min-h-0 flex-1 flex-col pt-[var(--safe-top)]">
         {demoMode && (
           <div
             role="status"
@@ -126,9 +124,9 @@ export function AppShell() {
           </div>
         )}
 
-        <div className="relative flex min-h-0 flex-1 min-[640px]:max-lg:pl-16">
+        <div className="relative flex min-h-0 flex-1">
           {sidebarOpen && (
-            <aside className="hidden w-56 shrink-0 border-r border-white/5 bg-surface/25 lg:flex lg:flex-col lg:w-64">
+            <aside aria-label="Conversas" className="hidden w-56 shrink-0 border-r border-border bg-surface/25 lg:flex lg:flex-col lg:w-64">
               <SessionsSidebar className="min-h-0 flex-1" />
             </aside>
           )}
@@ -136,6 +134,7 @@ export function AppShell() {
           <ChunkLoadBoundary key={activeView}>
             <div key={activeView} className="nexa-view-enter flex min-h-0 min-w-0 flex-1 flex-col">
             <main id="nexa-main" tabIndex={-1} className="nexa-content-container relative flex min-h-0 min-w-0 flex-1 flex-col">
+              <h1 className="sr-only">NEXA — interface neural</h1>
               {activeView === 'chat' ? (
                 <ChatView sessionId={activeSessionId} />
               ) : activeView === 'settings' ? (
@@ -155,7 +154,9 @@ export function AppShell() {
             </div>
           </ChunkLoadBoundary>
 
-          {activeView === 'chat' && <ContextPanel sessionId={activeSessionId} />}
+          {activeView === 'chat' && (
+            <ContextPanel sessionId={activeSessionId} desktopOpen={contextPanelOpen} />
+          )}
         </div>
 
         <Dock />

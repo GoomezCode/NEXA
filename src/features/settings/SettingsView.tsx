@@ -245,6 +245,9 @@ export function SettingsView() {
               <option value="rose">Rosa</option>
               <option value="classic">Clássico</option>
               <option value="light">Claro</option>
+              <option value="light-rose">Rosa claro</option>
+              <option value="light-lavender">Lavanda clara</option>
+              <option value="light-mint">Menta clara</option>
               <option value="contrast">Alto contraste</option>
             </select>
           </div>

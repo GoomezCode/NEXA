@@ -10,6 +10,7 @@ import { Orb } from '@/features/assistant/Orb';
 import { useMessageCount, useSessions } from '@/features/chat/api';
 import { useMemories } from '@/features/memory/api';
 import { formatSessionTime } from '@/lib/format';
+import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/auth-store';
 import { useModelStore } from '@/stores/model-store';
 import { useSettingsStore } from '@/stores/settings-store';
@@ -24,7 +25,7 @@ const SUBSYSTEMS = [
   { icon: ShieldCheck, label: 'Sanitização', value: 'Markdown seguro' },
 ] as const;
 
-export function ContextPanel({ sessionId }: { sessionId: string | null }) {
+export function ContextPanel({ sessionId, desktopOpen }: { sessionId: string | null; desktopOpen: boolean }) {
   const [now, setNow] = useState(0);
   const [activeSnapPoint, setActiveSnapPoint] = useState<number | string | null>(0.5);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -51,6 +52,7 @@ export function ContextPanel({ sessionId }: { sessionId: string | null }) {
   const isSpeaking = useSpeechStore((state) => state.isSpeaking);
   const auth = useAuthStore((state) => state.session);
   const selectedModel = useModelStore((state) => state.selectedModelId);
+  const setSelectedModel = useModelStore((state) => state.setSelectedModel);
   const usage = useUsage();
   const models = useModels();
   const memories = useMemories();
@@ -70,19 +72,34 @@ export function ContextPanel({ sessionId }: { sessionId: string | null }) {
   return (
     <>
     <Drawer.Root open={mobileOpen} onOpenChange={setMobileOpen} modal snapPoints={[0.5, 0.9]} activeSnapPoint={activeSnapPoint} setActiveSnapPoint={setActiveSnapPoint}>
-      <Drawer.Trigger asChild>
-        <IconButton label={mobileOpen ? 'Fechar painel do núcleo' : 'Abrir painel do núcleo'} aria-expanded={mobileOpen} aria-controls="nexa-core-drawer" className="absolute bottom-[calc(var(--safe-bottom)+var(--composer-height,5.5rem)+0.75rem)] right-3 z-30 rounded-full border-primary/30 bg-surface text-primary shadow-lg xl:hidden"><PanelRight className="h-4 w-4" aria-hidden="true" /></IconButton>
-      </Drawer.Trigger>
       <Drawer.Portal>
-        <Drawer.Overlay className="fixed inset-0 z-40 bg-black/55 backdrop-blur-sm xl:hidden" />
-        <Drawer.Content id="nexa-core-drawer" className="fixed inset-x-0 bottom-0 z-50 flex h-[90dvh] flex-col rounded-t-2xl border border-border bg-surface outline-none xl:hidden">
+        <Drawer.Overlay className="fixed inset-0 z-40 nexa-modal-overlay backdrop-blur-sm xl:hidden" />
+        <Drawer.Content
+          id="nexa-core-drawer"
+          className="fixed inset-x-0 bottom-0 z-50 flex h-[90dvh] flex-col rounded-t-2xl border border-border bg-surface outline-none xl:hidden"
+          onCloseAutoFocus={(event) => {
+            const trigger = document.getElementById('dock-core-toggle');
+            if (!trigger) return;
+            event.preventDefault();
+            trigger.focus();
+          }}
+        >
           <Drawer.Handle className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-muted/50" />
           <header className="flex items-center justify-between border-b border-border/60 px-4 py-3">
             <div><Drawer.Title className="font-display text-xs tracking-[0.2em] text-primary">NÚCLEO NEXA</Drawer.Title><Drawer.Description className="mt-1 text-xs text-muted">Estado e contexto da conversa atual.</Drawer.Description></div>
             <Drawer.Close asChild><IconButton label="Fechar painel do núcleo" className="text-muted"><PanelRight className="h-4 w-4" /></IconButton></Drawer.Close>
           </header>
           <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4 pb-[max(1rem,var(--safe-bottom))]">
-            <div className="flex items-center gap-3 rounded-xl border border-border/60 bg-background/40 p-3"><Orb state={aiState} size="sm" /><div><p role="status" aria-live="polite" className="font-mono text-xs uppercase tracking-wider text-primary">{isSpeaking ? 'Lendo resposta' : AI_STATE_LABEL[aiState]}</p><p className="mt-1 text-sm text-foreground">{offlineMode ? 'Ollama local' : demoMode ? 'NEXA demonstração' : model?.provider ?? 'Provedor —'} · {modelId ?? (offlineMode ? 'Automático' : 'Modelo —')}</p></div></div>
+            <div className="flex items-center gap-3 rounded-xl border border-border/60 bg-background/40 p-3"><Orb state={aiState} size="sm" /><div className="min-w-0"><p role="status" aria-live="polite" className="font-mono text-xs uppercase tracking-wider text-primary">{isSpeaking ? 'Lendo resposta' : AI_STATE_LABEL[aiState]}</p><p className="mt-1 text-sm text-foreground">{offlineMode ? 'Ollama local' : demoMode ? 'NEXA demonstração' : model?.provider ?? 'Provedor —'} · {modelId ?? (offlineMode ? 'Automático' : 'Modelo —')}</p></div></div>
+            {offlineMode && (
+              <div className="mt-3">
+                <label htmlFor="ollama-model-picker-mobile" className="font-mono text-2xs uppercase tracking-[0.12em] text-muted">Modelo</label>
+                <select id="ollama-model-picker-mobile" aria-label="Modelo Ollama" value={selectedModel ?? ''} onChange={(event) => setSelectedModel(event.target.value || null)} disabled={!models.data?.models.length} className="mt-1 min-h-11 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground">
+                  <option value="">Automático</option>
+                  {(models.data?.models ?? []).map((item) => <option key={item.model_id} value={item.model_id}>{item.name}</option>)}
+                </select>
+              </div>
+            )}
             <section className="rounded-xl border border-border/60 p-3"><h3 className="font-mono text-xs uppercase tracking-wider text-muted">Conversa</h3><p className="mt-1 truncate text-sm text-foreground">{sessionLabel}</p><p className="mt-2 text-xs text-muted">{messageCount} mensagens · {elapsedMinutes} min · {activeMemories} memórias ativas</p></section>
             <section className="rounded-xl border border-border/60 p-3"><h3 className="font-mono text-xs uppercase tracking-wider text-muted">Uso desta sessão</h3><p className="mt-1 text-sm text-foreground">{tokenTotals.input} tokens de entrada · {tokenTotals.output} de saída</p><p className="mt-1 text-xs text-muted">Latência {averageLatency === undefined || !Number.isFinite(averageLatency) ? '—' : `${(averageLatency / 1000).toFixed(1)} s`} · {averageSpeed === undefined ? '—' : `${averageSpeed.toFixed(1)} tokens/s`}</p></section>
           </div>
@@ -92,9 +109,12 @@ export function ContextPanel({ sessionId }: { sessionId: string | null }) {
     <aside
       id="nexa-context-panel"
       aria-label="Painel do núcleo"
-      className="hidden w-72 shrink-0 flex-col border-l border-border/50 bg-surface/25 xl:flex"
+      className={cn(
+        'hidden w-72 shrink-0 flex-col border-l border-border/50 bg-surface/25',
+        desktopOpen && 'xl:flex',
+      )}
     >
-      <div className="flex flex-col items-center border-b border-white/5 px-4 py-5">
+      <div className="flex flex-col items-center border-b border-border px-4 py-5">
         <Orb state={aiState} size="md" />
         <p className="mt-3 font-display text-2xs tracking-[0.22em] text-primary">NÚCLEO NEXA</p>
         <p
@@ -121,21 +141,31 @@ export function ContextPanel({ sessionId }: { sessionId: string | null }) {
         <section>
           <h2 className="font-display text-2xs tracking-[0.22em] text-primary/80">IA</h2>
           <p className="mt-2 truncate text-xs text-foreground">{offlineMode ? 'Ollama (local)' : demoMode ? 'NEXA demonstração' : model?.provider ?? 'Provedor —'}</p>
-          <p className="truncate font-mono text-2xs text-muted">
-            {modelId ?? (offlineMode ? 'Automático' : 'Modelo —')}{!offlineMode && <> · chave {latest?.keySource === 'user' || model?.key_source === 'user' ? 'própria' : 'do servidor'}</>}
-          </p>
+          {offlineMode ? (
+            <div className="mt-1.5">
+              <label htmlFor="ollama-model-picker" className="sr-only">Modelo Ollama</label>
+              <select id="ollama-model-picker" aria-label="Modelo Ollama" value={selectedModel ?? ''} onChange={(event) => setSelectedModel(event.target.value || null)} disabled={!models.data?.models.length} className="min-h-10 w-full rounded-lg border border-border bg-background px-2.5 font-mono text-2xs text-foreground">
+                <option value="">Automático</option>
+                {(models.data?.models ?? []).map((item) => <option key={item.model_id} value={item.model_id}>{item.name}</option>)}
+              </select>
+            </div>
+          ) : (
+            <p className="truncate font-mono text-2xs text-muted">
+              {modelId ?? 'Modelo —'} · chave {latest?.keySource === 'user' || model?.key_source === 'user' ? 'própria' : 'do servidor'}
+            </p>
+          )}
         </section>
 
         <section>
           <h2 className="font-display text-2xs tracking-[0.22em] text-primary/80">SESSÃO</h2>
           <dl className="mt-2 grid grid-cols-2 gap-2">
-            <div className="col-span-2 rounded-xl border border-white/5 bg-background/40 p-2.5">
+            <div className="col-span-2 rounded-xl border border-border bg-background/40 p-2.5">
               <dt className="font-mono text-2xs uppercase tracking-[0.12em] text-muted/70">
                 conversa
               </dt>
               <dd className="mt-0.5 truncate text-[13px] text-foreground">{sessionLabel}</dd>
             </div>
-            <div className="rounded-xl border border-white/5 bg-background/40 p-2.5">
+            <div className="rounded-xl border border-border bg-background/40 p-2.5">
               <dt className="font-mono text-2xs uppercase tracking-[0.12em] text-muted/70">
                 mensagens
               </dt>
@@ -143,7 +173,7 @@ export function ContextPanel({ sessionId }: { sessionId: string | null }) {
                 {messages.isError ? '—' : messageCount.toString().padStart(2, '0')}
               </dd>
             </div>
-            <div className="rounded-xl border border-white/5 bg-background/40 p-2.5">
+            <div className="rounded-xl border border-border bg-background/40 p-2.5">
               <dt className="font-mono text-2xs uppercase tracking-[0.12em] text-muted/70">
                 atualizada
               </dt>
@@ -188,7 +218,7 @@ export function ContextPanel({ sessionId }: { sessionId: string | null }) {
             {SUBSYSTEMS.map(({ icon: Icon, label, value }) => (
               <li
                 key={label}
-                className="flex items-center gap-2 rounded-lg border border-white/5 bg-background/30 px-2.5 py-2"
+                className="flex items-center gap-2 rounded-lg border border-border bg-background/30 px-2.5 py-2"
               >
                 <Icon className="h-3.5 w-3.5 shrink-0 text-primary/70" aria-hidden="true" />
                 <span className="font-mono text-2xs uppercase tracking-[0.1em] text-muted">
@@ -197,7 +227,7 @@ export function ContextPanel({ sessionId }: { sessionId: string | null }) {
                 <span className="ml-auto text-right text-2xs text-foreground/80">{value}</span>
               </li>
             ))}
-            <li className="flex items-center gap-2 rounded-lg border border-white/5 bg-background/30 px-2.5 py-2">
+            <li className="flex items-center gap-2 rounded-lg border border-border bg-background/30 px-2.5 py-2">
               <Cpu className="h-3.5 w-3.5 shrink-0 text-primary/70" aria-hidden="true" />
               <span className="font-mono text-2xs uppercase tracking-[0.1em] text-muted">
                 Adaptador

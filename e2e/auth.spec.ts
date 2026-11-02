@@ -64,5 +64,5 @@ test('continuar como convidado libera o HUD', async ({ page }) => {
   await page.getByRole('button', { name: 'Continuar como convidado' }).click();
 
   await expect(page.getByRole('textbox', { name: 'Mensagem para a NEXA' })).toBeVisible();
-  await expect(page.getByText('convidado')).toBeVisible();
+  await expect(page.getByText(/sem conta · guest/)).toBeVisible();
 });

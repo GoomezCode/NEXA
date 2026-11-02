@@ -334,7 +334,7 @@ export function MemoryView() {
                 {confirmingId === entry.id ? (
                   <AlertDialog.Root open onOpenChange={(open) => { if (!open) setConfirmingId(null); }}>
                     <AlertDialog.Portal>
-                      <AlertDialog.Overlay className="fixed inset-0 z-[89] bg-black/60 backdrop-blur-sm" />
+                      <AlertDialog.Overlay className="fixed inset-0 z-[89] nexa-modal-overlay backdrop-blur-sm" />
                       <AlertDialog.Content aria-describedby="delete-memory-description" className="fixed left-1/2 top-1/2 z-[90] w-[min(26rem,calc(100vw-2rem))] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-border bg-surface p-5 shadow-2xl">
                         <AlertDialog.Title className="font-display text-sm tracking-wide text-foreground">Esquecer “{entry.title}”?</AlertDialog.Title>
                         <AlertDialog.Description id="delete-memory-description" className="mt-2 text-sm text-muted">Esta ação não pode ser desfeita.</AlertDialog.Description>

@@ -1,17 +1,13 @@
 import { useEffect, useState } from 'react';
 
-import { AI_STATE_LABEL } from '@/features/assistant/ai-state';
-import { Orb } from '@/features/assistant/Orb';
 import { useSpeechRecognition } from '@/features/voice/use-speech-recognition';
 import { useOnlineStatus } from '@/hooks/use-online-status';
-import { formatSessionTime } from '@/lib/format';
 import { notify } from '@/stores/notification-store';
 import { useAuthStore } from '@/stores/auth-store';
 import { useSettingsStore } from '@/stores/settings-store';
 import { useUiStore } from '@/stores/ui-store';
 import { useConnectionStore } from '@/stores/connection-store';
 import { useModels } from '@/api/models';
-import { useModelStore } from '@/stores/model-store';
 
 import { useChat } from './use-chat';
 import { useSessions } from './api';
@@ -24,25 +20,19 @@ export function ChatView({ sessionId }: { sessionId: string | null }) {
     isLoading,
     isError,
     isStreaming,
-    aiState,
     error,
     sendBlockedByNetwork,
     sendMessage,
     stop,
     retry,
     retryLast,
-    // Novos estados da F7.3
-    modelFromStream,
-    finishReasonFromStream,
   } = useChat(sessionId);
   const sessions = useSessions();
-  const online = useOnlineStatus();
   const session = sessions.data?.find((item) => item.id === sessionId);
+  const online = useOnlineStatus();
   const demoMode = useSettingsStore((state) => state.settings.demoMode);
   const offlineMode = useConnectionStore((state) => state.mode === 'offline');
   const models = useModels();
-  const selectedModelId = useModelStore((state) => state.selectedModelId);
-  const setSelectedModel = useModelStore((state) => state.setSelectedModel);
   const voiceInputEnabled = useSettingsStore((state) => state.settings.voiceInputEnabled);
   const role = useAuthStore((state) => state.session?.role ?? 'guest');
   const maxMessageChars = role === 'admin' ? 8000 : 2000;
@@ -82,76 +72,9 @@ export function ChatView({ sessionId }: { sessionId: string | null }) {
 
   return (
     <section aria-label="Conversa" className="flex min-h-0 flex-1 flex-col">
-      <div className="flex shrink-0 items-center gap-3 border-b border-white/5 bg-background/40 px-3 py-2 sm:px-5">
-        <Orb state={aiState} size="sm" className="shrink-0" />
-
-        <div className="min-w-0">
-          <h2 className="truncate font-display text-[12px] tracking-[0.18em] text-foreground">
-            {session?.title ?? 'Nova conversa'}
-          </h2>
-          <p
-            role="status"
-            aria-live="polite"
-            className="font-mono text-2xs uppercase tracking-[0.18em] text-primary/80"
-          >
-            {offlineMode && aiState === 'processing' ? 'carregando modelo' : AI_STATE_LABEL[aiState]}
-            {session ? ` · ${formatSessionTime(session.updatedAt)}` : ''}
-          </p>
-        </div>
-
-        <div className="ml-auto hidden items-center gap-2 sm:flex">
-          {offlineMode && (
-            <label className="sr-only" htmlFor="ollama-model-picker">Modelo Ollama</label>
-          )}
-          {offlineMode && (
-            <select
-              id="ollama-model-picker"
-              aria-label="Modelo Ollama"
-              value={selectedModelId ?? ''}
-              onChange={(event) => setSelectedModel(event.target.value || null)}
-              disabled={!models.data?.models.length}
-              className="max-w-48 rounded-full border border-white/10 bg-background px-2.5 py-1 font-mono text-2xs text-foreground"
-            >
-              <option value="">Automático</option>
-              {(models.data?.models ?? []).map((model) => <option key={model.model_id} value={model.model_id}>{model.name}</option>)}
-            </select>
-          )}
-          <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 font-mono text-2xs uppercase tracking-[0.14em] text-muted">
-            {offlineMode ? (modelFromStream ?? 'ollama local') : demoMode ? 'nexa-mock-1' : 'nexa-remote'}
-          </span>
-          <span className="rounded-full border border-success/20 bg-success/5 px-2.5 py-1 font-mono text-2xs uppercase tracking-[0.14em] text-success">
-            {offlineMode ? 'offline' : demoMode ? 'demo' : 'online'}
-          </span>
-          {modelFromStream && (
-            <span className="ml-2 rounded-full border border-primary/20 bg-primary/5 px-2.5 py-1 font-mono text-2xs uppercase tracking-[0.14em] text-primary">
-              {modelFromStream}
-            </span>
-          )}
-          {finishReasonFromStream && (
-            <span className="ml-2 rounded-full border border-warning/20 bg-warning/5 px-2.5 py-1 font-mono text-2xs uppercase tracking-[0.14em] text-warning">
-              {finishReasonFromStream}
-            </span>
-          )}
-        </div>
-        <div className="ml-auto flex max-w-[52%] items-center gap-1.5 sm:hidden">
-          {offlineMode ? (
-            <select
-              aria-label="Modelo Ollama"
-              value={selectedModelId ?? ''}
-              onChange={(event) => setSelectedModel(event.target.value || null)}
-              disabled={!models.data?.models.length}
-              className="min-w-0 max-w-36 rounded-full border border-white/10 bg-background px-2 py-1 font-mono text-2xs text-foreground"
-            >
-              <option value="">Automático</option>
-              {(models.data?.models ?? []).map((model) => <option key={model.model_id} value={model.model_id}>{model.name}</option>)}
-            </select>
-          ) : null}
-          <span className="truncate rounded-full border border-white/10 bg-white/5 px-2 py-1 font-mono text-2xs text-muted">
-            {offlineMode ? 'offline' : demoMode ? 'demo' : online ? 'online' : 'sem rede'}
-          </span>
-        </div>
-      </div>
-
+      <h2 className="sr-only sm:not-sr-only sm:mx-auto sm:mt-3 sm:block sm:w-full sm:max-w-[760px] sm:px-6 sm:text-xs sm:font-medium sm:text-muted">
+        {session?.title ?? 'Nova conversa'}
+      </h2>
       <MessageList
         messages={messages}
         isLoading={isLoading}

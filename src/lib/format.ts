@@ -22,7 +22,7 @@ export function formatClock(date: Date): string {
 }
 
 export function formatShortDate(date: Date): string {
-  return shortDateFormatter.format(date).replace('.', '');
+  return shortDateFormatter.format(date).replace(/\./g, '');
 }
 
 export function formatTime(date: Date | string): string {

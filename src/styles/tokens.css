@@ -44,6 +44,39 @@
   --nexa-text-2xs: 0.75rem;
   --glass-blur: 16px;
   --nexa-text-xs-plus: 0.75rem;
+
+  /* Semantic aliases: themes may override the Nexa base tokens above; chat surfaces derive from them. */
+  --bg: var(--nexa-bg);
+  --surface: var(--nexa-surface);
+  --surface-2: var(--nexa-surface-2);
+  --border: color-mix(in srgb, var(--nexa-text) 10%, transparent);
+  --text: var(--nexa-text);
+  --text-muted: var(--nexa-muted);
+  --accent: var(--nexa-primary);
+  --accent-readable: var(--accent);
+  --accent-contrast: var(--nexa-bg);
+  --user-bubble: color-mix(in srgb, var(--nexa-surface-2) 94%, var(--nexa-text) 6%);
+  --code-bg: color-mix(in srgb, var(--nexa-surface-2) 78%, var(--nexa-bg));
+  /* Syntax palette stays inside text/accent so light and dark themes remain legible. */
+  --code-keyword: var(--accent-readable);
+  --code-string: color-mix(in srgb, var(--text) 58%, var(--accent-readable) 42%);
+  --code-number: color-mix(in srgb, var(--text) 74%, var(--accent-readable) 26%);
+  --code-type: color-mix(in srgb, var(--text) 66%, var(--accent-readable) 34%);
+  --overlay: color-mix(in srgb, var(--nexa-bg) 68%, var(--nexa-text) 32%);
+  --shadow-color: color-mix(in srgb, var(--nexa-text) 14%, transparent);
+  --bg-effect-opacity: 0.018;
+  --font-body: 'Inter Variable', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --radius-pill: 999px;
+  --duration-fast: 150ms;
+  --duration-standard: 180ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
 }
 
 @theme inline {
@@ -121,6 +154,63 @@
   --nexa-border: rgb(0 88 150 / 20%);
   --nexa-border-soft: rgb(14 37 65 / 12%);
   --nexa-white: #0b1526;
+  --accent-contrast: #fff;
+  --accent-readable: color-mix(in srgb, var(--accent) 84%, var(--text) 16%);
+  --bg-effect-opacity: 0;
+}
+
+:root[data-theme='light-rose'] {
+  color-scheme: light;
+  --nexa-bg: #fff5f8;
+  --nexa-surface: #fff;
+  --nexa-surface-2: #ffe8f0;
+  --nexa-primary: #d63384;
+  --nexa-primary-soft: rgb(214 51 132 / 10%);
+  --nexa-secondary: #a855f7;
+  --nexa-text: #351326;
+  --nexa-muted: #80596f;
+  --nexa-border: rgb(190 24 93 / 20%);
+  --nexa-border-soft: rgb(92 32 63 / 12%);
+  --nexa-white: #351326;
+  --accent-contrast: #fff;
+  --accent-readable: color-mix(in srgb, var(--accent) 84%, var(--text) 16%);
+  --bg-effect-opacity: 0;
+}
+
+:root[data-theme='light-lavender'] {
+  color-scheme: light;
+  --nexa-bg: #f7f5ff;
+  --nexa-surface: #fff;
+  --nexa-surface-2: #ece8ff;
+  --nexa-primary: #7353c6;
+  --nexa-primary-soft: rgb(115 83 198 / 10%);
+  --nexa-secondary: #c04491;
+  --nexa-text: #20183b;
+  --nexa-muted: #625a7c;
+  --nexa-border: rgb(91 65 164 / 20%);
+  --nexa-border-soft: rgb(43 32 76 / 12%);
+  --nexa-white: #20183b;
+  --accent-contrast: #fff;
+  --accent-readable: color-mix(in srgb, var(--accent) 84%, var(--text) 16%);
+  --bg-effect-opacity: 0;
+}
+
+:root[data-theme='light-mint'] {
+  color-scheme: light;
+  --nexa-bg: #f1faf7;
+  --nexa-surface: #fff;
+  --nexa-surface-2: #e1f3ec;
+  --nexa-primary: #087f68;
+  --nexa-primary-soft: rgb(8 127 104 / 10%);
+  --nexa-secondary: #3975b8;
+  --nexa-text: #102b25;
+  --nexa-muted: #526d66;
+  --nexa-border: rgb(8 127 104 / 20%);
+  --nexa-border-soft: rgb(24 67 57 / 12%);
+  --nexa-white: #102b25;
+  --accent-contrast: #fff;
+  --accent-readable: color-mix(in srgb, var(--accent) 84%, var(--text) 16%);
+  --bg-effect-opacity: 0;
 }
 
 :root[data-theme='contrast'] {
@@ -135,3 +225,11 @@
   --nexa-border-soft: rgb(255 255 255 / 32%);
   --nexa-white: #fff;
 }
+
+/*
+  New themes only need to define --nexa-bg, --nexa-surface, --nexa-surface-2,
+  --nexa-primary, --nexa-text and --nexa-muted; every semantic alias above is
+  derived from them. Optional overrides: --accent-contrast (text on the accent),
+  --accent-readable (links on --bg, useful on pale light themes),
+  --bg-effect-opacity (0 disables decorative glows/particles) and color-scheme.
+*/

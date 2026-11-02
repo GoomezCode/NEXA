@@ -88,7 +88,7 @@ export function SessionsSidebar({ onSelect, className }: SessionsSidebarProps) {
 
   return (
     <div className={cn('flex h-full min-h-0 flex-col', className)}>
-      <div className="flex items-center justify-between gap-2 border-b border-white/5 px-4 py-3">
+      <div className="flex items-center justify-between gap-2 border-b border-border px-4 py-3">
         <div>
           <h2 className="font-display text-2xs tracking-[0.24em] text-primary">CONVERSAS</h2>
           <p className="font-mono text-2xs uppercase tracking-[0.16em] text-muted">
@@ -110,7 +110,7 @@ export function SessionsSidebar({ onSelect, className }: SessionsSidebarProps) {
         </button>
       </div>
 
-      <div className="border-b border-white/5 px-3 py-2">
+      <div className="border-b border-border px-3 py-2">
         <div className="relative">
           <Search
             className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted"
@@ -122,7 +122,7 @@ export function SessionsSidebar({ onSelect, className }: SessionsSidebarProps) {
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Buscar conversas"
             aria-label="Buscar conversas"
-            className="w-full rounded-lg border border-white/10 bg-background/50 py-2 pl-8 pr-8 text-xs text-foreground outline-none transition placeholder:text-muted/70 focus:border-primary/35"
+            className="w-full rounded-lg border border-border bg-background/50 py-2 pl-8 pr-8 text-xs text-foreground outline-none transition placeholder:text-muted focus:border-primary/35"
           />
           {query && (
             <button
@@ -184,7 +184,7 @@ export function SessionsSidebar({ onSelect, className }: SessionsSidebarProps) {
                 <li key={session.id}>
                   <AlertDialog.Root open onOpenChange={(open) => { if (!open) setConfirmingId(null); }}>
                     <AlertDialog.Portal>
-                      <AlertDialog.Overlay className="fixed inset-0 z-[89] bg-black/60 backdrop-blur-sm" />
+                      <AlertDialog.Overlay className="fixed inset-0 z-[89] nexa-modal-overlay backdrop-blur-sm" />
                       <AlertDialog.Content aria-describedby="delete-session-description" className="fixed left-1/2 top-1/2 z-[90] w-[min(26rem,calc(100vw-2rem))] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-border bg-surface p-5 shadow-2xl">
                         <AlertDialog.Title className="font-display text-sm tracking-wide text-foreground">Excluir “{session.title}”?</AlertDialog.Title>
                         <AlertDialog.Description id="delete-session-description" className="mt-2 text-sm text-muted">Esta ação não pode ser desfeita.</AlertDialog.Description>
@@ -233,7 +233,7 @@ export function SessionsSidebar({ onSelect, className }: SessionsSidebarProps) {
                       <button
                         type="button"
                         onClick={cancelRename}
-                        className="rounded-lg border border-white/10 px-2.5 py-1.5 font-mono text-2xs uppercase tracking-[0.12em] text-muted transition hover:text-foreground"
+                        className="rounded-lg border border-border px-2.5 py-1.5 font-mono text-2xs uppercase tracking-[0.12em] text-muted transition hover:text-foreground"
                       >
                         Cancelar
                       </button>
@@ -250,7 +250,7 @@ export function SessionsSidebar({ onSelect, className }: SessionsSidebarProps) {
                     'group relative rounded-xl border transition',
                     active
                       ? 'border-primary/30 bg-primary/10'
-                      : 'border-transparent hover:border-white/10 hover:bg-white/5',
+                      : 'border-transparent hover:border-border hover:bg-surface-2',
                   )}
                 >
                   <button
@@ -275,7 +275,7 @@ export function SessionsSidebar({ onSelect, className }: SessionsSidebarProps) {
                       >
                         {session.title}
                       </span>
-                      <span className="font-mono text-2xs uppercase tracking-[0.12em] text-muted/70">
+                      <span className="font-mono text-2xs uppercase tracking-[0.12em] text-muted">
                         {formatSessionTime(session.updatedAt)}
                       </span>
                     </span>
@@ -286,7 +286,7 @@ export function SessionsSidebar({ onSelect, className }: SessionsSidebarProps) {
                       type="button"
                       onClick={() => startRename(session.id, session.title)}
                       aria-label={`Renomear ${session.title}`}
-                      className="flex h-11 w-11 items-center justify-center rounded-md text-muted transition hover:bg-white/10 hover:text-primary"
+                      className="flex h-11 w-11 items-center justify-center rounded-md text-muted transition hover:bg-surface-2 hover:text-primary"
                     >
                       <Pencil className="h-3 w-3" aria-hidden="true" />
                     </button>
@@ -312,8 +312,8 @@ export function SessionsSidebar({ onSelect, className }: SessionsSidebarProps) {
         )}
       </nav>
 
-      <div className="border-t border-white/5 px-4 py-3">
-        <p className="font-mono text-2xs uppercase leading-relaxed tracking-[0.14em] text-muted/70">
+      <div className="border-t border-border px-4 py-3">
+        <p className="font-mono text-2xs uppercase leading-relaxed tracking-[0.14em] text-muted">
           Histórico local
           <br />
           {offlineMode ? 'Ollama local · offline' : demoMode ? 'modo demonstração' : 'API conectada'}
