@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { del, get, set } from 'idb-keyval';
 
 import { createId } from '@/lib/id';
+import { normalizeTags } from '@/lib/tags';
 
 export interface MemoryEntry {
   id: string;
@@ -33,27 +34,8 @@ let persistQueue: Promise<void> = Promise.resolve();
 
 /** Normaliza tags: minúsculas, sem vazias, sem duplicatas e com limites. */
 export function normalizeMemoryTags(values: string[]): string[] {
-  const seen = new Set<string>();
-  const tags: string[] = [];
-
-  for (const value of values) {
-    const tag = value.trim().toLowerCase().slice(0, MEMORY_LIMITS.tag);
-
-    if (!tag || seen.has(tag)) {
-      continue;
-    }
-
-    seen.add(tag);
-    tags.push(tag);
-
-    if (tags.length >= MEMORY_LIMITS.tags) {
-      break;
-    }
-  }
-
-  return tags;
+  return normalizeTags(values, { maxTags: MEMORY_LIMITS.tags, maxLength: MEMORY_LIMITS.tag });
 }
-
 export function parseMemoryTags(input: string): string[] {
   return normalizeMemoryTags(input.split(','));
 }

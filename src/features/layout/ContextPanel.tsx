@@ -9,6 +9,7 @@ import { AI_STATE_LABEL } from '@/features/assistant/ai-state';
 import { Orb } from '@/features/assistant/Orb';
 import { useMessageCount, useSessions } from '@/features/chat/api';
 import { useMemories } from '@/features/memory/api';
+import { useSkills } from '@/features/skills/api';
 import { formatSessionTime } from '@/lib/format';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/auth-store';
@@ -56,6 +57,7 @@ export function ContextPanel({ sessionId, desktopOpen }: { sessionId: string | n
   const usage = useUsage();
   const models = useModels();
   const memories = useMemories();
+  const skills = useSkills();
   const { latest, tokenTotals, averageLatency, averageSpeed } = useCoreMetrics(sessionId);
   const modelId = latest?.modelId ?? selectedModel ?? models.data?.default_model ?? undefined;
   const model = models.data?.models.find((item) => item.model_id === modelId);
@@ -69,6 +71,7 @@ export function ContextPanel({ sessionId, desktopOpen }: { sessionId: string | n
     return provider.available && items.length ? [{ provider: provider.name, items }] : [];
   });
   const activeMemories = memories.data?.filter((memory) => memory.enabled).length ?? 0;
+  const activeSkills = skills.data?.filter((skill) => skill.enabled).length ?? 0;
   const sessions = useSessions();
   const messages = useMessageCount(sessionId);
   const session = sessions.data?.find((item) => item.id === sessionId);
@@ -112,7 +115,7 @@ export function ContextPanel({ sessionId, desktopOpen }: { sessionId: string | n
                 {!offlineMode && !availableModels.length && !models.isLoading && <p className="mt-1 text-2xs text-muted">Nenhum provedor disponível no momento.</p>}
               </div>
             )}
-            <section className="rounded-xl border border-border/60 p-3"><h3 className="font-mono text-xs uppercase tracking-wider text-muted">Conversa</h3><p className="mt-1 truncate text-sm text-foreground">{sessionLabel}</p><p className="mt-2 text-xs text-muted">{messageCount} mensagens · {elapsedMinutes} min · {activeMemories} memórias ativas</p></section>
+            <section className="rounded-xl border border-border/60 p-3"><h3 className="font-mono text-xs uppercase tracking-wider text-muted">Conversa</h3><p className="mt-1 truncate text-sm text-foreground">{sessionLabel}</p><p className="mt-2 text-xs text-muted">{messageCount} mensagens · {elapsedMinutes} min · {activeMemories} memórias · {activeSkills} skills ativas</p></section>
             <section className="rounded-xl border border-border/60 p-3"><h3 className="font-mono text-xs uppercase tracking-wider text-muted">Uso desta sessão</h3><p className="mt-1 text-sm text-foreground">{tokenTotals.input} tokens de entrada · {tokenTotals.output} de saída</p><p className="mt-1 text-xs text-muted">Latência {averageLatency === undefined || !Number.isFinite(averageLatency) ? '—' : `${(averageLatency / 1000).toFixed(1)} s`} · {averageSpeed === undefined ? '—' : `${averageSpeed.toFixed(1)} tokens/s`}</p></section>
           </div>
         </Drawer.Content>
@@ -220,7 +223,7 @@ export function ContextPanel({ sessionId, desktopOpen }: { sessionId: string | n
         <section>
           <h2 className="font-display text-2xs tracking-[0.22em] text-primary/80">TEMPO E CONTEXTO</h2>
           <p className="mt-2 font-mono text-2xs text-muted">Conversa: {elapsedMinutes} min · latência: {averageLatency === undefined || !Number.isFinite(averageLatency) ? '—' : `${(averageLatency / 1000).toFixed(1)} s`} · tokens/s: {averageSpeed === undefined ? '—' : averageSpeed.toFixed(1)}</p>
-          <p className="mt-1 font-mono text-2xs text-muted">Memórias ativas: {memories.isLoading ? '…' : activeMemories} · voz: {ttsEnabled ? 'ligada' : 'desligada'}</p>
+          <p className="mt-1 font-mono text-2xs text-muted">Memórias ativas: {memories.isLoading ? '…' : activeMemories} · skills ativas: {skills.isLoading ? '…' : activeSkills} · voz: {ttsEnabled ? 'ligada' : 'desligada'}</p>
           <p className="font-mono text-2xs text-muted">Duração última resposta: {latest ? `${(latest.durationMs / 1000).toFixed(1)} s` : '—'}</p>
         </section>
 

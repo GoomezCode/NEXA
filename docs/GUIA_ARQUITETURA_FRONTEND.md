@@ -68,7 +68,7 @@ O `BrowserRouter` está em `App.tsx`. `AppShell` resolve o conteúdo pelo `pathn
 |---|---|
 | `/` | Chat; se houver histórico, substitui a URL pela conversa ativa. |
 | `/c/:sessionId` | Conversa indicada pelo ID. |
-| `/memory` | Memórias locais. |
+| `/memory` | Memórias e skills locais (`?tab=skills`). |
 | `/monitor` | Telemetria da API ou do Ollama, conforme o modo. |
 | `/settings` | Preferências, conta, chaves de provedores e conexão. |
 
@@ -93,10 +93,10 @@ Ao alterar o formato do stream, atualize `ChatStreamEvent` em `src/api/types.ts`
 
 ### Outras áreas
 
-- Memória: `src/features/memory/api.ts` concentra validação, operações CRUD, cache e persistência local em IndexedDB. `MemoryView.tsx` é a tela; `MemoryForm.tsx` é o formulário.
+- Memória e Skills: módulos independentes em `src/features/memory/` e `src/features/skills/`, com cache e CRUD próprios. Skills ficam separadas por identidade em `nexa:skills:v1:<namespace>`; Memória permanece em `nexa:memory:v1`. `MemoryView.tsx` mantém as abas `/memory` e `/memory?tab=skills`.
 - Modelos, saúde e uso da API: hooks em `src/api/models.ts`, `health.ts` e `usage.ts`, consumidos principalmente pelo Monitor e pelo Composer.
 - Chaves de provedores: `src/api/provider-keys.ts` acessa o backend; `ProviderKeysPanel.tsx` cuida da interface e validação.
-- Personalização: `src/features/chat/personalization.ts` seleciona nome e memórias relevantes para cada resposta.
+- Personalização: `src/features/chat/personalization.ts` seleciona nome, memórias e skills relevantes. Skills são enviadas ao servidor apenas com `VITE_SKILLS_API_ENABLED=true`; offline são aplicadas no prompt do Ollama.
 
 ### Estado: quem deve ser dono?
 
@@ -118,6 +118,7 @@ Ao alterar o formato do stream, atualize `ChatStreamEvent` em `src/api/types.ts`
 | Sessão guest | `localStorage`; sessão de usuário/admin em `sessionStorage` |
 | Conversas | IndexedDB com namespaces por modo/identidade |
 | Memórias | IndexedDB, chave `nexa:memory:v1` |
+| Skills | IndexedDB, chave `nexa:skills:v1:<namespace>` |
 | Métricas da sessão | `sessionStorage`, `nexa:session-metrics:v1` |
 
 Stores que leem o navegador protegem acesso a storage indisponível e aplicam defaults/sanitização. Ao introduzir uma preferência, atualize o tipo, default, sanitização, persistência, controles de Ajustes e `reset()`, além dos testes do store.

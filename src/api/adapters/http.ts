@@ -6,7 +6,7 @@ import { streamChat } from '../chat';
 import { ApiError } from '../client/problem';
 import type { ChatAdapter, ChatContentPart, ChatMessage, ChatStreamEvent, ChatStreamInput, Session } from '../types';
 import type { LocalChatRepository } from './local-chat';
-import { namespace } from '@/api';
+import { namespace } from '@/lib/namespace';
 import { createAttachmentStore } from '@/features/chat/attachments/store';
 import type { AttachmentStore } from '@/features/chat/attachments/store';
 import { composeModelContent } from '@/features/chat/attachments/compose';
@@ -103,7 +103,7 @@ export class HttpChatAdapter implements ChatAdapter {
         }
       }
 
-      await this.repo.finishAssistant(sessionId, assistantId, { content: text, status: 'done', memoriesUsed: personalization.memories.length });
+      await this.repo.finishAssistant(sessionId, assistantId, { content: text, status: 'done', memoriesUsed: personalization.memories.length, skillsUsed: personalization.skills?.length ?? 0 });
     } catch (error) {
       await this.repo.finishAssistant(sessionId, assistantId, {
         content: text,

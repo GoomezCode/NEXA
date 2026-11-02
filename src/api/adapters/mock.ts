@@ -124,6 +124,7 @@ export class MockChatAdapter implements ChatAdapter {
         content: text,
         status: 'done',
         memoriesUsed: input.personalization?.memories.length ?? 0,
+        skillsUsed: input.personalization?.skills?.length ?? 0,
       });
 
       yield {

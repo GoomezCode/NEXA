@@ -2,7 +2,7 @@ import { Copy, Download, FileText, RefreshCw } from 'lucide-react';
 import { lazy, memo, Suspense, useDeferredValue, useEffect, useState } from 'react';
 
 import { formatFinishReason } from '@/api/chat';
-import { namespace } from '@/api';
+import { namespace } from '@/lib/namespace';
 import type { ChatMessage } from '@/api/types';
 import { formatTime } from '@/lib/format';
 import { cn } from '@/lib/utils';
@@ -154,6 +154,7 @@ export const MessageBubble = memo(function MessageBubble({
           )}
           {!isUser && message.status === 'done' && message.finish_reason && <span>{formatFinishReason(message.finish_reason)}</span>}
           {!isUser && message.status === 'done' && (message.memoriesUsed ?? 0) > 0 && <span>{message.memoriesUsed} {message.memoriesUsed === 1 ? 'memória usada' : 'memórias usadas'}</span>}
+          {!isUser && message.status === 'done' && (message.skillsUsed ?? 0) > 0 && <span>{message.skillsUsed} {message.skillsUsed === 1 ? 'skill usada' : 'skills usadas'}</span>}
         </div>
         {!isUser && message.status === 'done' && (
           <div className="nexa-message-actions mt-1 flex items-center gap-1">
