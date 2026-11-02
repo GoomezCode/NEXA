@@ -37,7 +37,24 @@ function AccountSettings() {
   const demoMode = useSettingsStore((state) => state.settings.demoMode);
   const offlineMode = useConnectionStore((state) => state.mode === 'offline');
 
-  if (offlineMode) return <p className="text-2xs leading-relaxed text-muted">Modo offline — sem conta. Suas conversas ficam neste navegador.</p>;
+  if (offlineMode) {
+    return (
+      <>
+        <p className="text-2xs leading-relaxed text-muted">Modo offline — sem conta. Suas conversas ficam neste navegador.</p>
+        <button
+          type="button"
+          onClick={() => {
+            useConnectionStore.getState().setMode('api');
+            logout();
+          }}
+          className="inline-flex min-h-11 w-full items-center justify-center gap-1.5 rounded-xl border border-white/10 px-3 py-2 font-mono text-2xs uppercase tracking-[0.12em] text-muted transition hover:border-primary/30 hover:text-primary"
+        >
+          <LogOut className="h-3.5 w-3.5" aria-hidden="true" />
+          Sair
+        </button>
+      </>
+    );
+  }
 
   if (demoMode || !session) {
     return (

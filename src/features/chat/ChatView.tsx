@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { DragEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { useSpeechRecognition } from '@/features/voice/use-speech-recognition';
 import { useOnlineStatus } from '@/hooks/use-online-status';
@@ -9,13 +10,19 @@ import { useSettingsStore } from '@/stores/settings-store';
 import { useUiStore } from '@/stores/ui-store';
 import { useConnectionStore } from '@/stores/connection-store';
 import { useModels } from '@/api/models';
+import { getChatAdapter } from '@/api';
+import type { ChatAdapter } from '@/api/types';
 
 import { useChat } from './use-chat';
-import { useSessions } from './api';
-import { Composer } from './Composer';
+import { useCreateSession, useRenameSession, useSessions } from './api';
+import { Composer, type PendingAttachment } from './Composer';
 import { MessageList } from './MessageList';
 
 export function ChatView({ sessionId }: { sessionId: string | null }) {
+  const navigate = useNavigate();
+  const createSession = useCreateSession();
+  const renameSession = useRenameSession();
+  const pendingSend = useRef<{ sessionId: string; content: string; attachments: PendingAttachment[]; adapter: ChatAdapter } | null>(null);
   const {
     messages,
     isLoading,
@@ -43,6 +50,39 @@ export function ChatView({ sessionId }: { sessionId: string | null }) {
   const [droppedFiles, setDroppedFiles] = useState<File[]>([]);
   const [draggingFiles, setDraggingFiles] = useState(false);
   const dragDepth = useRef(0);
+
+  useEffect(() => {
+    const pending = pendingSend.current;
+    if (!sessionId || !pending || pending.sessionId !== sessionId) return;
+    pendingSend.current = null;
+    void sendMessage(pending.content, pending.attachments, pending.adapter);
+  }, [sendMessage, sessionId]);
+
+  const send = async (content: string, attachments: PendingAttachment[] = []) => {
+    const titleSource = content.trim() || attachments[0]?.meta.name || '';
+    const title = titleSource.replace(/\s+/g, ' ').slice(0, 80).trim();
+
+    if (sessionId) {
+      if (messages.length === 0 && session?.title === 'Nova conversa' && title) {
+        try {
+          await renameSession.mutateAsync({ sessionId, title });
+        } catch {
+          notify({ tone: 'error', title: 'Nome da conversa', message: 'Não foi possível definir o nome automaticamente. Você pode renomear pela lista de conversas.' });
+        }
+      }
+      void sendMessage(content, attachments);
+      return;
+    }
+
+    try {
+      const adapter = getChatAdapter();
+      const session = await createSession.mutateAsync(title || undefined);
+      pendingSend.current = { sessionId: session.id, content, attachments, adapter };
+      navigate(`/c/${session.id}`);
+    } catch {
+      notify({ tone: 'error', title: 'Nova conversa', message: 'Não foi possível criar uma conversa.' });
+    }
+  };
 
   const hasFiles = (event: DragEvent<HTMLElement>) => Array.from(event.dataTransfer.types).includes('Files');
 
@@ -123,7 +163,7 @@ export function ChatView({ sessionId }: { sessionId: string | null }) {
         disabled={sendBlockedByNetwork}
         onRetry={retry}
         onRetryLast={retryLast}
-        onSuggestion={(value) => void sendMessage(value)}
+        onSuggestion={(value) => void send(value)}
       />
 
       {offlineMode && models.isError && (
@@ -164,16 +204,16 @@ export function ChatView({ sessionId }: { sessionId: string | null }) {
       )}
 
       <Composer
-        disabled={!sessionId || isLoading || isError || sendBlockedByNetwork || (offlineMode && (!models.data?.models.length || models.isLoading))}
+        disabled={createSession.isPending || isLoading || isError || sendBlockedByNetwork || (offlineMode && (!models.data?.models.length || models.isLoading))}
         disabledHint={sendBlockedByNetwork ? 'Sem conexão — aguardando a rede…' : undefined}
         isStreaming={isStreaming}
         value={draft}
         onValueChange={setDraft}
         onSend={(value) => {
           setDraft('');
-          void sendMessage(value);
+          void send(value);
         }}
-        onSendAttachments={(value, attachments) => { setDraft(''); void sendMessage(value, attachments); }}
+        onSendAttachments={(value, attachments) => { setDraft(''); void send(value, attachments); }}
         onStop={stop}
         voiceEnabled={voiceInputEnabled}
         voiceSupported={voice.supported}

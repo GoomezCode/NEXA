@@ -1,4 +1,5 @@
 import { Suspense, lazy, useEffect, type ReactNode } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { ensureGuest } from '@/api/auth';
 import { useAuthStore } from '@/stores/auth-store';
@@ -10,9 +11,17 @@ const AuthView = lazy(() => import('./AuthView').then((module) => ({ default: mo
 const MAX_TIMEOUT = 2 ** 31 - 1;
 
 export function AuthGate({ children }: { children: ReactNode }) {
+  const location = useLocation();
+  const navigate = useNavigate();
   const demoMode = useSettingsStore((state) => state.settings.demoMode);
   const session = useAuthStore((state) => state.session);
   const offline = useConnectionStore((state) => state.mode === 'offline');
+
+  useEffect(() => {
+    if (!offline && !demoMode && !session && location.pathname !== '/') {
+      navigate('/', { replace: true });
+    }
+  }, [demoMode, location.pathname, navigate, offline, session]);
 
   // Quando o token vence: convidado renova em silêncio; usuário/admin volta ao login.
   useEffect(() => {

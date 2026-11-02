@@ -6,8 +6,8 @@ import { Button } from '@/components/ui/Button';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { formatClock, formatShortDate } from '@/lib/format';
 import { cn } from '@/lib/utils';
-import { useConnectionStore } from '@/stores/connection-store';
 import { logout } from '@/api/auth';
+import { useConnectionStore } from '@/stores/connection-store';
 import { useAuthStore } from '@/stores/auth-store';
 import { useSettingsStore } from '@/stores/settings-store';
 import { useUiStore } from '@/stores/ui-store';
@@ -165,14 +165,17 @@ export function Dock() {
       </div>
 
       <div className="flex min-w-0 flex-1 items-center justify-end gap-1.5 sm:gap-3">
-        {!offlineMode && !demoMode && session && (
+        {(offlineMode || (!demoMode && session)) && (
           <Button
             type="button"
             variant="ghost"
             size="icon"
-            onClick={logout}
-            aria-label={session.role === 'guest' ? 'Sair do modo convidado' : 'Sair da conta'}
-            title={session.role === 'guest' ? 'Sair do modo convidado' : 'Sair da conta'}
+            onClick={() => {
+              if (offlineMode) useConnectionStore.getState().setMode('api');
+              logout();
+            }}
+            aria-label={offlineMode ? 'Sair do modo offline' : session?.role === 'guest' ? 'Sair do modo convidado' : 'Sair da conta'}
+            title={offlineMode ? 'Sair do modo offline' : session?.role === 'guest' ? 'Sair do modo convidado' : 'Sair da conta'}
             className="h-11 w-11 shrink-0 rounded-lg border border-transparent text-muted hover:border-danger/30 hover:bg-danger/5 hover:text-danger"
           >
             <LogOut className="h-4 w-4" aria-hidden="true" />
