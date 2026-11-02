@@ -154,7 +154,7 @@ export function Composer({
           disabled ? 'opacity-70' : '',
         )}
       >
-        <input ref={inputRef} type="file" multiple accept="image/*,application/pdf,.pdf,.txt,.md,.csv,.tsv,.json,.xml,.yaml,.yml,.log,.html,.css,.js,.ts,.tsx,.py,.java,.go,.rs,.sql,.sh" aria-label="Selecionar arquivos para anexar" tabIndex={-1} className="sr-only" onChange={(event) => { if (event.currentTarget.files) void addFiles(event.currentTarget.files); event.currentTarget.value = ''; }} />
+        <input ref={inputRef} type="file" multiple accept="image/*,application/pdf,text/plain,.pdf,.txt,.md,.csv,.tsv,.json,.xml,.yaml,.yml,.log,.html,.css,.js,.ts,.tsx,.py,.java,.go,.rs,.sql,.sh" aria-label="Selecionar arquivos para anexar" tabIndex={-1} className="sr-only" onChange={(event) => { if (event.currentTarget.files) void addFiles(event.currentTarget.files); event.currentTarget.value = ''; }} />
         {attachments.length > 0 && (
           <div className="order-0 flex w-full min-w-0 gap-2 overflow-x-auto py-1" aria-label="Anexos selecionados">
             {attachments.map((item) => (

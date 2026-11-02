@@ -29,7 +29,8 @@ export function formatBytes(bytes: number): string {
 }
 
 export function sniffAttachmentKind(bytes: Uint8Array, name: string): AttachmentKind {
-  const ext = name.split('.').at(-1)?.toLowerCase() ?? '';
+  const extensionStart = name.lastIndexOf('.');
+  const ext = extensionStart > 0 ? name.slice(extensionStart + 1).toLowerCase() : '';
   const prefix = new TextDecoder().decode(bytes.slice(0, 1024)).trimStart().toLowerCase();
   if (ext === 'svg' || /<svg(?:\s|>)/.test(prefix) || (prefix.startsWith('<?xml') && /<svg(?:\s|>)/.test(prefix))) throw new Error('SVG não é aceito.');
   if (bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47) return 'image';
@@ -38,7 +39,9 @@ export function sniffAttachmentKind(bytes: Uint8Array, name: string): Attachment
   if (new TextDecoder().decode(bytes.slice(0, 3)) === 'GIF') return 'image';
   if (bytes[0] === 0x25 && bytes[1] === 0x50 && bytes[2] === 0x44 && bytes[3] === 0x46) return 'pdf';
   if (bytes.includes(0)) throw new Error('Arquivo binário não suportado.');
-  if (TEXT_EXTENSIONS.has(ext)) {
+  // Arquivos sem extensão (por exemplo, arquivos de instruções ou saída de
+  // terminal) ainda podem ser texto simples. O conteúdo UTF-8 é a validação.
+  if (TEXT_EXTENSIONS.has(ext) || ext === '') {
     try { new TextDecoder('utf-8', { fatal: true }).decode(bytes); return 'text'; }
     catch { throw new Error('Arquivo binário não suportado.'); }
   }

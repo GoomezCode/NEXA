@@ -147,30 +147,31 @@ export function useChat(sessionId: string | null): UseChatResult {
         }
       };
 
-      updateMessages((current) => [
-        ...current,
-        {
-          id: createId('msg'),
-          role: 'user',
-          content: trimmed,
-          createdAt,
-          status: 'done',
-          ...(metas.length ? { attachments: metas } : {}),
-        },
-        {
-          id: assistantId,
-          role: 'assistant',
-          content: '',
-          createdAt,
-          status: 'streaming',
-        },
-      ]);
-
       try {
         const attachmentStore = createAttachmentStore(namespace());
         for (const attachment of attachments) {
           if (!await attachmentStore.get(attachment.meta.id)) await attachmentStore.put(attachment.meta.id, { blob: attachment.blob, ...(attachment.thumb ? { thumb: attachment.thumb } : {}), ...(attachment.text ? { text: attachment.text } : {}) });
         }
+        // O componente da bolha lê do IndexedDB ao montar. Grave os blobs antes
+        // de publicar a mensagem otimista para não mostrar “Anexo indisponível”.
+        updateMessages((current) => [
+          ...current,
+          {
+            id: createId('msg'),
+            role: 'user',
+            content: trimmed,
+            createdAt,
+            status: 'done',
+            ...(metas.length ? { attachments: metas } : {}),
+          },
+          {
+            id: assistantId,
+            role: 'assistant',
+            content: '',
+            createdAt,
+            status: 'streaming',
+          },
+        ]);
         personalization = await buildPersonalization(trimmed);
         let receivedToken = false;
 

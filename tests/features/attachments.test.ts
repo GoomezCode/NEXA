@@ -7,6 +7,7 @@ describe('processamento básico de anexos', () => {
   it('detecta tipos pelo conteúdo e recusa SVG e arquivos binários', () => {
     expect(sniffAttachmentKind(new Uint8Array([0x89, 0x50, 0x4e, 0x47]), 'imagem.bin')).toBe('image');
     expect(sniffAttachmentKind(new TextEncoder().encode('conteúdo simples'), 'dados.txt')).toBe('text');
+    expect(sniffAttachmentKind(new TextEncoder().encode('Olá como vai?\n\n'), 'teste')).toBe('text');
     expect(() => sniffAttachmentKind(new TextEncoder().encode('<svg viewBox="0 0 1 1"></svg>'), 'imagem.txt')).toThrow('SVG');
     expect(() => sniffAttachmentKind(new Uint8Array([0x50, 0x4b, 0x03, 0x04, 0]), 'arquivo.zip')).toThrow('binário');
   });
