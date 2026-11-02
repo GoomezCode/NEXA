@@ -23,9 +23,6 @@ interface ComposerProps {
   onVoiceCancel: () => void;
   /** Limite de caracteres da mensagem para o papel atual. */
   maxLength?: number;
-  modelOptions?: Array<{ id: string; name: string }>;
-  selectedModelId?: string | null;
-  onModelChange?: (modelId: string | null) => void;
 }
 
 const MAX_HEIGHT = 168;
@@ -47,9 +44,6 @@ export function Composer({
   onVoiceStop,
   onVoiceCancel,
   maxLength,
-  modelOptions,
-  selectedModelId,
-  onModelChange,
 }: ComposerProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const shellRef = useRef<HTMLDivElement>(null);
@@ -99,22 +93,6 @@ export function Composer({
 
   return (
     <div ref={shellRef} className="nexa-composer-shell shrink-0 border-t border-white/5 bg-background/50 px-3 py-3 pb-[max(0.75rem,var(--safe-bottom))] sm:px-5">
-      {modelOptions && onModelChange && (
-        <div className="mx-auto mb-2 flex w-full max-w-3xl items-center gap-2 px-1">
-          <label htmlFor="ollama-model-picker" className="font-mono text-2xs uppercase tracking-[0.12em] text-muted">Modelo</label>
-          <select
-            id="ollama-model-picker"
-            aria-label="Modelo Ollama"
-            value={selectedModelId ?? ''}
-            onChange={(event) => onModelChange(event.target.value || null)}
-            disabled={!modelOptions.length}
-            className="min-h-9 max-w-56 rounded-lg border border-border bg-background px-2.5 py-1 font-mono text-2xs text-foreground"
-          >
-            <option value="">Automático</option>
-            {modelOptions.map((model) => <option key={model.id} value={model.id}>{model.name}</option>)}
-          </select>
-        </div>
-      )}
       {voiceEnabled && (listening || interim || voiceError) && (
         <div
           role={voiceError ? 'alert' : 'status'}

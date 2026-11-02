@@ -51,6 +51,7 @@ export function ContextPanel({ sessionId }: { sessionId: string | null }) {
   const isSpeaking = useSpeechStore((state) => state.isSpeaking);
   const auth = useAuthStore((state) => state.session);
   const selectedModel = useModelStore((state) => state.selectedModelId);
+  const setSelectedModel = useModelStore((state) => state.setSelectedModel);
   const usage = useUsage();
   const models = useModels();
   const memories = useMemories();
@@ -82,7 +83,16 @@ export function ContextPanel({ sessionId }: { sessionId: string | null }) {
             <Drawer.Close asChild><IconButton label="Fechar painel do núcleo" className="text-muted"><PanelRight className="h-4 w-4" /></IconButton></Drawer.Close>
           </header>
           <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4 pb-[max(1rem,var(--safe-bottom))]">
-            <div className="flex items-center gap-3 rounded-xl border border-border/60 bg-background/40 p-3"><Orb state={aiState} size="sm" /><div><p role="status" aria-live="polite" className="font-mono text-xs uppercase tracking-wider text-primary">{isSpeaking ? 'Lendo resposta' : AI_STATE_LABEL[aiState]}</p><p className="mt-1 text-sm text-foreground">{offlineMode ? 'Ollama local' : demoMode ? 'NEXA demonstração' : model?.provider ?? 'Provedor —'} · {modelId ?? (offlineMode ? 'Automático' : 'Modelo —')}</p></div></div>
+            <div className="flex items-center gap-3 rounded-xl border border-border/60 bg-background/40 p-3"><Orb state={aiState} size="sm" /><div className="min-w-0"><p role="status" aria-live="polite" className="font-mono text-xs uppercase tracking-wider text-primary">{isSpeaking ? 'Lendo resposta' : AI_STATE_LABEL[aiState]}</p><p className="mt-1 text-sm text-foreground">{offlineMode ? 'Ollama local' : demoMode ? 'NEXA demonstração' : model?.provider ?? 'Provedor —'} · {modelId ?? (offlineMode ? 'Automático' : 'Modelo —')}</p></div></div>
+            {offlineMode && (
+              <div className="mt-3">
+                <label htmlFor="ollama-model-picker-mobile" className="font-mono text-2xs uppercase tracking-[0.12em] text-muted">Modelo</label>
+                <select id="ollama-model-picker-mobile" aria-label="Modelo Ollama" value={selectedModel ?? ''} onChange={(event) => setSelectedModel(event.target.value || null)} disabled={!models.data?.models.length} className="mt-1 min-h-11 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground">
+                  <option value="">Automático</option>
+                  {(models.data?.models ?? []).map((item) => <option key={item.model_id} value={item.model_id}>{item.name}</option>)}
+                </select>
+              </div>
+            )}
             <section className="rounded-xl border border-border/60 p-3"><h3 className="font-mono text-xs uppercase tracking-wider text-muted">Conversa</h3><p className="mt-1 truncate text-sm text-foreground">{sessionLabel}</p><p className="mt-2 text-xs text-muted">{messageCount} mensagens · {elapsedMinutes} min · {activeMemories} memórias ativas</p></section>
             <section className="rounded-xl border border-border/60 p-3"><h3 className="font-mono text-xs uppercase tracking-wider text-muted">Uso desta sessão</h3><p className="mt-1 text-sm text-foreground">{tokenTotals.input} tokens de entrada · {tokenTotals.output} de saída</p><p className="mt-1 text-xs text-muted">Latência {averageLatency === undefined || !Number.isFinite(averageLatency) ? '—' : `${(averageLatency / 1000).toFixed(1)} s`} · {averageSpeed === undefined ? '—' : `${averageSpeed.toFixed(1)} tokens/s`}</p></section>
           </div>
@@ -121,9 +131,19 @@ export function ContextPanel({ sessionId }: { sessionId: string | null }) {
         <section>
           <h2 className="font-display text-2xs tracking-[0.22em] text-primary/80">IA</h2>
           <p className="mt-2 truncate text-xs text-foreground">{offlineMode ? 'Ollama (local)' : demoMode ? 'NEXA demonstração' : model?.provider ?? 'Provedor —'}</p>
-          <p className="truncate font-mono text-2xs text-muted">
-            {modelId ?? (offlineMode ? 'Automático' : 'Modelo —')}{!offlineMode && <> · chave {latest?.keySource === 'user' || model?.key_source === 'user' ? 'própria' : 'do servidor'}</>}
-          </p>
+          {offlineMode ? (
+            <div className="mt-1.5">
+              <label htmlFor="ollama-model-picker" className="sr-only">Modelo Ollama</label>
+              <select id="ollama-model-picker" aria-label="Modelo Ollama" value={selectedModel ?? ''} onChange={(event) => setSelectedModel(event.target.value || null)} disabled={!models.data?.models.length} className="min-h-10 w-full rounded-lg border border-border bg-background px-2.5 font-mono text-2xs text-foreground">
+                <option value="">Automático</option>
+                {(models.data?.models ?? []).map((item) => <option key={item.model_id} value={item.model_id}>{item.name}</option>)}
+              </select>
+            </div>
+          ) : (
+            <p className="truncate font-mono text-2xs text-muted">
+              {modelId ?? 'Modelo —'} · chave {latest?.keySource === 'user' || model?.key_source === 'user' ? 'própria' : 'do servidor'}
+            </p>
+          )}
         </section>
 
         <section>

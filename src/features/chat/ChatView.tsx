@@ -8,7 +8,6 @@ import { useSettingsStore } from '@/stores/settings-store';
 import { useUiStore } from '@/stores/ui-store';
 import { useConnectionStore } from '@/stores/connection-store';
 import { useModels } from '@/api/models';
-import { useModelStore } from '@/stores/model-store';
 
 import { useChat } from './use-chat';
 import { useSessions } from './api';
@@ -33,8 +32,6 @@ export function ChatView({ sessionId }: { sessionId: string | null }) {
   const demoMode = useSettingsStore((state) => state.settings.demoMode);
   const offlineMode = useConnectionStore((state) => state.mode === 'offline');
   const models = useModels();
-  const selectedModelId = useModelStore((state) => state.selectedModelId);
-  const setSelectedModel = useModelStore((state) => state.setSelectedModel);
   const voiceInputEnabled = useSettingsStore((state) => state.settings.voiceInputEnabled);
   const role = useAuthStore((state) => state.session?.role ?? 'guest');
   const maxMessageChars = role === 'admin' ? 8000 : 2000;
@@ -123,9 +120,6 @@ export function ChatView({ sessionId }: { sessionId: string | null }) {
       )}
 
       <Composer
-        modelOptions={offlineMode ? (models.data?.models ?? []).map((model) => ({ id: model.model_id, name: model.name })) : undefined}
-        selectedModelId={selectedModelId}
-        onModelChange={setSelectedModel}
         disabled={!sessionId || isLoading || isError || sendBlockedByNetwork || (offlineMode && (!models.data?.models.length || models.isLoading))}
         disabledHint={sendBlockedByNetwork ? 'Sem conexão — aguardando a rede…' : undefined}
         isStreaming={isStreaming}
