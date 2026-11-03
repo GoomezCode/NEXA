@@ -15,8 +15,9 @@ app = FastAPI(title="NEXA local voice service")
 
 @lru_cache(maxsize=1)
 def model() -> WhisperModel:
+    model_name = os.getenv("WHISPER_MODEL", "small")
     return WhisperModel(
-        os.getenv("WHISPER_MODEL", "base"),
+        model_name,
         device=os.getenv("WHISPER_DEVICE", "cpu"),
         compute_type=os.getenv("WHISPER_COMPUTE_TYPE", "int8"),
         download_root=os.getenv("WHISPER_MODEL_DIR", "models"),
@@ -25,7 +26,7 @@ def model() -> WhisperModel:
 
 @app.get("/health")
 def health() -> dict[str, object]:
-    return {"status": "ok", "stt": True, "tts": False, "model": os.getenv("WHISPER_MODEL", "base")}
+    return {"status": "ok", "stt": True, "tts": False, "model": os.getenv("WHISPER_MODEL", "small")}
 
 
 @app.post("/stt")
@@ -39,8 +40,19 @@ async def transcribe(audio: UploadFile = File(...), language: str = Form("pt")) 
         frames = []
         for frame in container.decode(audio=0):
             frames.extend(resampler.resample(frame))
+        frames.extend(resampler.resample(None))
+        if not frames:
+            raise ValueError("O arquivo não contém áudio decodificável.")
         samples = np.concatenate([frame.to_ndarray().reshape(-1) for frame in frames]).astype(np.float32)
-        segments, _ = model().transcribe(samples, language=language, vad_filter=True, beam_size=1)
+        segments, _ = model().transcribe(
+            samples,
+            language=language,
+            vad_filter=True,
+            beam_size=5,
+            temperature=0,
+            condition_on_previous_text=False,
+            initial_prompt="Transcrição de conversa falada em português brasileiro.",
+        )
         return {"text": " ".join(segment.text.strip() for segment in segments).strip()}
     except Exception as error:
         raise HTTPException(422, f"Não foi possível transcrever o áudio: {error}") from error

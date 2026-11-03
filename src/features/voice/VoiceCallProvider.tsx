@@ -2,9 +2,11 @@ import { useEffect } from 'react';
 import { useVoiceCall } from './use-voice-call';
 import { VoiceCallContext } from './voice-call-context';
 import { useUiStore } from '@/stores/ui-store';
+import { useSpeechStore } from '@/stores/speech-store';
 
 export function VoiceCallProvider({ children, onTranscript, onInterrupt, isBusy }: { children: React.ReactNode; onTranscript: (text: string) => void; onInterrupt: () => void; isBusy: boolean }) {
-  const call = useVoiceCall({ onTranscript, onInterrupt, isBusy });
+  const isSpeaking = useSpeechStore((store) => store.isSpeaking);
+  const call = useVoiceCall({ onTranscript, onInterrupt, isBusy, isSpeaking });
   const { active, state, setEvent, stop, start } = call;
   const setAiState = useUiStore((state) => state.setAiState);
   useEffect(() => {
@@ -14,9 +16,10 @@ export function VoiceCallProvider({ children, onTranscript, onInterrupt, isBusy 
     return () => { if (useUiStore.getState().aiState !== 'idle') setAiState('idle'); };
   }, [active, state, setAiState]);
   useEffect(() => {
-    if (isBusy && active) setEvent('SPEAK');
+    if (isSpeaking && active) setEvent('SPEAK');
+    else if (isBusy && active && state === 'transcribing') setEvent('THINK');
     else if (!isBusy && active && (state === 'thinking' || state === 'speaking')) setEvent('DONE');
-  }, [isBusy, active, setEvent, state]);
+  }, [isBusy, isSpeaking, active, setEvent, state]);
   useEffect(() => {
     const key = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && active) stop();
