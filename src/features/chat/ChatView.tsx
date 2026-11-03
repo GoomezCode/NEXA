@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import type { DragEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -7,8 +7,8 @@ import { useOnlineStatus } from '@/hooks/use-online-status';
 import { notify } from '@/stores/notification-store';
 import { useAuthStore } from '@/stores/auth-store';
 import { useSettingsStore } from '@/stores/settings-store';
-import { useUiStore } from '@/stores/ui-store';
 import { useConnectionStore } from '@/stores/connection-store';
+import { useUiStore } from '@/stores/ui-store';
 import { useModels } from '@/api/models';
 import { getChatAdapter } from '@/api';
 import type { ChatAdapter } from '@/api/types';
@@ -18,11 +18,13 @@ import { useCreateSession, useRenameSession, useSessions } from './api';
 import { Composer, type PendingAttachment } from './Composer';
 import { MessageList } from './MessageList';
 
+const VoiceCallProvider = lazy(() => import('@/features/voice/VoiceCallProvider').then((module) => ({ default: module.VoiceCallProvider })));
+
 export function ChatView({ sessionId }: { sessionId: string | null }) {
   const navigate = useNavigate();
   const createSession = useCreateSession();
   const renameSession = useRenameSession();
-  const pendingSend = useRef<{ sessionId: string; content: string; attachments: PendingAttachment[]; adapter: ChatAdapter } | null>(null);
+  const pendingSend = useRef<{ sessionId: string; content: string; attachments: PendingAttachment[]; adapter: ChatAdapter; voiceCall: boolean } | null>(null);
   const {
     messages,
     isLoading,
@@ -55,10 +57,10 @@ export function ChatView({ sessionId }: { sessionId: string | null }) {
     const pending = pendingSend.current;
     if (!sessionId || !pending || pending.sessionId !== sessionId) return;
     pendingSend.current = null;
-    void sendMessage(pending.content, pending.attachments, pending.adapter);
+    void sendMessage(pending.content, pending.attachments, pending.adapter, pending.voiceCall);
   }, [sendMessage, sessionId]);
 
-  const send = async (content: string, attachments: PendingAttachment[] = []) => {
+  const send = async (content: string, attachments: PendingAttachment[] = [], voiceCall = false) => {
     const titleSource = content.trim() || attachments[0]?.meta.name || '';
     const title = titleSource.replace(/\s+/g, ' ').slice(0, 80).trim();
 
@@ -70,14 +72,14 @@ export function ChatView({ sessionId }: { sessionId: string | null }) {
           notify({ tone: 'error', title: 'Nome da conversa', message: 'Não foi possível definir o nome automaticamente. Você pode renomear pela lista de conversas.' });
         }
       }
-      void sendMessage(content, attachments);
+      void sendMessage(content, attachments, undefined, voiceCall);
       return;
     }
 
     try {
       const adapter = getChatAdapter();
       const session = await createSession.mutateAsync(title || undefined);
-      pendingSend.current = { sessionId: session.id, content, attachments, adapter };
+      pendingSend.current = { sessionId: session.id, content, attachments, adapter, voiceCall };
       navigate(`/c/${session.id}`);
     } catch {
       notify({ tone: 'error', title: 'Nova conversa', message: 'Não foi possível criar uma conversa.' });
@@ -104,6 +106,7 @@ export function ChatView({ sessionId }: { sessionId: string | null }) {
       notify({ tone: 'error', title: 'Entrada por voz', message });
     },
   });
+  const voiceCallEnabled = useSettingsStore((state) => state.settings.voiceCallEnabled);
 
   useEffect(() => {
     if (voice.listening) {
@@ -203,7 +206,8 @@ export function ChatView({ sessionId }: { sessionId: string | null }) {
         </div>
       )}
 
-      <Composer
+      {(() => {
+        const composer = <Composer
         disabled={createSession.isPending || isLoading || isError || sendBlockedByNetwork || (offlineMode && (!models.data?.models.length || models.isLoading))}
         disabledHint={sendBlockedByNetwork ? 'Sem conexão — aguardando a rede…' : undefined}
         isStreaming={isStreaming}
@@ -228,7 +232,9 @@ export function ChatView({ sessionId }: { sessionId: string | null }) {
         apiMode={!offlineMode && !demoMode}
         externalFiles={droppedFiles}
         onAttachmentsChange={(items) => { setAttachmentNotice(items.length ? `${items.length} anexos adicionados` : ''); }}
-      />
+      />;
+        return voiceCallEnabled && !offlineMode && !demoMode ? <Suspense fallback={composer}><VoiceCallProvider onTranscript={(text) => { void send(text, [], true); }} onInterrupt={stop} isBusy={isStreaming}>{composer}</VoiceCallProvider></Suspense> : composer;
+      })()}
     </section>
   );
 }

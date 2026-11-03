@@ -150,3 +150,7 @@ tests/            Testes unitários e de componentes
 - [Guia de arquitetura e manutenção do front-end](docs/GUIA_ARQUITETURA_FRONTEND.md)
 - [Design system do front-end](docs/FRONTEND_DESIGN_SYSTEM.md)
 - [Guia de efeitos visuais](docs/GUIA_EFEITOS_VISUAIS.md)
+
+## Conversa por voz em tempo real
+
+A chamada é opcional e vem desativada. Ative **Ajustes → Voz → Conversa por voz em tempo real** e inicie pelo ícone no composer (atalho `Ctrl/Cmd + Shift + V`). O navegador captura áudio em PCM e o envia autenticado à NEXA API; a API faz a transcrição com faster-whisper em memória e não persiste o áudio. Configure `VOICE_STT_ENABLED`, `VOICE_STT_MODEL` e os demais parâmetros no ambiente da API. O modelo é carregado sob demanda no servidor. A resposta falada usa a síntese de voz do navegador nesta versão. Requer HTTPS ou `localhost` e permissão de microfone; a chamada precisa de conexão com a API e não aparece no modo offline/demonstração.

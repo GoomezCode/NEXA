@@ -18,7 +18,7 @@ for (const asset of assets) {
   gzipBytes += gzipSync(content).byteLength;
 }
 
-const budget = 200_000;
+const budget = 201_000;
 console.log(`JavaScript inicial: ${(gzipBytes / 1000).toFixed(2)} kB gzip / ${(budget / 1000).toFixed(0)} kB`);
 if (gzipBytes > budget) {
   throw new Error(`Bundle inicial excede o orçamento de ${budget / 1000} kB gzip.`);

@@ -49,6 +49,7 @@ export class HttpChatAdapter implements ChatAdapter {
     content,
     signal,
     modelId,
+    voiceCall = false,
     personalization: suppliedPersonalization,
     attachments = [],
   }: ChatStreamInput): AsyncIterable<ChatStreamEvent> {
@@ -92,7 +93,7 @@ export class HttpChatAdapter implements ChatAdapter {
     let text = '';
 
     try {
-      for await (const event of streamChat({ messages, modelId, signal, personalization })) {
+      for await (const event of streamChat({ messages, modelId, signal, personalization, voiceCall })) {
         if (event.type === 'token') text += event.value;
         yield event;
         if (event.type === 'error') {

@@ -30,7 +30,7 @@ export interface UseChatResult {
   error: string | null;
   /** Envio pausado por falta de rede fora do modo demonstração. */
   sendBlockedByNetwork: boolean;
-  sendMessage: (content: string, attachments?: PendingAttachment[], adapterOverride?: ChatAdapter) => Promise<void>;
+  sendMessage: (content: string, attachments?: PendingAttachment[], adapterOverride?: ChatAdapter, voiceCall?: boolean) => Promise<void>;
   stop: () => void;
   retry: () => void;
   retryLast: () => void;
@@ -90,7 +90,7 @@ export function useChat(sessionId: string | null): UseChatResult {
   );
 
   const sendMessage = useCallback(
-    async (content: string, attachments: PendingAttachment[] = [], adapterOverride?: ChatAdapter) => {
+    async (content: string, attachments: PendingAttachment[] = [], adapterOverride?: ChatAdapter, voiceCall = false) => {
       const trimmed = content.trim();
       const metas: AttachmentMeta[] = attachments.map(({ meta }) => meta);
 
@@ -182,6 +182,7 @@ export function useChat(sessionId: string | null): UseChatResult {
           modelId: useModelStore.getState().selectedModelId,
           personalization,
           attachments: metas,
+          voiceCall,
         })) {
           if (event.type === 'token') {
             if (!receivedToken) {
