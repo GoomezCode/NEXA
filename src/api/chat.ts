@@ -1,6 +1,7 @@
 import { authorizedFetch } from './auth';
 import { ApiError } from './client/problem';
 import type { ChatContentPart, ChatStreamEvent, FinishReason, ProviderUsage, UsageInfo } from './types';
+import type { ChatPersonalization } from '@/features/chat/personalization';
 
 export class StreamInterruptedError extends Error {
   constructor() {
@@ -115,7 +116,7 @@ export async function* readChatStream(
 export async function* streamChat(input: {
   messages: { role: 'user' | 'assistant'; content: string | ChatContentPart[] }[];
   modelId?: string | null;
-  personalization?: { display_name?: string; memories: { title: string; content: string }[] };
+  personalization?: ChatPersonalization;
   signal: AbortSignal;
 }): AsyncGenerator<ChatStreamEvent> {
   const response = await authorizedFetch('/chat', {

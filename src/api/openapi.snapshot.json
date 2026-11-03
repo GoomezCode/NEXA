@@ -2951,6 +2951,13 @@
               "content": "Prefere respostas diretas.",
               "title": "Preferências"
             }
+          ],
+          "skills": [
+            {
+              "description": "Ao enviar código",
+              "instructions": "Revise bugs e clareza.",
+              "name": "Revisor"
+            }
           ]
         },
         "properties": {
@@ -2972,6 +2979,14 @@
             },
             "maxItems": 50,
             "title": "Memories",
+            "type": "array"
+          },
+          "skills": {
+            "items": {
+              "$ref": "#/components/schemas/PersonalizationSkill"
+            },
+            "maxItems": 12,
+            "title": "Skills",
             "type": "array"
           }
         },
@@ -4351,6 +4366,42 @@
           "type"
         ],
         "title": "ValidationError",
+        "type": "object"
+      },
+      "PersonalizationSkill": {
+        "additionalProperties": false,
+        "description": "Instrução de comportamento fornecida pelo usuário.",
+        "properties": {
+          "description": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "instructions": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Instructions",
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 60,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "instructions"
+        ],
+        "title": "PersonalizationSkill",
         "type": "object"
       }
     },

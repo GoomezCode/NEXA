@@ -15,7 +15,7 @@ import { useSessionMetricsStore } from '@/stores/session-metrics-store';
 import { useConnectionStore } from '@/stores/connection-store';
 import { useStreamStore } from '@/stores/stream-store';
 import { buildPersonalization } from './personalization';
-import { namespace } from '@/api';
+import { namespace } from '@/lib/namespace';
 import { createAttachmentStore } from './attachments/store';
 import type { PendingAttachment } from './Composer';
 
@@ -228,7 +228,7 @@ export function useChat(sessionId: string | null): UseChatResult {
         flushContent();
         updateMessages((current) =>
           current.map((message) =>
-            message.id === assistantId ? { ...message, content: streamContent, memoriesUsed: personalization.memories.length, status: 'done' } : message,
+            message.id === assistantId ? { ...message, content: streamContent, memoriesUsed: personalization.memories.length, skillsUsed: personalization.skills?.length ?? 0, status: 'done' } : message,
           ),
         );
         setAiState('idle');

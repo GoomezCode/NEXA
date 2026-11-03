@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { resetChatAdapterForTests } from '@/api';
@@ -20,7 +21,7 @@ function renderChat() {
 
   return render(
     <QueryClientProvider client={client}>
-      <ChatView sessionId={null} />
+      <MemoryRouter><ChatView sessionId={null} /></MemoryRouter>
     </QueryClientProvider>,
   );
 }
@@ -91,7 +92,7 @@ describe('ChatView sem conexão', () => {
     const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
     render(
       <QueryClientProvider client={client}>
-        <ChatView sessionId={session.id} />
+        <MemoryRouter><ChatView sessionId={session.id} /></MemoryRouter>
       </QueryClientProvider>,
     );
 

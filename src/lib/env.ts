@@ -11,6 +11,7 @@ const frontendEnvSchema = z.object({
     .default('/api/v1'),
   VITE_DEMO_MODE: z.enum(['true', 'false']).default('false'),
   VITE_REGISTRATION_ENABLED: z.enum(['true', 'false']).default('false'),
+  VITE_SKILLS_API_ENABLED: z.enum(['true', 'false']).default('false'),
 });
 
 const parsed = frontendEnvSchema.safeParse(import.meta.env);
@@ -23,4 +24,5 @@ export const appEnv = {
   apiUrl: parsed.data.VITE_API_URL,
   demoMode: parsed.data.VITE_DEMO_MODE === 'true',
   registrationEnabled: parsed.data.VITE_REGISTRATION_ENABLED === 'true',
+  skillsApiEnabled: parsed.data.VITE_SKILLS_API_ENABLED === 'true',
 };

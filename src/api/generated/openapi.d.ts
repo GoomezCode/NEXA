@@ -1777,6 +1777,13 @@ export interface components {
      *       "content": "Prefere respostas diretas.",
      *       "title": "Preferências"
      *     }
+     *   ],
+     *   "skills": [
+     *     {
+     *       "description": "Ao enviar código",
+     *       "instructions": "Revise bugs e clareza.",
+     *       "name": "Revisor"
+     *     }
      *   ]
      * }
      */
@@ -1785,6 +1792,8 @@ export interface components {
       display_name?: string | null;
       /** Memories */
       memories?: components["schemas"]["PersonalizationMemory"][];
+      /** Skills */
+      skills?: components["schemas"]["PersonalizationSkill"][];
     };
     /**
      * PersonalizationMemory
@@ -2451,6 +2460,18 @@ export interface components {
       msg: string;
       /** Error Type */
       type: string;
+    };
+    /**
+     * PersonalizationSkill
+     * @description Instrução de comportamento fornecida pelo usuário.
+     */
+    PersonalizationSkill: {
+      /** Description */
+      description?: string | null;
+      /** Instructions */
+      instructions: string;
+      /** Name */
+      name: string;
     };
   };
   responses: never;
