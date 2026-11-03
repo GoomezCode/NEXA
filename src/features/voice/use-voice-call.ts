@@ -3,6 +3,7 @@ import { cancelSpeech, setVoiceCallSpeechEnabled } from '@/lib/speech';
 import { useSettingsStore } from '@/stores/settings-store';
 import { transitionVoiceCall, type VoiceCallEvent, type VoiceCallState } from './voice-call-state';
 import { setVoiceCallActive } from './voice-call-runtime';
+import { transcribeVoice } from '@/api/voice';
 
 function toWav(chunks: Float32Array[], sampleRate: number): Blob {
   const sampleCount = chunks.reduce((total, chunk) => total + chunk.length, 0);
@@ -32,6 +33,7 @@ export function useVoiceCall(options: { onTranscript: (text: string) => void; on
   const optionsRef = useRef(options);
   const mediaRef = useRef<MediaStream | null>(null);
   const audioRef = useRef<AudioContext | null>(null);
+  const transcriptionsRef = useRef(new Set<AbortController>());
   const frameRef = useRef(0);
   const activeRef = useRef(false);
   const mutedRef = useRef(false);
@@ -42,6 +44,8 @@ export function useVoiceCall(options: { onTranscript: (text: string) => void; on
     activeRef.current = false;
     setVoiceCallActive(false);
     setVoiceCallSpeechEnabled(false);
+    for (const controller of transcriptionsRef.current) controller.abort();
+    transcriptionsRef.current.clear();
     cancelAnimationFrame(frameRef.current);
     mediaRef.current?.getTracks().forEach((track) => track.stop()); mediaRef.current = null;
     void audioRef.current?.close(); audioRef.current = null;
@@ -79,12 +83,17 @@ export function useVoiceCall(options: { onTranscript: (text: string) => void; on
         if (!activeRef.current) return;
         if (blob.size < 1200) { setEvent('SILENCE'); setEvent('DONE'); return; }
         setEvent('SILENCE');
-        const form = new FormData(); form.append('audio', blob, 'utterance.wav'); form.append('language', 'pt');
-        void fetch('/voice/stt', { method: 'POST', body: form }).then(async (response) => {
-          if (!response.ok) throw new Error((await response.text()) || 'Servidor de voz indisponível.');
-          return response.json() as Promise<{ text?: string }>;
-        }).then(({ text }) => { if (text?.trim() && activeRef.current) { optionsRef.current.onTranscript(text.trim()); setEvent('THINK'); } else setEvent('DONE'); })
-          .catch((cause: unknown) => { if (activeRef.current) { const message = cause instanceof Error ? cause.message : 'Falha na transcrição local.'; setError(message); setEvent('DONE'); } });
+        const controller = new AbortController();
+        transcriptionsRef.current.add(controller);
+        void transcribeVoice(blob, controller.signal)
+          .then(({ text }) => { if (text.trim() && activeRef.current) { optionsRef.current.onTranscript(text.trim()); setEvent('THINK'); } else setEvent('DONE'); })
+          .catch((cause: unknown) => {
+            if (activeRef.current && !(cause instanceof DOMException && cause.name === 'AbortError')) {
+              const message = cause instanceof Error ? cause.message : 'Falha na transcrição de voz.';
+              setError(message); setEvent('DONE');
+            }
+          })
+          .finally(() => transcriptionsRef.current.delete(controller));
       };
       const begin = () => {
         speaking = true; silenceAt = 0;
@@ -108,7 +117,7 @@ export function useVoiceCall(options: { onTranscript: (text: string) => void; on
           silenceAt = 0;
         } else if (speaking && rms < 0.016) {
           silenceAt ||= Date.now();
-          if (Date.now() - silenceAt > 720) {
+          if (Date.now() - silenceAt > useSettingsStore.getState().settings.callSilenceMs) {
             speaking = false;
             const finished = segmentChunks ?? [];
             segmentChunks = null;

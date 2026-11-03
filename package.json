@@ -9,7 +9,7 @@
     "node": ">=24"
   },
   "scripts": {
-    "dev": "node scripts/dev.mjs",
+    "dev": "vite",
     "build": "npm run typecheck && vite build",
     "preview": "vite preview",
     "lint": "eslint .",
@@ -24,9 +24,7 @@
     "test:responsive": "playwright test --project=responsive-chromium --project=responsive-touch --project=responsive-firefox --project=responsive-webkit",
     "check": "npm run lint && npm run typecheck && npm run test && npm run build",
     "api:types": "openapi-typescript src/api/openapi.snapshot.json -o src/api/generated/openapi.d.ts",
-    "api:types:check": "node scripts/check-api-types.mjs",
-    "dev:web": "vite",
-    "voice:setup": "node scripts/setup-voice.mjs"
+    "api:types:check": "node scripts/check-api-types.mjs"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.3.0",

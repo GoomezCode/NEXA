@@ -17,6 +17,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
 import { logout } from '@/api/auth';
+import { getVoiceHealth } from '@/api/voice';
 import { isSpeechRecognitionSupported } from '@/features/voice/use-speech-recognition';
 import { cancelSpeech, isSpeechSynthesisSupported, speakText } from '@/lib/speech';
 import { useAuthStore } from '@/stores/auth-store';
@@ -123,7 +124,7 @@ export function SettingsView() {
     if (!settings.voiceCallEnabled) return;
     let mounted = true;
     const check = async () => {
-      try { const response = await fetch('/voice/health'); if (!response.ok) throw new Error(); if (mounted) setVoiceService('online'); }
+      try { const response = await getVoiceHealth(); if (mounted) setVoiceService(response.stt ? 'online' : 'offline'); }
       catch { if (mounted) setVoiceService('offline'); }
     };
     void check(); const timer = window.setInterval(() => void check(), 15000);
@@ -184,11 +185,11 @@ export function SettingsView() {
         <SectionCard id="settings-voice" title="VOZ" icon={Mic}>
           <SettingSwitch
             label="Conversa por voz em tempo real"
-            description="Mostra o botão de chamada no chat. O áudio é processado pelo servidor local de voz."
+            description="Mostra o botão de chamada no chat. O áudio é enviado à NEXA API para transcrição; requer conexão e não funciona no modo offline/demonstração."
             checked={settings.voiceCallEnabled}
             onChange={(checked) => update({ voiceCallEnabled: checked })}
           />
-          {settings.voiceCallEnabled && <p role="status" className="text-xs text-muted">Servidor local de voz: {voiceService === 'checking' ? 'verificando…' : voiceService === 'online' ? 'STT conectado' : 'indisponível — inicie o voice-server'}</p>}
+          {settings.voiceCallEnabled && <p role="status" className="text-xs text-muted">Transcrição pela NEXA API: {voiceService === 'checking' ? 'verificando…' : voiceService === 'online' ? 'disponível' : 'indisponível'}</p>}
           <SettingSwitch
             label="Permitir interrupção por voz"
             description="Durante a resposta, uma fala detectada interrompe a IA. Use fones para evitar eco."
@@ -202,6 +203,23 @@ export function SettingsView() {
             checked={settings.callHalfDuplex}
             onChange={(checked) => update({ callHalfDuplex: checked, ...(checked ? { callBargeIn: false } : {}) })}
           />
+          <div>
+            <div className="flex items-center justify-between gap-3">
+              <label htmlFor="settings-call-silence" className="text-2xs text-muted">Pausa antes de enviar sua fala</label>
+              <span className="font-mono text-2xs text-primary">{(settings.callSilenceMs / 1000).toFixed(1)} s</span>
+            </div>
+            <input
+              id="settings-call-silence"
+              type="range"
+              min={800}
+              max={5000}
+              step={100}
+              value={settings.callSilenceMs}
+              onChange={(event) => update({ callSilenceMs: Number(event.target.value) })}
+              className="mt-1 w-full accent-primary"
+            />
+            <p className="text-2xs text-muted">A chamada só envia a fala depois deste tempo sem detectar voz. Aumente para pausas longas.</p>
+          </div>
           <SettingSwitch
             label="Entrada por voz"
             description={

@@ -87,6 +87,8 @@ export interface ChatStreamInput {
   modelId?: string | null;
   personalization?: ChatPersonalization;
   attachments?: AttachmentMeta[];
+  /** A mensagem veio da transcrição de uma conversa por voz. */
+  voiceCall?: boolean;
 }
 
 /**

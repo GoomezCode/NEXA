@@ -15,6 +15,3 @@ blob-report/
 
 .DS_Store
 .vite/
-voice-server/.venv/
-voice-server/models/
-voice-server/__pycache__/

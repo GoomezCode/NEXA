@@ -44,9 +44,11 @@ export async function rawFetch(path: string, opts: RequestOptions = {}): Promise
     throw new ApiError(0, 'Modo offline ativo: chamadas à API NEXA estão bloqueadas.', undefined, { code: 'offline_mode' });
   }
   const headers = new Headers(opts.headers);
+  const blobBody = typeof Blob !== 'undefined' && opts.body instanceof Blob ? opts.body : null;
   if (!headers.has('Accept')) headers.set('Accept', 'application/json');
   headers.set('X-Request-ID', generateRequestId());
-  if (opts.body !== undefined) headers.set('Content-Type', 'application/json');
+  if (opts.body !== undefined && !blobBody) headers.set('Content-Type', 'application/json');
+  if (blobBody && !headers.has('Content-Type')) headers.set('Content-Type', blobBody.type || 'application/octet-stream');
   if (opts.token) headers.set('Authorization', `Bearer ${opts.token}`);
 
   const timeout = AbortSignal.timeout(opts.timeoutMs ?? 30_000);
@@ -56,7 +58,7 @@ export async function rawFetch(path: string, opts: RequestOptions = {}): Promise
     return await fetch(buildUrl(path, opts), {
       method: opts.method ?? (opts.body !== undefined ? 'POST' : 'GET'),
       headers,
-      body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined,
+      body: opts.body === undefined ? undefined : blobBody ?? JSON.stringify(opts.body),
       signal,
     });
   } catch (error) {

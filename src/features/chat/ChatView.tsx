@@ -24,7 +24,7 @@ export function ChatView({ sessionId }: { sessionId: string | null }) {
   const navigate = useNavigate();
   const createSession = useCreateSession();
   const renameSession = useRenameSession();
-  const pendingSend = useRef<{ sessionId: string; content: string; attachments: PendingAttachment[]; adapter: ChatAdapter } | null>(null);
+  const pendingSend = useRef<{ sessionId: string; content: string; attachments: PendingAttachment[]; adapter: ChatAdapter; voiceCall: boolean } | null>(null);
   const {
     messages,
     isLoading,
@@ -57,10 +57,10 @@ export function ChatView({ sessionId }: { sessionId: string | null }) {
     const pending = pendingSend.current;
     if (!sessionId || !pending || pending.sessionId !== sessionId) return;
     pendingSend.current = null;
-    void sendMessage(pending.content, pending.attachments, pending.adapter);
+    void sendMessage(pending.content, pending.attachments, pending.adapter, pending.voiceCall);
   }, [sendMessage, sessionId]);
 
-  const send = async (content: string, attachments: PendingAttachment[] = []) => {
+  const send = async (content: string, attachments: PendingAttachment[] = [], voiceCall = false) => {
     const titleSource = content.trim() || attachments[0]?.meta.name || '';
     const title = titleSource.replace(/\s+/g, ' ').slice(0, 80).trim();
 
@@ -72,14 +72,14 @@ export function ChatView({ sessionId }: { sessionId: string | null }) {
           notify({ tone: 'error', title: 'Nome da conversa', message: 'Não foi possível definir o nome automaticamente. Você pode renomear pela lista de conversas.' });
         }
       }
-      void sendMessage(content, attachments);
+      void sendMessage(content, attachments, undefined, voiceCall);
       return;
     }
 
     try {
       const adapter = getChatAdapter();
       const session = await createSession.mutateAsync(title || undefined);
-      pendingSend.current = { sessionId: session.id, content, attachments, adapter };
+      pendingSend.current = { sessionId: session.id, content, attachments, adapter, voiceCall };
       navigate(`/c/${session.id}`);
     } catch {
       notify({ tone: 'error', title: 'Nova conversa', message: 'Não foi possível criar uma conversa.' });
@@ -233,7 +233,7 @@ export function ChatView({ sessionId }: { sessionId: string | null }) {
         externalFiles={droppedFiles}
         onAttachmentsChange={(items) => { setAttachmentNotice(items.length ? `${items.length} anexos adicionados` : ''); }}
       />;
-        return voiceCallEnabled ? <Suspense fallback={composer}><VoiceCallProvider onTranscript={(text) => { void send(text); }} onInterrupt={stop} isBusy={isStreaming}>{composer}</VoiceCallProvider></Suspense> : composer;
+        return voiceCallEnabled && !offlineMode && !demoMode ? <Suspense fallback={composer}><VoiceCallProvider onTranscript={(text) => { void send(text, [], true); }} onInterrupt={stop} isBusy={isStreaming}>{composer}</VoiceCallProvider></Suspense> : composer;
       })()}
     </section>
   );

@@ -55,7 +55,7 @@ export class OllamaChatAdapter implements ChatAdapter {
         ? (originalQuestion || 'Leia o arquivo anexado e responda à solicitação.')
         : completeContent;
 
-      const voicePrompt = isVoiceCallActive() ? 'Durante esta conversa por voz, responda brevemente, em português, sem Markdown nem listas.' : '';
+      const voicePrompt = isVoiceCallActive() ? 'Durante esta conversa por voz, responda brevemente em português, sem Markdown nem listas. A mensagem do usuário pode vir de reconhecimento automático de fala e conter palavras trocadas, erros fonéticos, hesitações ou trechos fora de ordem. Interprete a intenção provável usando o contexto, sem exigir uma transcrição perfeita. Se houver mais de uma interpretação plausível, faça uma pergunta curta para confirmar.' : '';
       const systemMessages = [system, voicePrompt].filter(Boolean).map((content) => ({ role: 'system', content }));
       if (hasReadableText && completeContent.length > contextBudget && lastUser) {
         const baseMessages = fitContextToBudget(history, { budgetChars: contextBudget });

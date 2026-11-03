@@ -117,6 +117,7 @@ export async function* streamChat(input: {
   messages: { role: 'user' | 'assistant'; content: string | ChatContentPart[] }[];
   modelId?: string | null;
   personalization?: ChatPersonalization;
+  voiceCall?: boolean;
   signal: AbortSignal;
 }): AsyncGenerator<ChatStreamEvent> {
   const response = await authorizedFetch('/chat', {
@@ -126,6 +127,7 @@ export async function* streamChat(input: {
       stream: true,
       ...(input.modelId ? { model: input.modelId } : {}),
       ...(input.personalization ? { personalization: input.personalization } : {}),
+      ...(input.voiceCall ? { voice_call: true } : {}),
     },
     headers: { Accept: 'text/event-stream' },
     signal: input.signal,
