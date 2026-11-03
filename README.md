@@ -150,3 +150,7 @@ tests/            Testes unitários e de componentes
 - [Guia de arquitetura e manutenção do front-end](docs/GUIA_ARQUITETURA_FRONTEND.md)
 - [Design system do front-end](docs/FRONTEND_DESIGN_SYSTEM.md)
 - [Guia de efeitos visuais](docs/GUIA_EFEITOS_VISUAIS.md)
+
+## Conversa por voz em tempo real
+
+A chamada é opcional e vem desativada. Ative **Ajustes → Voz → Conversa por voz em tempo real** e inicie pelo ícone no composer (atalho `Ctrl/Cmd + Shift + V`). A captura contínua usa VAD por energia e envia segmentos somente ao serviço local `voice-server`; nenhuma gravação é persistida. Consulte [voice-server/README.md](voice-server/README.md) para instalação do STT local. A resposta falada usa a síntese de voz do navegador nesta versão. Requer HTTPS ou `localhost` e permissão de microfone.

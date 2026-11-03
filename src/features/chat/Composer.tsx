@@ -1,9 +1,10 @@
-import { CornerDownLeft, Mic, Send, Square, Paperclip, X, FileText } from 'lucide-react';
+import { AudioLines, CornerDownLeft, Mic, Send, Square, Paperclip, X, FileText, PhoneOff } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import type { AttachmentMeta } from '@/api/types';
 import { formatBytes, processTextOrImage } from './attachments/validate';
 
 import { cn } from '@/lib/utils';
+import { useVoiceCallControls } from '@/features/voice/voice-call-context';
 import { IconButton } from '@/components/ui/Button';
 
 interface ComposerProps {
@@ -30,6 +31,7 @@ interface ComposerProps {
   maxLength?: number;
   attachmentNotice?: string;
   apiMode?: boolean;
+  voiceCall?: { active: boolean; muted: boolean; elapsed: number; state: string; error: string | null; onToggle: () => void; onMute: () => void };
 }
 
 export interface PendingAttachment { meta: AttachmentMeta; blob: Blob; thumb?: Blob; text?: string; processing?: boolean }
@@ -69,6 +71,7 @@ export function Composer({
   attachmentNotice = '',
   apiMode = false,
 }: ComposerProps) {
+  const voiceCall = useVoiceCallControls();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [attachments, setAttachments] = useState<PendingAttachment[]>([]);
@@ -127,6 +130,8 @@ export function Composer({
 
   return (
     <div className="nexa-composer-shell shrink-0 px-3 pb-3 pt-3 sm:px-5">
+      {voiceCall?.active && <div className="mx-auto mb-2 flex w-full max-w-3xl items-center gap-2 rounded-xl border border-primary/20 bg-primary/5 px-3 py-2 text-xs" aria-live="polite"><AudioLines className="h-4 w-4 text-primary" aria-hidden="true" /><span className="flex-1 text-primary">{voiceCall.state === 'thinking' ? 'Pensando' : voiceCall.state === 'speaking' ? 'Falando' : 'Em chamada'} · {Math.floor(voiceCall.elapsed / 60).toString().padStart(2, '0')}:{(voiceCall.elapsed % 60).toString().padStart(2, '0')}</span><button type="button" onClick={voiceCall.onMute} className="min-h-10 rounded-lg px-2 text-muted">{voiceCall.muted ? 'Ativar microfone' : 'Silenciar'}</button><button type="button" onClick={voiceCall.onToggle} aria-label="Encerrar chamada" className="grid h-10 w-10 place-items-center rounded-full text-danger"><PhoneOff className="h-4 w-4" aria-hidden="true" /></button></div>}
+      {voiceCall?.error && <p role="alert" className="mx-auto mb-2 w-full max-w-3xl text-xs text-danger">{voiceCall.error}</p>}
       {voiceEnabled && (listening || interim || voiceError) && (
         <div
           role={voiceError ? 'alert' : 'status'}
@@ -264,6 +269,8 @@ export function Composer({
             <Mic className={cn('h-4 w-4', listening && 'animate-pulse')} aria-hidden="true" />
           </IconButton>
         )}
+
+        {voiceCall && <IconButton label={voiceCall.active ? 'Encerrar conversa por voz' : 'Iniciar conversa por voz'} onClick={voiceCall.onToggle} aria-pressed={voiceCall.active} title="Conversa por voz em tempo real" className={cn('h-11 w-11 shrink-0 rounded-full border transition', voiceCall.active ? 'border-primary/50 bg-primary/15 text-primary' : 'border-border bg-surface-2 text-muted hover:text-primary')}><AudioLines className="h-4 w-4" aria-hidden="true" /></IconButton>}
 
         {isStreaming ? (
           <IconButton

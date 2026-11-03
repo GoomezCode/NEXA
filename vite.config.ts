@@ -19,6 +19,14 @@ export default defineConfig(({ mode }) => {
       },
     },
   };
+  const voiceProxy: Record<string, ProxyOptions> = {
+    '/voice': {
+      target: env.VITE_VOICE_PROXY || 'http://127.0.0.1:8765',
+      changeOrigin: true,
+      rewrite: (path: string) => path.replace(/^\/voice/, ''),
+      configure: (proxy) => { proxy.on('proxyReq', (proxyReq) => proxyReq.removeHeader('origin')); },
+    },
+  };
 
   return {
     plugins: [
@@ -45,11 +53,13 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
         },
         ...ollamaProxy,
+        ...voiceProxy,
       },
     },
     preview: {
       proxy: {
         ...ollamaProxy,
+        ...voiceProxy,
       },
     },
     build: {

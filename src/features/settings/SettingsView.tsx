@@ -98,6 +98,7 @@ export function SettingsView() {
   const [demoMode, setDemoMode] = useState(settings.demoMode);
   const [connectionError, setConnectionError] = useState<string | null>(null);
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const [voiceService, setVoiceService] = useState<'checking' | 'online' | 'offline'>('checking');
   const profileForm = useForm({
     resolver: zodResolver(profileSchema),
     defaultValues: { displayName: settings.displayName },
@@ -118,6 +119,16 @@ export function SettingsView() {
     synth.addEventListener('voiceschanged', updateVoices);
     return () => synth.removeEventListener('voiceschanged', updateVoices);
   }, [speechSupported]);
+  useEffect(() => {
+    if (!settings.voiceCallEnabled) return;
+    let mounted = true;
+    const check = async () => {
+      try { const response = await fetch('/voice/health'); if (!response.ok) throw new Error(); if (mounted) setVoiceService('online'); }
+      catch { if (mounted) setVoiceService('offline'); }
+    };
+    void check(); const timer = window.setInterval(() => void check(), 15000);
+    return () => { mounted = false; window.clearInterval(timer); };
+  }, [settings.voiceCallEnabled]);
   const normalizedApiUrl = apiUrl.trim();
   const validApiUrl =
     normalizedApiUrl.startsWith('/') || /^https?:\/\/[^\s]+$/i.test(normalizedApiUrl);
@@ -171,6 +182,26 @@ export function SettingsView() {
         </SectionCard>
 
         <SectionCard id="settings-voice" title="VOZ" icon={Mic}>
+          <SettingSwitch
+            label="Conversa por voz em tempo real"
+            description="Mostra o botão de chamada no chat. O áudio é processado pelo servidor local de voz."
+            checked={settings.voiceCallEnabled}
+            onChange={(checked) => update({ voiceCallEnabled: checked })}
+          />
+          {settings.voiceCallEnabled && <p role="status" className="text-xs text-muted">Servidor local de voz: {voiceService === 'checking' ? 'verificando…' : voiceService === 'online' ? 'STT conectado' : 'indisponível — inicie o voice-server'}</p>}
+          <SettingSwitch
+            label="Permitir interrupção por voz"
+            description="Durante a resposta, uma fala detectada interrompe a IA. Use fones para evitar eco."
+            checked={settings.callBargeIn}
+            onChange={(checked) => update({ callBargeIn: checked })}
+            disabled={settings.callHalfDuplex}
+          />
+          <SettingSwitch
+            label="Meia-duplex (sem interrupção por voz)"
+            description="Reduz falsos disparos em alto-falantes; use o botão Parar para interromper."
+            checked={settings.callHalfDuplex}
+            onChange={(checked) => update({ callHalfDuplex: checked, ...(checked ? { callBargeIn: false } : {}) })}
+          />
           <SettingSwitch
             label="Entrada por voz"
             description={

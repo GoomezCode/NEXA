@@ -10,6 +10,7 @@ import type { LocalChatRepository } from './local-chat';
 import { createAttachmentStore } from '@/features/chat/attachments/store';
 import { composeModelContent, escapeXml, splitTextForContext } from '@/features/chat/attachments/compose';
 import { namespace } from '@/lib/namespace';
+import { isVoiceCallActive } from '@/features/voice/voice-call-runtime';
 
 export class OllamaChatAdapter implements ChatAdapter {
   constructor(private readonly repo: LocalChatRepository) {}
@@ -54,7 +55,8 @@ export class OllamaChatAdapter implements ChatAdapter {
         ? (originalQuestion || 'Leia o arquivo anexado e responda à solicitação.')
         : completeContent;
 
-      const systemMessages = system ? [{ role: 'system', content: system }] : [];
+      const voicePrompt = isVoiceCallActive() ? 'Durante esta conversa por voz, responda brevemente, em português, sem Markdown nem listas.' : '';
+      const systemMessages = [system, voicePrompt].filter(Boolean).map((content) => ({ role: 'system', content }));
       if (hasReadableText && completeContent.length > contextBudget && lastUser) {
         const baseMessages = fitContextToBudget(history, { budgetChars: contextBudget });
         const priorMessages = baseMessages.slice(0, -1).map((message, index) => ({

@@ -5,6 +5,9 @@ export function isSpeechSynthesisSupported(): boolean {
   return typeof window !== 'undefined' && 'speechSynthesis' in window;
 }
 
+let voiceCallSpeech = false;
+export function setVoiceCallSpeechEnabled(enabled: boolean): void { voiceCallSpeech = enabled; }
+
 /** Remove marcação suficiente para uma leitura natural da resposta. */
 export function toSpeakableText(markdown: string): string {
   return markdown
@@ -20,7 +23,7 @@ export function toSpeakableText(markdown: string): string {
 }
 
 function enqueueSpeechText(text: string): void {
-  if (!isSpeechSynthesisSupported() || !getSettingsSnapshot().ttsEnabled || !text.trim()) return;
+  if (!isSpeechSynthesisSupported() || (!voiceCallSpeech && !getSettingsSnapshot().ttsEnabled) || !text.trim()) return;
   const utterance = new SpeechSynthesisUtterance(text.trim());
   const settings = getSettingsSnapshot();
   const synth = window.speechSynthesis;
@@ -50,7 +53,7 @@ export class SpeechStreamer implements SpeechEngine {
   private stopped = false;
 
   push(chunk: string): void {
-    if (this.stopped || !isSpeechSynthesisSupported() || !getSettingsSnapshot().ttsEnabled) return;
+    if (this.stopped || !isSpeechSynthesisSupported() || (!voiceCallSpeech && !getSettingsSnapshot().ttsEnabled)) return;
     const input = this.carry + chunk;
     this.carry = '';
     let cursor = 0;

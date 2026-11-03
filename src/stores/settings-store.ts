@@ -8,6 +8,12 @@ export interface AppSettings {
   ttsEnabled: boolean;
   speechRate: number;
   speechVoiceURI: string;
+  voiceCallEnabled: boolean;
+  sttProvider: 'local-server';
+  ttsProvider: 'browser' | 'local-server';
+  callVoice: string;
+  callBargeIn: boolean;
+  callHalfDuplex: boolean;
   reducedMotion: boolean;
   effectsMode: 'auto' | 'full' | 'balanced' | 'lite';
   apiUrl: string;
@@ -36,6 +42,12 @@ export const DEFAULT_SETTINGS: AppSettings = {
   ttsEnabled: false,
   speechRate: 1,
   speechVoiceURI: '',
+  voiceCallEnabled: false,
+  sttProvider: 'local-server',
+  ttsProvider: 'browser',
+  callVoice: '',
+  callBargeIn: true,
+  callHalfDuplex: false,
   reducedMotion: false,
   effectsMode: 'auto',
   apiUrl: appEnv.apiUrl,
@@ -72,6 +84,12 @@ function sanitizeSettings(value: unknown): AppSettings {
       ? Math.min(2, Math.max(0.5, rate))
       : DEFAULT_SETTINGS.speechRate,
     speechVoiceURI: typeof candidate.speechVoiceURI === 'string' ? candidate.speechVoiceURI.slice(0, 300) : '',
+    voiceCallEnabled: typeof candidate.voiceCallEnabled === 'boolean' ? candidate.voiceCallEnabled : false,
+    sttProvider: 'local-server',
+    ttsProvider: candidate.ttsProvider === 'local-server' ? 'local-server' : 'browser',
+    callVoice: typeof candidate.callVoice === 'string' ? candidate.callVoice.slice(0, 100) : '',
+    callBargeIn: typeof candidate.callBargeIn === 'boolean' ? candidate.callBargeIn : true,
+    callHalfDuplex: typeof candidate.callHalfDuplex === 'boolean' ? candidate.callHalfDuplex : false,
     reducedMotion:
       typeof candidate.reducedMotion === 'boolean'
         ? candidate.reducedMotion
