@@ -2,6 +2,7 @@ import type { ChatStreamEvent } from './types';
 import { useQuery } from '@tanstack/react-query';
 import { useConnectionStore } from '@/stores/connection-store';
 import { readNdjson } from './ollama/ndjson';
+import { isVoiceCallActive } from '@/features/voice/voice-call-runtime';
 
 export function ollamaBase(): string {
   const value = useConnectionStore.getState().ollamaUrl.trim().replace(/\/+$/, '');
@@ -93,7 +94,7 @@ export async function* streamOllama(input: {
     response = await fetch(`${ollamaBase()}/api/chat`, {
     method: 'POST', signal: input.signal,
     headers: { 'Content-Type': 'application/json', Accept: 'application/x-ndjson' },
-    body: JSON.stringify({ model: input.model, messages: input.messages, stream: true, options: { num_ctx: useConnectionStore.getState().numCtx } }),
+    body: JSON.stringify({ model: input.model, messages: input.messages, stream: true, ...(isVoiceCallActive() ? { think: false } : {}), options: { num_ctx: useConnectionStore.getState().numCtx } }),
     });
   } catch (error) {
     if (input.signal.aborted) throw error;

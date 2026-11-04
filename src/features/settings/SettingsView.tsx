@@ -17,6 +17,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
 import { logout } from '@/api/auth';
+import { getVoiceHealth } from '@/api/voice';
 import { isSpeechRecognitionSupported } from '@/features/voice/use-speech-recognition';
 import { cancelSpeech, isSpeechSynthesisSupported, speakText } from '@/lib/speech';
 import { useAuthStore } from '@/stores/auth-store';
@@ -98,6 +99,7 @@ export function SettingsView() {
   const [demoMode, setDemoMode] = useState(settings.demoMode);
   const [connectionError, setConnectionError] = useState<string | null>(null);
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const [voiceService, setVoiceService] = useState<'checking' | 'online' | 'offline'>('checking');
   const profileForm = useForm({
     resolver: zodResolver(profileSchema),
     defaultValues: { displayName: settings.displayName },
@@ -118,6 +120,16 @@ export function SettingsView() {
     synth.addEventListener('voiceschanged', updateVoices);
     return () => synth.removeEventListener('voiceschanged', updateVoices);
   }, [speechSupported]);
+  useEffect(() => {
+    if (!settings.voiceCallEnabled) return;
+    let mounted = true;
+    const check = async () => {
+      try { const response = await getVoiceHealth(); if (mounted) setVoiceService(response.stt ? 'online' : 'offline'); }
+      catch { if (mounted) setVoiceService('offline'); }
+    };
+    void check(); const timer = window.setInterval(() => void check(), 15000);
+    return () => { mounted = false; window.clearInterval(timer); };
+  }, [settings.voiceCallEnabled]);
   const normalizedApiUrl = apiUrl.trim();
   const validApiUrl =
     normalizedApiUrl.startsWith('/') || /^https?:\/\/[^\s]+$/i.test(normalizedApiUrl);
@@ -171,6 +183,43 @@ export function SettingsView() {
         </SectionCard>
 
         <SectionCard id="settings-voice" title="VOZ" icon={Mic}>
+          <SettingSwitch
+            label="Conversa por voz em tempo real"
+            description="Mostra o botão de chamada no chat. O áudio é enviado à NEXA API para transcrição; requer conexão e não funciona no modo offline/demonstração."
+            checked={settings.voiceCallEnabled}
+            onChange={(checked) => update({ voiceCallEnabled: checked })}
+          />
+          {settings.voiceCallEnabled && <p role="status" className="text-xs text-muted">Transcrição pela NEXA API: {voiceService === 'checking' ? 'verificando…' : voiceService === 'online' ? 'disponível' : 'indisponível'}</p>}
+          <SettingSwitch
+            label="Permitir interrupção por voz"
+            description="Durante a resposta, uma fala detectada interrompe a IA. Use fones para evitar eco."
+            checked={settings.callBargeIn}
+            onChange={(checked) => update({ callBargeIn: checked })}
+            disabled={settings.callHalfDuplex}
+          />
+          <SettingSwitch
+            label="Meia-duplex (sem interrupção por voz)"
+            description="Reduz falsos disparos em alto-falantes; use o botão Parar para interromper."
+            checked={settings.callHalfDuplex}
+            onChange={(checked) => update({ callHalfDuplex: checked, ...(checked ? { callBargeIn: false } : {}) })}
+          />
+          <div>
+            <div className="flex items-center justify-between gap-3">
+              <label htmlFor="settings-call-silence" className="text-2xs text-muted">Pausa antes de enviar sua fala</label>
+              <span className="font-mono text-2xs text-primary">{(settings.callSilenceMs / 1000).toFixed(1)} s</span>
+            </div>
+            <input
+              id="settings-call-silence"
+              type="range"
+              min={800}
+              max={5000}
+              step={100}
+              value={settings.callSilenceMs}
+              onChange={(event) => update({ callSilenceMs: Number(event.target.value) })}
+              className="mt-1 w-full accent-primary"
+            />
+            <p className="text-2xs text-muted">A chamada só envia a fala depois deste tempo sem detectar voz. Aumente para pausas longas.</p>
+          </div>
           <SettingSwitch
             label="Entrada por voz"
             description={

@@ -2,7 +2,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from '@playwright/test';
 import { useDemoMode } from './responsive/helpers';
 
-type ViewName = 'chat' | 'ajustes' | 'memória';
+type ViewName = 'chat' | 'ajustes' | 'memória' | 'skills';
 
 const VIEWS: { name: ViewName; open: (page: Page) => Promise<void> }[] = [
   { name: 'chat', open: async () => undefined },
@@ -21,6 +21,14 @@ const VIEWS: { name: ViewName; open: (page: Page) => Promise<void> }[] = [
     open: async (page) => {
       await page.locator('button:visible', { hasText: 'Memória' }).first().click();
       await expect(page.getByRole('heading', { name: 'Memória', exact: true })).toBeVisible();
+    },
+  },
+  {
+    name: 'skills',
+    open: async (page) => {
+      await page.locator('button:visible', { hasText: 'Memória' }).first().click();
+      await page.getByRole('tab', { name: /Skills/ }).click();
+      await expect(page.getByText('Salvas apenas neste navegador')).toBeVisible();
     },
   },
 ];

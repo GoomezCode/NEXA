@@ -15,7 +15,7 @@ import { useSessionMetricsStore } from '@/stores/session-metrics-store';
 import { useConnectionStore } from '@/stores/connection-store';
 import { useStreamStore } from '@/stores/stream-store';
 import { buildPersonalization } from './personalization';
-import { namespace } from '@/api';
+import { namespace } from '@/lib/namespace';
 import { createAttachmentStore } from './attachments/store';
 import type { PendingAttachment } from './Composer';
 
@@ -30,7 +30,7 @@ export interface UseChatResult {
   error: string | null;
   /** Envio pausado por falta de rede fora do modo demonstração. */
   sendBlockedByNetwork: boolean;
-  sendMessage: (content: string, attachments?: PendingAttachment[], adapterOverride?: ChatAdapter) => Promise<void>;
+  sendMessage: (content: string, attachments?: PendingAttachment[], adapterOverride?: ChatAdapter, voiceCall?: boolean) => Promise<void>;
   stop: () => void;
   retry: () => void;
   retryLast: () => void;
@@ -90,7 +90,7 @@ export function useChat(sessionId: string | null): UseChatResult {
   );
 
   const sendMessage = useCallback(
-    async (content: string, attachments: PendingAttachment[] = [], adapterOverride?: ChatAdapter) => {
+    async (content: string, attachments: PendingAttachment[] = [], adapterOverride?: ChatAdapter, voiceCall = false) => {
       const trimmed = content.trim();
       const metas: AttachmentMeta[] = attachments.map(({ meta }) => meta);
 
@@ -182,6 +182,7 @@ export function useChat(sessionId: string | null): UseChatResult {
           modelId: useModelStore.getState().selectedModelId,
           personalization,
           attachments: metas,
+          voiceCall,
         })) {
           if (event.type === 'token') {
             if (!receivedToken) {
@@ -228,7 +229,7 @@ export function useChat(sessionId: string | null): UseChatResult {
         flushContent();
         updateMessages((current) =>
           current.map((message) =>
-            message.id === assistantId ? { ...message, content: streamContent, memoriesUsed: personalization.memories.length, status: 'done' } : message,
+            message.id === assistantId ? { ...message, content: streamContent, memoriesUsed: personalization.memories.length, skillsUsed: personalization.skills?.length ?? 0, status: 'done' } : message,
           ),
         );
         setAiState('idle');

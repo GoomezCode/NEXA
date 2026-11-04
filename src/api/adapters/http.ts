@@ -6,7 +6,7 @@ import { streamChat } from '../chat';
 import { ApiError } from '../client/problem';
 import type { ChatAdapter, ChatContentPart, ChatMessage, ChatStreamEvent, ChatStreamInput, Session } from '../types';
 import type { LocalChatRepository } from './local-chat';
-import { namespace } from '@/api';
+import { namespace } from '@/lib/namespace';
 import { createAttachmentStore } from '@/features/chat/attachments/store';
 import type { AttachmentStore } from '@/features/chat/attachments/store';
 import { composeModelContent } from '@/features/chat/attachments/compose';
@@ -49,6 +49,7 @@ export class HttpChatAdapter implements ChatAdapter {
     content,
     signal,
     modelId,
+    voiceCall = false,
     personalization: suppliedPersonalization,
     attachments = [],
   }: ChatStreamInput): AsyncIterable<ChatStreamEvent> {
@@ -92,7 +93,7 @@ export class HttpChatAdapter implements ChatAdapter {
     let text = '';
 
     try {
-      for await (const event of streamChat({ messages, modelId, signal, personalization })) {
+      for await (const event of streamChat({ messages, modelId, signal, personalization, voiceCall })) {
         if (event.type === 'token') text += event.value;
         yield event;
         if (event.type === 'error') {
@@ -103,7 +104,7 @@ export class HttpChatAdapter implements ChatAdapter {
         }
       }
 
-      await this.repo.finishAssistant(sessionId, assistantId, { content: text, status: 'done', memoriesUsed: personalization.memories.length });
+      await this.repo.finishAssistant(sessionId, assistantId, { content: text, status: 'done', memoriesUsed: personalization.memories.length, skillsUsed: personalization.skills?.length ?? 0 });
     } catch (error) {
       await this.repo.finishAssistant(sessionId, assistantId, {
         content: text,

@@ -1,3 +1,4 @@
+import type { ChatPersonalization } from '@/features/chat/personalization';
 export type AiState = 'idle' | 'listening' | 'processing' | 'responding' | 'error';
 
 export type MessageRole = 'user' | 'assistant' | 'system';
@@ -41,6 +42,7 @@ export interface ChatMessage {
   finish_reason?: string;
   /** Número de memórias locais usadas para contextualizar esta resposta. */
   memoriesUsed?: number;
+  skillsUsed?: number;
   attachments?: AttachmentMeta[];
 }
 
@@ -83,8 +85,10 @@ export interface ChatStreamInput {
   signal: AbortSignal;
   /** null/undefined = "Automático" (campo `model` omitido no corpo). */
   modelId?: string | null;
-  personalization?: { display_name?: string; memories: { title: string; content: string }[] };
+  personalization?: ChatPersonalization;
   attachments?: AttachmentMeta[];
+  /** A mensagem veio da transcrição de uma conversa por voz. */
+  voiceCall?: boolean;
 }
 
 /**

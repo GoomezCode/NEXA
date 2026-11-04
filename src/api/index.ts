@@ -1,6 +1,8 @@
 import { queryClient } from '@/app/query-client';
 import { useAuthStore } from '@/stores/auth-store';
 import { getSettingsSnapshot } from '@/stores/settings-store';
+import { namespace } from '@/lib/namespace';
+export { namespace } from '@/lib/namespace';
 
 import { HttpChatAdapter } from './adapters/http';
 import { createLocalChatRepository } from './adapters/local-chat';
@@ -21,12 +23,6 @@ function demoFailureRequested(): boolean {
   return new URLSearchParams(window.location.search).get('demoError') === '1';
 }
 
-export function namespace(): string {
-  if (getSettingsSnapshot().demoMode && !isOfflineMode()) return 'demo';
-  if (isOfflineMode()) return 'offline';
-  const session = useAuthStore.getState().session;
-  return !session || session.role === 'guest' ? 'guest' : `user:${session.userId}`;
-}
 
 /**
  * Retorna o adaptador ativo. A escolha vem das preferências persistidas
